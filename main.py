@@ -4,29 +4,23 @@ from flask import Flask, flash, request, render_template, \
 from flask_cors import CORS
 from werkzeug.utils import secure_filename
 
-
-
 # File Management
-import os
-import io
-import base64
-import boto3
+import os, io, base64, boto3, datetime, calendar
+from PIL import Image
 
 # Random hash generation
-import uuid
-import hashlib
-
-# Datetime
-import datetime
-import calendar
-
-# Image Management
-from PIL import Image
+import uuid, hashlib
 
 # Knack integrator
 # by the Austin Department of Transportation
 #   https://github.com/cityofaustin/knackpy
-import knackpy
+import knackpy, json
+
+
+#  dP""b8  dP"Yb  88b 88 888888 88  dP""b8
+# dP   `" dP   Yb 88Yb88 88__   88 dP   `"
+# Yb      Yb   dP 88 Y88 88""   88 Yb  "88
+#  YboodP  YbodP  88  Y8 88     88  YboodP
 
 #
 # Configuration & Environment Variables
@@ -35,8 +29,6 @@ import knackpy
 UPLOAD_FOLDER = '/tmp'
 DEPLOYMENT_MODE           = os.environ.get("DEPLOYMENT_MODE")
 ALLOWED_EXTENSIONS = set(['pdf', 'png', 'jpg', 'jpeg', 'gif'])
-
-
 
 KNACK_APPLICATION_ID      = os.environ.get("KNACK_APPLICATION_ID")
 KNACK_API_KEY             = os.environ.get("KNACK_API_KEY")
@@ -64,6 +56,63 @@ if(DEPLOYMENT_MODE=="local"):
     s3 = boto3.client("s3", aws_access_key_id=S3_KEY, aws_secret_access_key=S3_SECRET)
 else:
     s3 = boto3.client("s3")
+
+
+
+#8  dP 88b 88    db     dP""b8 88  dP     8b    d8    db    88""Yb .dP"Y8
+#8odP  88Yb88   dPYb   dP   `" 88odP      88b  d88   dPYb   88__dP `Ybo."
+#8"Yb  88 Y88  dP__Yb  Yb      88"Yb      88YbdP88  dP__Yb  88"""  o.`Y8b
+#8  Yb 88  Y8 dP""""Yb  YboodP 88  Yb     88 YY 88 dP""""Yb 88     8bodP'
+
+knackMap = {
+    "userName":                 "field_6",
+    "userEmail":                "field_7",
+    "userPhoneNumber":          "field_8",
+    "userNeedsTranslator":      "field_9",
+    "userPreferredLanguage":    "field_10",
+    "userContactPreferences":   "field_11",
+    "userEthnicity":            "field_12",
+    "userGender":               "field_13",
+    "userZipCode":              "field_14",
+    "referralMethod":           "field_15",
+    "organizationName":         "field_16",
+    "officerDataAvailable":     "field_17",
+    "incidentDescription":      "field_18",
+    "incidentDate":             "field_19",
+    "incidentTime":             "field_20",
+    "incidentLocation":         "field_21",
+    "imageAttachment1":         "field_22",
+    "recordCreationDatetime":   "field_42",
+    "incidentOfficers":         "field_43"
+}
+
+knack_PoliceMonitor_ComplaintRecord = {
+    "field_6": "",
+    "field_7": "",
+    "field_8": "",
+    "field_9": "",
+    "field_10": "",
+    "field_11": "",
+    "field_12": "",
+    "field_13": "",
+    "field_14": "",
+    "field_15": "",
+    "field_16": "",
+    "field_17": "",
+    "field_18": "",
+    "field_19": "",
+    "field_20": "",
+    "field_21": "",
+    "field_22": "",
+    "field_42": "",
+    "field_43": "",
+}
+
+
+#8  88 888888 88     88""Yb 888888 88""Yb .dP"Y8
+#8  88 88__   88     88__dP 88__   88__dP `Ybo."
+#88888 88""   88  .o 88"""  88""   88"Yb  o.`Y8b
+#8  88 888888 88ood8 88     888888 88  Yb 8bodP'
 
 #
 # Helper Functions
@@ -130,6 +179,12 @@ def upload_file_to_s3(file, bucket_name, acl="public-read"):
     return "{}{}".format(app.config["S3_LOCATION"], newFilename)
 
 
+def buildKnackRecord(inputJson):
+    knackRecord = knack_PoliceMonitor_ComplaintRecord.copy()
+    jsonObject = json.loads(inputJson)
+    for k, v in jsonObject.items():
+        knackRecord[knackMap[k]] = v
+    return knackRecord
 
 #
 # Routes
@@ -142,53 +197,44 @@ def index():
 
 
 
-#
-#  88  dP 88b 88    db     dP""b8 88  dP     88""Yb 888888  dP""b8  dP"Yb  88""Yb 8888b.  .dP"Y8
-#  88odP  88Yb88   dPYb   dP   `" 88odP      88__dP 88__   dP   `" dP   Yb 88__dP  8I  Yb `Ybo."
-#  88"Yb  88 Y88  dP__Yb  Yb      88"Yb      88"Yb  88""   Yb      Yb   dP 88"Yb   8I  dY o.`Y8b
-#  88  Yb 88  Y8 dP""""Yb  YboodP 88  Yb     88  Yb 888888  YboodP  YbodP  88  Yb 8888Y"  8bodP'
-#
 
 
-@app.route('/knack/submit', methods=['OPTIONS', 'POST'])
+#8  dP 88b 88    db     dP""b8 88  dP     88""Yb 888888  dP""b8  dP"Yb  88""Yb 8888b.  .dP"Y8
+#8odP  88Yb88   dPYb   dP   `" 88odP      88__dP 88__   dP   `" dP   Yb 88__dP  8I  Yb `Ybo."
+#8"Yb  88 Y88  dP__Yb  Yb      88"Yb      88"Yb  88""   Yb      Yb   dP 88"Yb   8I  dY o.`Y8b
+#8  Yb 88  Y8 dP""""Yb  YboodP 88  Yb     88  Yb 888888  YboodP  YbodP  88  Yb 8888Y"  8bodP'
+
+
+
+
+@app.route('/knack/submit', methods=['POST'])
 def form_helper():
-    print(request.get_json())
-    print(jsonify(request.form))
-    return jsonify(request.form)
+    jsonString = str(request.get_json()).replace("'", "\"")
+    print("\n\n\n\n------------------------------------------------------------")
+    print("Oh yes, the JSON:")
+    print(jsonString)
+    knackRecord = buildKnackRecord(jsonString)
+    knackRecord["field_42"] = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+    demoData = json.dumps(knackRecord)
 
-#
-# First Method: Using knackpy
-#
-
-@app.route('/knack/create_record')
-def knack_record():
-    record = {
-        "field_2": "John Doe",
-        "field_4": "theuseremail@gmail.com",
-        "field_5": "Male",
-        "field_6": "Dev",
-        "field_7": "(777) 123-4567",
-        "field_8": {
-          "street": "123 Fake St.",
-          "city": "Amonate",
-          "state": "VA",
-          "zip": "24601"
-        }
-    }
-
-    response = knack_create_record(record)
+    print("Oh yes, the new knack data: {0}".format(demoData))
+    #response = knack_create_record(knackRecord)
+    print("------------------------------------------------------------")
+    response = {}
     return jsonify(response), 200
 
 
 
 
 
-#
-# 888888 88 88     888888     88   88 88""Yb 88      dP"Yb     db    8888b.  .dP"Y8
-# 88__   88 88     88__       88   88 88__dP 88     dP   Yb   dPYb    8I  Yb `Ybo."
-# 88""   88 88  .o 88""       Y8   8P 88"""  88  .o Yb   dP  dP__Yb   8I  dY o.`Y8b
-# 88     88 88ood8 888888     `YbodP' 88     88ood8  YbodP  dP""""Yb 8888Y"  8bodP'
-#
+
+
+#88888 88 88     888888     88   88 88""Yb 88      dP"Yb     db    8888b.  .dP"Y8
+#8__   88 88     88__       88   88 88__dP 88     dP   Yb   dPYb    8I  Yb `Ybo."
+#8""   88 88  .o 88""       Y8   8P 88"""  88  .o Yb   dP  dP__Yb   8I  dY o.`Y8b
+#8     88 88ood8 888888     `YbodP' 88     88ood8  YbodP  dP""""Yb 8888Y"  8bodP'
+
+
 
 #
 # First method: local file, then to knack api.
