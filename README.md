@@ -65,5 +65,7 @@ python main.py
 This step is not necessary, it is taken care of by Travis-CI, but for development purposes you can deploy this application using zappa like this:
 
 ```
-zappa update dev
+zappa deploy dev (done only once, the first time)
+zappa update dev (re-reploy & update code)
+zappa undeploy dev (to remove service)
 ```
