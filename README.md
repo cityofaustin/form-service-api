@@ -62,7 +62,9 @@ python main.py
 
 ## 5. Deployment to AWS Lambda
 
-This step is not necessary, it is taken care of by Travis-CI, but for development purposes you can deploy this application using zappa like this:
+You may want to familiarize with the zappa documentation. First, the function needs to be deployed once, and updated constantly thereafter. Also, you should upload different environments (production, dev, etc). For this particular project we will be using TravisCI to manage our deployments.
+
+[Zappa Documentation](https://github.com/Miserlou/Zappa)
 
 ```
 zappa deploy dev (done only once, the first time)
