@@ -5,16 +5,31 @@ from flask_cors import CORS
 from werkzeug.utils import secure_filename
 
 # File Management
-import os, io, base64, boto3, datetime, calendar
+import os, io, base64, boto3, datetime, time, calendar, requests
 from PIL import Image
 
 # Random hash generation
 import uuid, hashlib
 
 # Knack integrator
-# by the Austin Department of Transportation
-#   https://github.com/cityofaustin/knackpy
 import knackpy, json
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 #  dP""b8  dP"Yb  88b 88 888888 88  dP""b8
@@ -28,15 +43,19 @@ import knackpy, json
 
 UPLOAD_FOLDER = '/tmp'
 DEPLOYMENT_MODE           = os.environ.get("DEPLOYMENT_MODE")
+ALLOWED_IMAGE_EXTENSIONS = set(['png', 'jpg', 'jpeg', 'gif'])
 ALLOWED_EXTENSIONS = set(['pdf', 'png', 'jpg', 'jpeg', 'gif'])
+
 
 KNACK_APPLICATION_ID      = os.environ.get("KNACK_APPLICATION_ID")
 KNACK_API_KEY             = os.environ.get("KNACK_API_KEY")
 KNACK_OBJECT_ID           = os.environ.get("KNACK_OBJECT_ID")
-KNACK_API_ENDPOINT_FILE_UPLOADS="https://api.knack.com/v1/applications/${KNACK_APPLICATION_ID}/assets/file/upload"
+KNACK_API_ENDPOINT_FILE_UPLOADS="https://api.knack.com/v1/applications/" + KNACK_APPLICATION_ID + "/assets/file/upload"
 
 S3_BUCKET                 = os.environ.get("AWS_BUCKET_NAME")
 S3_LOCATION               = 'http://{}.s3.amazonaws.com/'.format(S3_BUCKET)
+
+LOG_TABLE                 = "police-monitor-records"#os.environ['LOG_TABLE']
 
 
 app = Flask(__name__)
@@ -47,6 +66,7 @@ app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 app.config['DEPLOYMENT_MODE'] = DEPLOYMENT_MODE
 app.config['S3_BUCKET'] = S3_BUCKET
 app.config['S3_LOCATION'] = S3_LOCATION
+app.config['LOG_TABLE'] = LOG_TABLE
 
 if(DEPLOYMENT_MODE=="local"):
     S3_KEY                    = os.environ.get("AWS_ACCESS_KEY_ID")
@@ -57,56 +77,34 @@ if(DEPLOYMENT_MODE=="local"):
 else:
     s3 = boto3.client("s3")
 
+# Initialize DynamoDB client
+dynamodb_client = boto3.client('dynamodb')
 
 
-#8  dP 88b 88    db     dP""b8 88  dP     8b    d8    db    88""Yb .dP"Y8
-#8odP  88Yb88   dPYb   dP   `" 88odP      88b  d88   dPYb   88__dP `Ybo."
-#8"Yb  88 Y88  dP__Yb  Yb      88"Yb      88YbdP88  dP__Yb  88"""  o.`Y8b
-#8  Yb 88  Y8 dP""""Yb  YboodP 88  Yb     88 YY 88 dP""""Yb 88     8bodP'
 
-knackMap = {
-    "userName":                 "field_6",
-    "userEmail":                "field_7",
-    "userPhoneNumber":          "field_8",
-    "userNeedsTranslator":      "field_9",
-    "userPreferredLanguage":    "field_10",
-    "userContactPreferences":   "field_11",
-    "userEthnicity":            "field_12",
-    "userGender":               "field_13",
-    "userZipCode":              "field_14",
-    "referralMethod":           "field_15",
-    "organizationName":         "field_16",
-    "officerDataAvailable":     "field_17",
-    "incidentDescription":      "field_18",
-    "incidentDate":             "field_19",
-    "incidentTime":             "field_20",
-    "incidentLocation":         "field_21",
-    "imageAttachment1":         "field_22",
-    "recordCreationDatetime":   "field_42",
-    "incidentOfficers":         "field_43"
-}
 
-knack_PoliceMonitor_ComplaintRecord = {
-    "field_6": "",
-    "field_7": "",
-    "field_8": "",
-    "field_9": "",
-    "field_10": "",
-    "field_11": "",
-    "field_12": "",
-    "field_13": "",
-    "field_14": "",
-    "field_15": "",
-    "field_16": "",
-    "field_17": "",
-    "field_18": "",
-    "field_19": "",
-    "field_20": "",
-    "field_21": "",
-    "field_22": "",
-    "field_42": "",
-    "field_43": "",
-}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 #8  88 888888 88     88""Yb 888888 88""Yb .dP"Y8
@@ -117,10 +115,15 @@ knack_PoliceMonitor_ComplaintRecord = {
 #
 # Helper Functions
 #
+def build_response(inputDict):
+    return jsonify(inputDict), inputDict["status_code"]
+
 def filename_timestamp():
   now = datetime.datetime.now()
   return now.strftime("%m%d%Y")
 
+def getCurrentDateTime():
+    return datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
 
 def get_file_extension(filename):
     return filename.rsplit('.', 1)[1].lower()
@@ -129,33 +132,120 @@ def allowed_file(filename):
     return '.' in filename and \
             get_file_extension(filename) in ALLOWED_EXTENSIONS
 
-def knack_upload_image(filepath):
-    headers = {'content-type': 'multipart/form-data', 'x-knack-rest-api-key': KNACK_API_KEY }
-    files = {'file': open(filepath, 'rb')}
-    r = requests.post(KNACK_API_ENDPOINT_FILE_UPLOADS, headers=headers, files=files)
-    return r.text
+def is_image(filename):
+    return get_file_extension(filename) in ALLOWED_IMAGE_EXTENSIONS
+
+def is_json(inputText):
+    try:
+        json_object = json.loads(inputText)
+        # The JSON is good
+        return True
+    except:
+        # The JSON test is bad
+        return False
+
+def load_map(file_path):
+    return json.load(open(file_path))
+
+def generate_random_hash():
+    rand_uuid_str = "{0}".format(uuid.uuid1()).encode()
+    return hashlib.sha256(rand_uuid_str).hexdigest()
 
 def generate_random_filename(filename):
   timestamp = filename_timestamp()
   original_extension = get_file_extension(filename)
-  rand_uuid_str = "{0}".format(uuid.uuid1()).encode()
-  output_hash = hashlib.sha256(rand_uuid_str).hexdigest()
+  output_hash = generate_random_hash()
   return "{0}_{1}.{2}".format(timestamp, output_hash, original_extension)
 
-def knack_create_record(record):
+def get_knack_object(tablename):
+    knack_objects = load_map('./knackmaps/knack_objects.json')
+    return knack_objects[tablename]
+
+def build_knack_item_raw(inputJson, map):
+    # Copy record map, we do not want it modified
+    rawRecord = map.copy()
+
+    # Convert inputJson to string (if it isn't)
+    if(isinstance(inputJson, str)):
+        jsonObject = json.loads(inputJson)
+    else:
+        jsonObject = inputJson
+
+    # For each key,val in jsonObject
+    for key, val in jsonObject.items():
+        try:
+            rawRecord[key] = val
+        except:
+            print("Invalid Key: " + key)
+
+    return rawRecord
+
+def build_knack_item(inputJson, map, record):
+    # Copy record map, we do not want it modified
+    knackRecord = record.copy()
+
+    # Convert inputJson to string (if it isn't)
+    if(isinstance(inputJson, str)):
+        jsonObject = json.loads(inputJson)
+    else:
+        jsonObject = inputJson
+
+    # For each key,val in jsonObject
+    for key, val in jsonObject.items():
+        try:
+            knackRecord[map[key]] = val
+        except:
+            print("Invalid Key: " + key)
+
+    return knackRecord
+
+def knack_create_record(record, table='complaints'):
     response = knackpy.record(
         record,
-        obj_key = KNACK_OBJECT_ID,
+        obj_key = get_knack_object(table),
         app_id  = KNACK_APPLICATION_ID,
         api_key = KNACK_API_KEY,
         method='create'
     )
 
-    return response
+    return response["id"], response
+
+
+
+
+def create_dynamodb_record(inputJson, type='record', knack_record_id=''):
+    if(isinstance(inputJson, str) == False):
+        jsonString = json.dumps(inputJson)
+    else:
+        jsonString = inputJson
+
+    random_hash = generate_random_hash()
+    resp = dynamodb_client.put_item(
+        TableName=LOG_TABLE,
+        Item={
+            'entryId': {'S': random_hash }, # A random identifier
+            'timestamp': {'N': str(int(time.time())) }, # Epoch Time
+            'dateCreated': {'S': getCurrentDateTime() }, # Epoch Time
+            'type': {'S': type }, # Epoch Time
+            'data': { 'S': jsonString },
+            'knackRecordId': {'S': knack_record_id }
+        }
+    )
+    return random_hash, resp
+
+def knack_upload_image(filepath):
+    # First try uploading the image and parse the response
+    try:
+        headers = {'x-knack-rest-api-key': KNACK_API_KEY }
+        multiple_files = [('files', open(filepath, 'rb'))]
+        return requests.post(KNACK_API_ENDPOINT_FILE_UPLOADS, headers=headers, files=multiple_files)
+    # We've failed along the way...
+    except:
+        print("It should have never reached this point!")
+        return "error"
 
 
 def upload_file_to_s3(file, bucket_name, acl="public-read"):
-
     """
     Docs: http://boto3.readthedocs.io/en/latest/guide/s3.html
     """
@@ -179,13 +269,6 @@ def upload_file_to_s3(file, bucket_name, acl="public-read"):
     return "{}{}".format(app.config["S3_LOCATION"], newFilename)
 
 
-def buildKnackRecord(inputJson):
-    knackRecord = knack_PoliceMonitor_ComplaintRecord.copy()
-    jsonObject = json.loads(inputJson)
-    for k, v in jsonObject.items():
-        knackRecord[knackMap[k]] = v
-    return knackRecord
-
 #
 # Routes
 #
@@ -199,6 +282,24 @@ def index():
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 #8  dP 88b 88    db     dP""b8 88  dP     88""Yb 888888  dP""b8  dP"Yb  88""Yb 8888b.  .dP"Y8
 #8odP  88Yb88   dPYb   dP   `" 88odP      88__dP 88__   dP   `" dP   Yb 88__dP  8I  Yb `Ybo."
 #8"Yb  88 Y88  dP__Yb  Yb      88"Yb      88"Yb  88""   Yb      Yb   dP 88"Yb   8I  dY o.`Y8b
@@ -206,22 +307,140 @@ def index():
 
 
 
+@app.route('/knack/getrecord/<string:record_id>', methods=['GET'])
+def get_record(record_id):
+    print("Record: " + record_id)
+    dynamodb_response = dynamodb_client.get_item(
+        TableName=LOG_TABLE,
+        Key={
+            'entryId': { 'S': str(record_id) }
+        }
+    )
+
+    item = dynamodb_response.get('Item')
+    print(item)
+
+    if not item:
+        return jsonify({'error': 'User does not exist'}), 404
+
+    return jsonify({
+        'entryId': item.get('entryId').get('S'),
+        'timestamp': item.get('timestamp').get('N'),
+        'type': item.get('type').get('S'),
+        'data': item.get('data').get('S')
+    }), 200
+
+
+
 
 @app.route('/knack/submit', methods=['POST'])
-def form_helper():
-    jsonString = str(request.get_json()).replace("'", "\"")
-    print("\n\n\n\n------------------------------------------------------------")
-    print("Oh yes, the JSON:")
-    print(jsonString)
-    knackRecord = buildKnackRecord(jsonString)
-    knackRecord["field_42"] = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
-    demoData = json.dumps(knackRecord)
+def knack_testrelationships():
+    jsonInputData = None
 
-    print("Oh yes, the new knack data: {0}".format(demoData))
-    #response = knack_create_record(knackRecord)
-    print("------------------------------------------------------------")
+    try:
+        jsonInputData = request.get_json()
+    except:
+        return "Invalid JSON request", 403
+
+    knack_officer_map = load_map("./knackmaps/knack_officer_map.json")
+    knack_officer_record = load_map("./knackmaps/knack_officer_record.json")
+
+    knack_witness_map = load_map("./knackmaps/knack_witness_map.json")
+    knack_witness_record = load_map("./knackmaps/knack_witness_record.json")
+
+    knack_evidence_map = load_map("./knackmaps/knack_evidence_map.json")
+    knack_evidence_record = load_map("./knackmaps/knack_evidence_record.json")
+
+    knack_complaint_map = load_map("./knackmaps/knack_complaint_map.json")
+    knack_complaint_record = load_map("./knackmaps/knack_complaint_record.json")
+
+    knack_compliment_map = load_map("./knackmaps/knack_compliment_map.json")
+    knack_compliment_record = load_map("./knackmaps/knack_compliment_record.json")
+
+    officersId = []
+    witnessesId = []
+    evidenceFileIds = []
+
+    #
+    # First create the officers' records (if any provided)
+    #
+    try:
+        for officer in jsonInputData["officers"]:
+            knack_record = build_knack_item(officer, knack_officer_map, knack_officer_record)
+            entry_id, response = knack_create_record(knack_record, table="officers")
+            officersId.append(entry_id)
+            print("New Officer creted: " +  entry_id)
+    except Exception as e:
+        print("Error while creating officer records: " + e.message)
+
+    try:
+        for witness in jsonInputData["witnesses"]:
+            knack_record = build_knack_item(witness, knack_witness_map, knack_witness_record)
+            entry_id, response = knack_create_record(knack_record, table="witnesses")
+            witnessesId.append(entry_id)
+            print("New witness creted: " +  entry_id)
+    except Exception as e:
+        print("Error while creating witness records: " + e.message)
+
+
+
+    #
+    #  Now the evidence records
+    #
+
+    try:
+        for knackFileId in jsonInputData["evidence"]:
+            new_evidence_data = knack_evidence_map.copy()
+            new_evidence_data["evidenceFile"] = knackFileId
+            new_evidence_data["evidenceName"] = "Knack Attachment Id: {0}".format(knackFileId)
+            new_evidence_data["evidenceUploadDate"] = getCurrentDateTime()
+            new_evidence_record = build_knack_item(new_evidence_data, knack_evidence_map, knack_evidence_record)
+            entry_id, response = knack_create_record(new_evidence_record, table="evidence")
+            evidenceFileIds.append(entry_id)
+            print("New Evidence File Creted: " +  entry_id)
+    except Exception as e:
+        print("Error while creating evidence records: " + e.message)
+
+    #
+    # We now build the full record
+    #
+    knack_record = build_knack_item(jsonInputData, knack_complaint_map, knack_complaint_record)
+
+    # We begin associating officers and evidence records to the full record.
+    # Get the knack key for the officers & witnesses column & assign the value to that key
+    knack_record[knack_complaint_map["officers"]] = officersId
+    knack_record[knack_complaint_map["witnesses"]] = witnessesId
+    knack_record[knack_complaint_map["evidence"]] = evidenceFileIds
+
+    knack_record_raw = json.dumps(jsonInputData)
+    knack_record_plain = json.dumps(knack_record)
+
+    knack_record_id, response = knack_create_record(knack_record)
+    dyn_record_id, dynamodb_response = create_dynamodb_record(knack_record_raw, type='complaint', knack_record_id=knack_record_id)
+    print("New Record Created! knack_record_id: {0}, dynamo_record_id: {1}".format(knack_record_id, dyn_record_id))
+
     response = {}
     return jsonify(response), 200
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -240,41 +459,79 @@ def form_helper():
 # First method: local file, then to knack api.
 #
 
-
-# /tmp is guaranteed to be available during the execution of your Lambda function.
-# Lambda will reuse your function when possible, and when it does,
-# the content of /tmp will be preserved along with any processes
-# you had running when you previously exited.
-# However, the contents of /tmp (along with the memory of any running processes)
-# could disappear at any time.
-
-@app.route('/upload-knack', methods=['GET', 'POST'])
-def upload_file():
-    if request.method == 'POST':
-        # check if the post request has the file part
-        if 'file' not in request.files:
-            flash('No file part')
-            return redirect(request.url)
-        file = request.files['file']
-        # if user does not select file, browser also
-        # submit an empty part without filename
-        if file.filename == '':
-            flash('No selected file')
-            return redirect(request.url)
-        if file and allowed_file(file.filename):
-            filename = secure_filename(file.filename)
-            file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
-            return redirect(url_for('uploaded_file', filename=filename))
+@app.route('/upload-knack-form', methods=['GET'])
+def upload_file_knack():
     return '''
     <!doctype html>
     <title>Upload new File</title>
     <h1>Upload new File</h1>
-    <form method=post enctype=multipart/form-data>
+    <form action='/upload-knack' method=post enctype=multipart/form-data>
       <input type=file name=file>
       <input type=submit value=Upload>
     </form>
     '''
 
+@app.route('/upload-knack', methods=['GET', 'POST'])
+def upload_file():
+
+    response = {
+        "status": "error",
+        "status_code": 403,
+        "knack-file-id": "",
+        "message": "Failed to upload file."
+    }
+
+    # Check if the method is post
+    if request.method == 'POST':
+
+        # check if the post request has the file part
+        if 'file' not in request.files:
+            response["message"] = "No file part"
+            return build_response(response)
+
+        # Gather file from request
+        file = request.files['file']
+
+        # if user does not select file, browser also submit an empty part without filename
+        if file.filename == '':
+            response["message"] = "No selected file"
+            return build_response(response)
+
+        # If the file has a permitted extension
+        if file and allowed_file(file.filename):
+            filename = secure_filename(file.filename)
+            new_filename = generate_random_filename(filename)
+            file_path = os.path.join(app.config['UPLOAD_FOLDER'], new_filename)
+
+            # We are going to try to save the file first, then upload to knack
+            try:
+                file.save(file_path)
+                r = knack_upload_image(file_path)
+
+                # If the response is a JSON file, then we are OK
+                if(is_json(r.text)):
+                    file_record = r.json()
+                    response["status"] = "success"
+                    response["status_code"] = 200
+                    response["knack-file-record"] = file_record["id"]
+                    response["message"] = file_record["public_url"]
+                    dyn_rid, dyn_resp = create_dynamodb_record(json.dumps(response), type='attachment', knack_record_id=file_record["id"])
+                    print("New Image uploaded: " + file_record["id"])
+                else:
+                    print("We have a problem: " + r.text)
+                    response["message"] = "Error: " + r.text
+
+
+            except Exception as e:
+                response["message"] = "Error while uploading: " + str(e)
+
+            return build_response(response)
+
+    # Not a POST request, redirect to form
+    else:
+        response["message"] = "Not a POST request"
+
+    return build_response(response)
 
 @app.route('/uploads-knack/<filename>')
 def uploaded_file(filename):
