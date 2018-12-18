@@ -59,12 +59,11 @@ else
 fi;
 
 
+echo "Working with deployment mode: ${DEPLOYMENT_MODE}"
 
 
-function backend_create_backup {
-  CURRENT_BRANCH=$1
+function backend_set_env_vars {
 
-  echo "Nothing to be done for $CURRENT_BRANCH"
 }
 
 
@@ -72,6 +71,7 @@ function backend_create_backup {
   CURRENT_BRANCH=$1
 
   echo "Nothing to be done for $CURRENT_BRANCH"
+  echo "Deployment Mode: ${DEPLOYMENT_MODE}"
 }
 
 
@@ -79,7 +79,9 @@ function backend_build {
   CURRENT_BRANCH=$1
 
   echo "Nothing to be done for $CURRENT_BRANCH"
-  #zappa update $DEPLOYMENT_MODE
+  echo "Deployment Mode: ${DEPLOYMENT_MODE}"
+
+  # zappa update $DEPLOYMENT_MODE
 }
 
 
@@ -88,6 +90,7 @@ function backend_release {
   CURRENT_BRANCH=$1
 
   echo "Nothing to be done for $CURRENT_BRANCH"
+  echo "Deployment Mode: ${DEPLOYMENT_MODE}"
 }
 
 
@@ -97,4 +100,5 @@ function backend_migrate {
   CURRENT_BRANCH=$1
 
   echo "Nothing to be done for $CURRENT_BRANCH"
+  echo "Deployment Mode: ${DEPLOYMENT_MODE}"
 }
