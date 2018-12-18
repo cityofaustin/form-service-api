@@ -43,7 +43,7 @@ import knackpy, json
 #
 
 UPLOAD_FOLDER = '/tmp'
-DEPLOYMENT_MODE           = os.getenv("DEPLOYMENT_MODE", "local")
+DEPLOYMENT_MODE           = os.getenv("DEPLOYMENT_MODE", "LOCAL")
 ALLOWED_IMAGE_EXTENSIONS = set(['png', 'jpg', 'jpeg', 'gif'])
 ALLOWED_EXTENSIONS = set(['pdf', 'png', 'jpg', 'jpeg', 'gif'])
 
@@ -71,14 +71,16 @@ app.config['LOG_TABLE'] = LOG_TABLE
 app.config['S3_KEY']      = S3_KEY
 app.config['S3_SECRET']   = S3_SECRET
 
-# Initialize S3 Client
-s3 = boto3.client("s3", aws_access_key_id=S3_KEY, aws_secret_access_key=S3_SECRET)
-
-# Initialize DynamoDB client
-dynamodb_client = boto3.client('dynamodb')
-
-# Create a new SES resource and specify a region.
-client = boto3.client('ses')
+if(DEPLOYMENT_MODE == "LOCAL"):
+    # Initialize S3 Client
+    s3 = boto3.client("s3",region_name=DEFALUT_REGION, aws_access_key_id=S3_KEY, aws_secret_access_key=S3_SECRET)
+    dynamodb_client = boto3.client('dynamodb', region_name=DEFALUT_REGION, aws_access_key_id=S3_KEY, aws_secret_access_key=S3_SECRET)
+    client = boto3.client('ses', region_name=DEFALUT_REGION, aws_access_key_id=S3_KEY, aws_secret_access_key=S3_SECRET)
+else:
+    # We should already have access to these resources
+    s3 = boto3.client("s3", region_name=DEFALUT_REGION)
+    dynamodb_client = boto3.client('dynamodb', region_name=DEFALUT_REGION)
+    ses_client = boto3.client('ses', region_name=DEFALUT_REGION)
 
 # Default Email Configuration (Default structure)
 emailConfigDefault = {
@@ -277,7 +279,7 @@ def upload_file_to_s3(file, bucket_name, acl="public-read"):
 def sendEmail(emailConfig):
     try:
         #Provide the contents of the email.
-        response = client.send_email(
+        response = ses_client.send_email(
             Destination={
                 'ToAddresses': [
                     emailConfig['recipient'],
