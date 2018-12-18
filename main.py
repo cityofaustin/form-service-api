@@ -43,22 +43,20 @@ import knackpy, json
 #
 
 UPLOAD_FOLDER = '/tmp'
-DEPLOYMENT_MODE           = os.getenv("DEPLOYMENT_MODE")
+DEPLOYMENT_MODE           = os.getenv("DEPLOYMENT_MODE", "local")
 ALLOWED_IMAGE_EXTENSIONS = set(['png', 'jpg', 'jpeg', 'gif'])
 ALLOWED_EXTENSIONS = set(['pdf', 'png', 'jpg', 'jpeg', 'gif'])
 
 
 KNACK_APPLICATION_ID      = os.getenv("KNACK_APPLICATION_ID")
 KNACK_API_KEY             = os.getenv("KNACK_API_KEY")
-KNACK_OBJECT_ID           = os.getenv("KNACK_OBJECT_ID")
 KNACK_API_ENDPOINT_FILE_UPLOADS="https://api.knack.com/v1/applications/" + KNACK_APPLICATION_ID + "/assets/file/upload"
-
+S3_KEY                    = os.getenv("AWS_ACCESS_KEY_ID")
+S3_SECRET                 = os.getenv("AWS_SECRET_ACCESS_KEY")
 S3_BUCKET                 = os.getenv("AWS_BUCKET_NAME")
 S3_LOCATION               = 'http://{}.s3.amazonaws.com/'.format(S3_BUCKET)
 DEFALUT_REGION            = os.getenv("AWS_DEFAULT_REGION", "us-east-1")
-LOG_TABLE                 = "police-monitor-records"
-
-#os.getenv('LOG_TABLE')
+LOG_TABLE                 = os.getenv("PM_LOGTABLE", "police-monitor-records")
 
 app = Flask(__name__)
 CORS(app) # Get rid of me!!!!
@@ -70,15 +68,11 @@ app.config['S3_BUCKET'] = S3_BUCKET
 app.config['S3_LOCATION'] = S3_LOCATION
 app.config['DEFALUT_REGION'] = DEFALUT_REGION
 app.config['LOG_TABLE'] = LOG_TABLE
+app.config['S3_KEY']      = S3_KEY
+app.config['S3_SECRET']   = S3_SECRET
 
-if(DEPLOYMENT_MODE=="local"):
-    S3_KEY                    = os.environ.get("AWS_ACCESS_KEY_ID")
-    S3_SECRET                 = os.environ.get("AWS_SECRET_ACCESS_KEY")
-    app.config['S3_KEY']      = S3_KEY
-    app.config['S3_SECRET']   = S3_SECRET
-    s3 = boto3.client("s3", aws_access_key_id=S3_KEY, aws_secret_access_key=S3_SECRET)
-else:
-    s3 = boto3.client("s3")
+# Initialize S3 Client
+s3 = boto3.client("s3", aws_access_key_id=S3_KEY, aws_secret_access_key=S3_SECRET)
 
 # Initialize DynamoDB client
 dynamodb_client = boto3.client('dynamodb')
@@ -86,8 +80,8 @@ dynamodb_client = boto3.client('dynamodb')
 # Create a new SES resource and specify a region.
 client = boto3.client('ses')
 
-
-emailConfigBasic = {
+# Default Email Configuration (Default structure)
+emailConfigDefault = {
     "charset": "UTF-8",
     "html": "",
     "text": "Test sent from API",
@@ -352,19 +346,30 @@ def index():
 #8"Yb  88 Y88  dP__Yb  Yb      88"Yb      88"Yb  88""   Yb      Yb   dP 88"Yb   8I  dY o.`Y8b
 #8  Yb 88  Y8 dP""""Yb  YboodP 88  Yb     88  Yb 888888  YboodP  YbodP  88  Yb 8888Y"  8bodP'
 
-@app.route('/emailtest', methods=['GET'])
+@app.route('/emailtest', methods=['GET', 'POST'])
 def emailtest():
     #
     # E-Mail Configuration
     #
-    stringOutput = render_template('email.html', type='Klog', content='Testme')
 
-    emailConfig = emailConfigBasic.copy()
-    emailConfig['html'] = stringOutput
-    emailConfig['recipient'] = "sergio.garcia@austintexas.gov"
+    # Check if the method is post
+    if request.method == 'POST':
+        stringOutput = render_template('email.html', type='Office Of Design and Delivery', content='This is a test.')
 
-    response = sendEmail(emailConfig)
-    return "Output: " + response, 200
+        user_email = request.form["user_email"]
+        print("User email: " + user_email)
+
+        emailConfig = emailConfigDefault.copy()
+        emailConfig['html'] = stringOutput
+        emailConfig['recipient'] = user_email
+
+        response = sendEmail(emailConfig)
+        return "Output: " + response, 200
+
+    else:
+        return render_template('email_form.html', url=url_for('emailtest')), 200
+
+
 
 @app.route('/knack/getrecord/<string:record_id>', methods=['GET'])
 def get_record(record_id):
