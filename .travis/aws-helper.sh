@@ -117,9 +117,9 @@ function backend_set_env_vars {
   echo "AWS_BUCKET_NAME: ${AWS_BUCKET_NAME}"
   echo "AWS_FUNCTION_NAME: ${AWS_FUNCTION_NAME}"
 
-  # aws lambda update-function-configuration \
-  #       --function-name $AWS_FUNCTION_NAME \
-  #       --environment "Variables={DEPLOYMENT_MODE=${DEPLOYMENT_MODE},KNACK_APPLICATION_ID=${KNACK_APPLICATION_ID},KNACK_API_KEY=${KNACK_API_KEY},PM_LOGTABLE=${PM_LOGTABLE},AWS_BUCKET_NAME=${AWS_BUCKET_NAME}}"
+  aws lambda update-function-configuration \
+        --function-name $AWS_FUNCTION_NAME \
+        --environment "Variables={DEPLOYMENT_MODE=${DEPLOYMENT_MODE},KNACK_APPLICATION_ID=${KNACK_APPLICATION_ID},KNACK_API_KEY=${KNACK_API_KEY},PM_LOGTABLE=${PM_LOGTABLE},AWS_BUCKET_NAME=${AWS_BUCKET_NAME}}"
 }
 
 
@@ -136,7 +136,7 @@ function backend_create_backup {
 function backend_build {
   print_header "Building API app for: ${DEPLOYMENT_MODE}"
   ZAPPA_DEPLOYMENT_MODE=$(to_lowercase $DEPLOYMENT_MODE)
-  echo "zappa update $ZAPPA_DEPLOYMENT_MODE"
+  zappa update $ZAPPA_DEPLOYMENT_MODE
 }
 
 
