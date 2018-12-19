@@ -41,10 +41,8 @@ jobs:
     - zappa --version
   - stage: Building Lambda Function
     script:
-    - backend_create_backup $TRAVIS_BRANCH
+    - backend_set_env_vars $TRAVIS_BRANCH
     - backend_build $TRAVIS_BRANCH
-    after_success:
-    - backend_release $TRAVIS_BRANCH
   - stage: Post-release functions
     script:
-    - backend_migrate $TRAVIS_BRANCH
+    - backend_postrelease $TRAVIS_BRANCH
