@@ -88,12 +88,25 @@ function to_lowercase {
   echo $1 | awk '{print tolower($0)}'
 }
 
+function resolve_function_name {
+  ZAPPA_DEPLOYMENT_MODE=$(to_lowercase $DEPLOYMENT_MODE)
+  echo
+}
+
+function resolve_bucket {
+  if [ "${DEPLOYMENT_MODE}" == "PRODUCTION" ]; then
+    echo $AWS_BUCKET_NAME_PRODUCTION;
+  else
+    echo $AWS_BUCKET_NAME_STAGING;
+  fi;
+}
+
 function backend_set_env_vars {
 
   print_header "Setting up environment variables for: ${DEPLOYMENT_MODE}"
 
 
-
+  AWS_BUCKET_NAME=$(resolve_bucket)
   ZAPPA_DEPLOYMENT_MODE=$(to_lowercase $DEPLOYMENT_MODE)
   AWS_FUNCTION_NAME="police-monitor-${ZAPPA_DEPLOYMENT_MODE}"
 
@@ -105,7 +118,7 @@ function backend_set_env_vars {
   echo "AWS_FUNCTION_NAME: ${AWS_FUNCTION_NAME}"
 
   # aws lambda update-function-configuration \
-  #       --function-name police-monitor-staging \
+  #       --function-name $AWS_FUNCTION_NAME \
   #       --environment "Variables={DEPLOYMENT_MODE=${DEPLOYMENT_MODE},KNACK_APPLICATION_ID=${KNACK_APPLICATION_ID},KNACK_API_KEY=${KNACK_API_KEY},PM_LOGTABLE=${PM_LOGTABLE},AWS_BUCKET_NAME=${AWS_BUCKET_NAME}}"
 }
 
