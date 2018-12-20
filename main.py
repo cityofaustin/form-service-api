@@ -10,7 +10,7 @@ from PIL import Image
 from botocore.exceptions import ClientError
 
 # Random hash generation
-import uuid, hashlib
+import uuid, hashlib, hmac, re
 
 # Knack integrator
 import knackpy, json
@@ -58,7 +58,7 @@ S3_LOCATION               = 'http://{}.s3.amazonaws.com/'.format(S3_BUCKET)
 DEFALUT_REGION            = os.getenv("AWS_DEFAULT_REGION", "us-east-1")
 LOG_TABLE                 = os.getenv("PM_LOGTABLE", "police-monitor-records")
 
-app = Flask(__name__)
+app = Flask(__name__, static_folder='static', static_url_path='/static')
 CORS(app) # Get rid of me!!!!
 # https://github.com/corydolphin/flask-cors
 
@@ -127,6 +127,9 @@ def filename_timestamp():
   now = datetime.datetime.now()
   return now.strftime("%m%d%Y")
 
+def getYyyyMmDd():
+    return datetime.datetime.now().strftime('%Y%m%d')
+
 def getCurrentDateTime():
     return datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
 
@@ -149,8 +152,25 @@ def is_json(inputText):
         # The JSON test is bad
         return False
 
+def is_valid_casenumber(case):
+	pattern = re.compile("^([A-Z0-9]){3}-([0-9]){3}-([0-9]){4}$")
+	return str(pattern.match(case)) != "None"
+
 def load_map(file_path):
     return json.load(open(file_path))
+
+def sign(key, msg):
+    return hmac.new(key, msg.encode('utf-8'), hashlib.sha256).digest()
+
+def getSignatureKey(key, dateStamp, regionName, serviceName):
+    kDate = sign(('AWS4' + key).encode('utf-8'), dateStamp)
+    kRegion = sign(kDate, regionName)
+    kService = sign(kRegion, serviceName)
+    kSigning = sign(kService, 'aws4_request')
+    return kSigning
+
+def generate_amz_date():
+    return datetime.datetime.utcnow().strftime('%Y%m%dT%H%M%SZ')
 
 def generate_random_hash():
     rand_uuid_str = "{0}".format(uuid.uuid1()).encode()
@@ -372,7 +392,6 @@ def emailtest():
         return render_template('email_form.html', url=url_for('emailtest')), 200
 
 
-
 @app.route('/knack/getrecord/<string:record_id>', methods=['GET'])
 def get_record(record_id):
     print("Record: " + record_id)
@@ -539,6 +558,50 @@ def knack_testrelationships():
 #8     88 88ood8 888888     `YbodP' 88     88ood8  YbodP  dP""""Yb 8888Y"  8bodP'
 
 
+
+#
+# AWS Direct Upload (from browser)
+#
+# 1. Request Signature: /uploads/request-signature
+# 2. Generate fields:   JavaScript
+# 3. Upload Files   :   Direct to S3
+#
+@app.route('/uploads/request-signature', methods=['GET'])
+def uploads_request_signature():
+    filename = request.args.get('file')
+    casenumber = request.args.get('case')
+
+    if(str(filename) == "None" or filename == ""):
+        return json.dumps({ "status": "error", "message": "file not declared"}), 403
+
+    if(str(casenumber) == "None" or filename == ""):
+        return json.dumps({ "status": "error", "message": "case number not declared"}), 403
+
+    if(is_valid_casenumber(casenumber) == False):
+        return json.dumps({ "status": "error", "message": "invalid case number"}), 403
+
+
+    new_filename = generate_random_filename(filename)
+
+    new_key = "uploads/" + casenumber + "/" + new_filename
+
+    post = s3.generate_presigned_post(
+        Bucket=S3_BUCKET,
+        Key=new_key
+    )
+
+    response = {
+        "status": "success",
+        "message": "permission granted",
+        "url": post['url'],
+        "key": post['fields']['key'],
+        "uuid": generate_random_hash(),
+        "filename": filename,
+        "key": new_key,
+        "creds": post
+    }
+
+    return json.dumps(response), 200
 
 #
 # First method: local file, then to knack api.
