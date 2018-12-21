@@ -1,0 +1,48 @@
+language: python
+python:
+- '3.6'
+dist: trusty
+
+# We only deploy for staging and production.
+if: (branch IN (master, production) AND type = push) OR (type = pull_request)
+
+# We require sudo
+sudo: required
+
+# We only care for curl and jq (aws output parsing)
+addons:
+  apt:
+    packages:
+      - jq
+      - curl
+
+# We are going to install AWS Cli, Heroku Cli and source our helper scripts
+before_install:
+    - source ./.travis/aws-helper.sh
+    - sudo pip install awscli zappa
+
+# Jobs
+jobs:
+  include:
+  - stage: Running Tests
+    script:
+    - echo "Deployment Details ( TRAVIS_BRANCH=$TRAVIS_BRANCH, PR=$TRAVIS_PULL_REQUEST,
+      TRAVIS_PULL_REQUEST_BRANCH=$TRAVIS_PULL_REQUEST_BRANCH, MESSAGE=$TRAVIS_COMMIT_MESSAGE,
+      TRAVIS_REPO_SLUG=$TRAVIS_REPO_SLUG, TRAVIS_PULL_REQUEST_SLUG=$TRAVIS_PULL_REQUEST_SLUG,
+      TRAVIS_PULL_REQUEST_SHA=$TRAVIS_PULL_REQUEST_SHA, TRAVIS_BUILD_DIR=$TRAVIS_BUILD_DIR,
+      TRAVIS_BUILD_ID=$TRAVIS_BUILD_ID, TRAVIS_BUILD_NUMBER=$TRAVIS_BUILD_NUMBER,
+      TRAVIS_COMMIT=$TRAVIS_COMMIT, TRAVIS_COMMIT_RANGE=$TRAVIS_COMMIT_RANGE, TRAVIS_EVENT_TYPE=$TRAVIS_EVENT_TYPE,
+      TRAVIS_JOB_ID=$TRAVIS_JOB_ID, TRAVIS_JOB_NUMBER=$TRAVIS_JOB_NUMBER, TRAVIS_TAG=$TRAVIS_TAG )"
+    - echo "Testing AWS CLI is installed"
+    - aws --version
+    - echo "Testing AWS has access to the buckets list"
+    - aws s3api list-buckets --query "Buckets[].Name"
+    - echo "Testing Zappa, current version:"
+    - zappa --version
+  - stage: Building Lambda Function
+    script:
+    - backend_set_env_vars $TRAVIS_BRANCH
+    - backend_build $TRAVIS_BRANCH
+  - stage: Post-release functions
+    script:
+    - backend_postrelease $TRAVIS_BRANCH

@@ -7,9 +7,10 @@ from werkzeug.utils import secure_filename
 # File Management
 import os, io, base64, boto3, datetime, time, calendar, requests
 from PIL import Image
+from botocore.exceptions import ClientError
 
 # Random hash generation
-import uuid, hashlib
+import uuid, hashlib, hmac, re
 
 # Knack integrator
 import knackpy, json
@@ -42,23 +43,22 @@ import knackpy, json
 #
 
 UPLOAD_FOLDER = '/tmp'
-DEPLOYMENT_MODE           = os.environ.get("DEPLOYMENT_MODE")
+DEPLOYMENT_MODE           = os.getenv("DEPLOYMENT_MODE", "LOCAL")
 ALLOWED_IMAGE_EXTENSIONS = set(['png', 'jpg', 'jpeg', 'gif'])
 ALLOWED_EXTENSIONS = set(['pdf', 'png', 'jpg', 'jpeg', 'gif'])
 
 
-KNACK_APPLICATION_ID      = os.environ.get("KNACK_APPLICATION_ID")
-KNACK_API_KEY             = os.environ.get("KNACK_API_KEY")
-KNACK_OBJECT_ID           = os.environ.get("KNACK_OBJECT_ID")
+KNACK_APPLICATION_ID      = os.getenv("KNACK_APPLICATION_ID")
+KNACK_API_KEY             = os.getenv("KNACK_API_KEY")
 KNACK_API_ENDPOINT_FILE_UPLOADS="https://api.knack.com/v1/applications/" + KNACK_APPLICATION_ID + "/assets/file/upload"
-
-S3_BUCKET                 = os.environ.get("AWS_BUCKET_NAME")
+S3_KEY                    = os.getenv("AWS_ACCESS_KEY_ID")
+S3_SECRET                 = os.getenv("AWS_SECRET_ACCESS_KEY")
+S3_BUCKET                 = os.getenv("AWS_BUCKET_NAME")
 S3_LOCATION               = 'http://{}.s3.amazonaws.com/'.format(S3_BUCKET)
+DEFALUT_REGION            = os.getenv("AWS_DEFAULT_REGION", "us-east-1")
+LOG_TABLE                 = os.getenv("PM_LOGTABLE", "police-monitor-records")
 
-LOG_TABLE                 = "police-monitor-records"#os.environ['LOG_TABLE']
-
-
-app = Flask(__name__)
+app = Flask(__name__, static_folder='static', static_url_path='/static')
 CORS(app) # Get rid of me!!!!
 # https://github.com/corydolphin/flask-cors
 
@@ -66,26 +66,31 @@ app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 app.config['DEPLOYMENT_MODE'] = DEPLOYMENT_MODE
 app.config['S3_BUCKET'] = S3_BUCKET
 app.config['S3_LOCATION'] = S3_LOCATION
+app.config['DEFALUT_REGION'] = DEFALUT_REGION
 app.config['LOG_TABLE'] = LOG_TABLE
+app.config['S3_KEY']      = S3_KEY
+app.config['S3_SECRET']   = S3_SECRET
 
-if(DEPLOYMENT_MODE=="local"):
-    S3_KEY                    = os.environ.get("AWS_ACCESS_KEY_ID")
-    S3_SECRET                 = os.environ.get("AWS_SECRET_ACCESS_KEY")
-    app.config['S3_KEY']      = S3_KEY
-    app.config['S3_SECRET']   = S3_SECRET
-    s3 = boto3.client("s3", aws_access_key_id=S3_KEY, aws_secret_access_key=S3_SECRET)
+if(DEPLOYMENT_MODE == "LOCAL"):
+    # Initialize S3 Client
+    s3 = boto3.client("s3",region_name=DEFALUT_REGION, aws_access_key_id=S3_KEY, aws_secret_access_key=S3_SECRET)
+    dynamodb_client = boto3.client('dynamodb', region_name=DEFALUT_REGION, aws_access_key_id=S3_KEY, aws_secret_access_key=S3_SECRET)
+    client = boto3.client('ses', region_name=DEFALUT_REGION, aws_access_key_id=S3_KEY, aws_secret_access_key=S3_SECRET)
 else:
-    s3 = boto3.client("s3")
+    # We should already have access to these resources
+    s3 = boto3.client("s3", region_name=DEFALUT_REGION)
+    dynamodb_client = boto3.client('dynamodb', region_name=DEFALUT_REGION)
+    ses_client = boto3.client('ses', region_name=DEFALUT_REGION)
 
-# Initialize DynamoDB client
-dynamodb_client = boto3.client('dynamodb')
-
-
-
-
-
-
-
+# Default Email Configuration (Default structure)
+emailConfigDefault = {
+    "charset": "UTF-8",
+    "html": "",
+    "text": "Test sent from API",
+    "subject": "Amazon SES Test (SDK for Python)",
+    "sender": "Office of Design and Delivery <no-reply@austintexas.io>",
+    "recipient": "no-reply@austintexas.io"
+}
 
 
 
@@ -122,6 +127,9 @@ def filename_timestamp():
   now = datetime.datetime.now()
   return now.strftime("%m%d%Y")
 
+def getYyyyMmDd():
+    return datetime.datetime.now().strftime('%Y%m%d')
+
 def getCurrentDateTime():
     return datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
 
@@ -144,8 +152,25 @@ def is_json(inputText):
         # The JSON test is bad
         return False
 
+def is_valid_casenumber(case):
+	pattern = re.compile("^([A-Z0-9]){3}-([0-9]){3}-([0-9]){4}$")
+	return str(pattern.match(case)) != "None"
+
 def load_map(file_path):
     return json.load(open(file_path))
+
+def sign(key, msg):
+    return hmac.new(key, msg.encode('utf-8'), hashlib.sha256).digest()
+
+def getSignatureKey(key, dateStamp, regionName, serviceName):
+    kDate = sign(('AWS4' + key).encode('utf-8'), dateStamp)
+    kRegion = sign(kDate, regionName)
+    kService = sign(kRegion, serviceName)
+    kSigning = sign(kService, 'aws4_request')
+    return kSigning
+
+def generate_amz_date():
+    return datetime.datetime.utcnow().strftime('%Y%m%dT%H%M%SZ')
 
 def generate_random_hash():
     rand_uuid_str = "{0}".format(uuid.uuid1()).encode()
@@ -268,6 +293,44 @@ def upload_file_to_s3(file, bucket_name, acl="public-read"):
 
     return "{}{}".format(app.config["S3_LOCATION"], newFilename)
 
+#
+# Send Email Function
+#
+def sendEmail(emailConfig):
+    try:
+        #Provide the contents of the email.
+        response = ses_client.send_email(
+            Destination={
+                'ToAddresses': [
+                    emailConfig['recipient'],
+                ],
+            },
+            Message={
+                'Body': {
+                    'Html': {
+                        'Charset': emailConfig['charset'],
+                        'Data': emailConfig['html'],
+                    },
+                    'Text': {
+                        'Charset': emailConfig['charset'],
+                        'Data': emailConfig['text'],
+                    },
+                },
+                'Subject': {
+                    'Charset': emailConfig['charset'],
+                    'Data': emailConfig['subject'],
+                },
+            },
+            Source=emailConfig['sender']
+        )
+    # Display an error if something goes wrong.
+    except ClientError as e:
+        print(e.response['Error']['Message'])
+        return "error"
+    else:
+        mid = response['MessageId']
+        print("Email sent! Message ID: " + mid)
+        return mid
 
 #
 # Routes
@@ -279,7 +342,11 @@ def index():
 
 
 
-
+@app.route('/post-debug', methods=['POST'])
+def post_debug():
+    jsonStr = json.dumps(request.form)
+    print(jsonStr)
+    return jsonStr, 200
 
 
 
@@ -305,6 +372,28 @@ def index():
 #8"Yb  88 Y88  dP__Yb  Yb      88"Yb      88"Yb  88""   Yb      Yb   dP 88"Yb   8I  dY o.`Y8b
 #8  Yb 88  Y8 dP""""Yb  YboodP 88  Yb     88  Yb 888888  YboodP  YbodP  88  Yb 8888Y"  8bodP'
 
+@app.route('/emailtest', methods=['GET', 'POST'])
+def emailtest():
+    #
+    # E-Mail Configuration
+    #
+
+    # Check if the method is post
+    if request.method == 'POST':
+        stringOutput = render_template('email.html', type='Office Of Design and Delivery', content='This is a test.')
+
+        user_email = request.form["user_email"]
+        print("User email: " + user_email)
+
+        emailConfig = emailConfigDefault.copy()
+        emailConfig['html'] = stringOutput
+        emailConfig['recipient'] = user_email
+
+        response = sendEmail(emailConfig)
+        return "Output: " + response, 200
+
+    else:
+        return render_template('email_form.html', url=url_for('emailtest')), 200
 
 
 @app.route('/knack/getrecord/<string:record_id>', methods=['GET'])
@@ -362,33 +451,52 @@ def knack_testrelationships():
     evidenceFileIds = []
 
     #
+    # Response Structure
+    #
+
+    api_response = {
+        "status": "error",
+        "message": "",
+        "httpcode": 403
+    }
+
+    jsonObject = json.loads(json_string)
+
+
+    if 'type' in jsonInputData.keys():
+        submissionType = jsonInputData['type']
+    else:
+        api_response["message"] = "No submission type specified."
+        return jsonify(api_response), api_response["httpcode"]
+
+
+
+    #
     # First create the officers' records (if any provided)
     #
-    try:
+    if 'officers' in jsonInputData.keys():
         for officer in jsonInputData["officers"]:
             knack_record = build_knack_item(officer, knack_officer_map, knack_officer_record)
             entry_id, response = knack_create_record(knack_record, table="officers")
             officersId.append(entry_id)
             print("New Officer creted: " +  entry_id)
-    except Exception as e:
-        print("Error while creating officer records: " + e.message)
 
-    try:
+
+
+    if 'witnesses' in jsonInputData.keys():
         for witness in jsonInputData["witnesses"]:
             knack_record = build_knack_item(witness, knack_witness_map, knack_witness_record)
             entry_id, response = knack_create_record(knack_record, table="witnesses")
             witnessesId.append(entry_id)
             print("New witness creted: " +  entry_id)
-    except Exception as e:
-        print("Error while creating witness records: " + e.message)
 
 
 
     #
     #  Now the evidence records
     #
-
-    try:
+    if 'evidence' in jsonInputData.keys():
+    #try:
         for knackFileId in jsonInputData["evidence"]:
             new_evidence_data = knack_evidence_map.copy()
             new_evidence_data["evidenceFile"] = knackFileId
@@ -398,8 +506,8 @@ def knack_testrelationships():
             entry_id, response = knack_create_record(new_evidence_record, table="evidence")
             evidenceFileIds.append(entry_id)
             print("New Evidence File Creted: " +  entry_id)
-    except Exception as e:
-        print("Error while creating evidence records: " + e.message)
+    # except Exception as e:
+    #     print("Error while creating evidence records: " + e.message)
 
     #
     # We now build the full record
@@ -454,6 +562,47 @@ def knack_testrelationships():
 #8     88 88ood8 888888     `YbodP' 88     88ood8  YbodP  dP""""Yb 8888Y"  8bodP'
 
 
+
+#
+# AWS Direct Upload (from browser)
+#
+# 1. Request Signature: /uploads/request-signature
+# 2. Generate fields:   JavaScript
+# 3. Upload Files   :   Direct to S3
+#
+@app.route('/uploads/request-signature', methods=['GET'])
+def uploads_request_signature():
+    filename = request.args.get('file')
+    casenumber = request.args.get('case')
+
+    if(str(filename) == "None" or filename == ""):
+        return json.dumps({ "status": "error", "message": "file not declared"}), 403
+
+    if(str(casenumber) == "None" or filename == ""):
+        return json.dumps({ "status": "error", "message": "case number not declared"}), 403
+
+    if(is_valid_casenumber(casenumber) == False):
+        return json.dumps({ "status": "error", "message": "invalid case number"}), 403
+
+
+    new_filename = generate_random_filename(filename)
+
+    new_key = "uploads/" + casenumber + "/" + new_filename
+
+    post = s3.generate_presigned_post(
+        Bucket=S3_BUCKET,
+        Key=new_key
+    )
+
+    response = {
+        "status": "success",
+        "message": "permission granted",
+        "uuid": generate_random_hash(),
+        "filename": filename,
+        "creds": post
+    }
+
+    return json.dumps(response), 200
 
 #
 # First method: local file, then to knack api.
