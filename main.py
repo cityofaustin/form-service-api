@@ -342,7 +342,11 @@ def index():
 
 
 
-
+@app.route('/post-debug', methods=['POST'])
+def post_debug():
+    jsonStr = json.dumps(request.form)
+    print(jsonStr)
+    return jsonStr, 200
 
 
 
@@ -593,11 +597,8 @@ def uploads_request_signature():
     response = {
         "status": "success",
         "message": "permission granted",
-        "url": post['url'],
-        "key": post['fields']['key'],
         "uuid": generate_random_hash(),
         "filename": filename,
-        "key": new_key,
         "creds": post
     }
 
