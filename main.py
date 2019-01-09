@@ -47,7 +47,6 @@ DEPLOYMENT_MODE           = os.getenv("DEPLOYMENT_MODE", "LOCAL")
 ALLOWED_IMAGE_EXTENSIONS = set(['png', 'jpg', 'jpeg', 'gif'])
 ALLOWED_EXTENSIONS = set(['pdf', 'png', 'jpg', 'jpeg', 'gif'])
 
-
 KNACK_APPLICATION_ID      = os.getenv("KNACK_APPLICATION_ID")
 KNACK_API_KEY             = os.getenv("KNACK_API_KEY")
 KNACK_API_ENDPOINT_FILE_UPLOADS="https://api.knack.com/v1/applications/" + KNACK_APPLICATION_ID + "/assets/file/upload"
@@ -152,9 +151,6 @@ def is_json(inputText):
         # The JSON test is bad
         return False
 
-def is_valid_casenumber(case):
-	pattern = re.compile("^([A-Z0-9]){3}-([0-9]){3}-([0-9]){4}$")
-	return str(pattern.match(case)) != "None"
 
 def load_map(file_path):
     return json.load(open(file_path))
@@ -175,6 +171,15 @@ def generate_amz_date():
 def generate_random_hash():
     rand_uuid_str = "{0}".format(uuid.uuid1()).encode()
     return hashlib.sha256(rand_uuid_str).hexdigest()
+
+def is_valid_casenumber(case):
+	pattern = re.compile("^([0-9]){4}-([0-9]){4}-([a-z0-9]){4}$")
+	return str(pattern.match(case)) != "None"
+
+def generate_casenum():
+	datestr = datetime.datetime.now().strftime('%Y-%m%d-')
+	rndstr = generate_random_hash()[0:4]
+	return "{0}{1}".format(datestr,rndstr)
 
 def generate_random_filename(filename):
   timestamp = filename_timestamp()
@@ -238,25 +243,82 @@ def knack_create_record(record, table='complaints'):
 
 
 
-def create_dynamodb_record(inputJson, type='record', knack_record_id=''):
+def get_dynamodb_record(identifierHash):
+    print("get_dynamodb_record() Record: " + identifierHash)
+    dynamodb_response = dynamodb_client.get_item(
+        TableName=LOG_TABLE,
+        Key={
+            'entryId': { 'S': str(identifierHash) }
+        }
+    )
+
+    item = dynamodb_response.get('Item')
+
+    if not item:
+        return None
+
+    return jsonify({
+        'entryId': item.get('entryId').get('S'),
+        'timestamp': item.get('timestamp').get('N'),
+        'type': item.get('type').get('S'),
+        'data': item.get('data').get('S')
+    })
+
+
+def create_dynamodb_record(inputJson, type='record', case_number="", knack_record_id=''):
     if(isinstance(inputJson, str) == False):
         jsonString = json.dumps(inputJson)
     else:
         jsonString = inputJson
 
-    random_hash = generate_random_hash()
+    identifierHash = ""
+
+    if(case_number == ""):
+        identifierHash = generate_random_hash()
+    else:
+        identifierHash = case_number
+
+    if(knack_record_id == ""):
+        knack_record_id = generate_random_hash()
+
+    #random_hash = generate_random_hash()
     resp = dynamodb_client.put_item(
         TableName=LOG_TABLE,
         Item={
-            'entryId': {'S': random_hash }, # A random identifier
-            'timestamp': {'N': str(int(time.time())) }, # Epoch Time
-            'dateCreated': {'S': getCurrentDateTime() }, # Epoch Time
-            'type': {'S': type }, # Epoch Time
+            'entryId': {'S': identifierHash },
+            'timestamp': {'N': str(int(time.time())) },
+            'dateCreated': {'S': getCurrentDateTime() },
+            'type': {'S': type },
             'data': { 'S': jsonString },
             'knackRecordId': {'S': knack_record_id }
         }
     )
-    return random_hash, resp
+    return identifierHash, resp
+
+def update_dynamodb_record(case_number, inputJson, type='record', knack_record_id=''):
+    if(isinstance(inputJson, str) == False):
+        jsonString = json.dumps(inputJson)
+    else:
+        jsonString = inputJson
+
+    if(knack_record_id == ""):
+        knack_record_id = generate_random_hash()
+
+    resp = table.update_item(
+        TableName=LOG_TABLE,
+        Key={
+            'entryId': 'identifierHash'
+        },
+        UpdateExpression="set data = :d, dateCreated=:c, knackRecordId = :k",
+        ExpressionAttributeValues={
+            ':d': jsonString,
+            ':c': getCurrentDateTime(),
+            ':k': knack_record_id
+        },
+        ReturnValues="UPDATED_NEW"
+    )
+
+    return identifierHash, resp
 
 def knack_upload_image(filepath):
     # First try uploading the image and parse the response
@@ -342,19 +404,74 @@ def index():
 
 
 
-@app.route('/post-debug', methods=['POST'])
+@app.route('/form/post-debug', methods=['GET', 'POST'])
 def post_debug():
     jsonStr = json.dumps(request.form)
+    requestJson = json.dumps(request.json)
+    print("Request.form:")
     print(jsonStr)
+
+    print("Request.json:")
+    print(requestJson)
     return jsonStr, 200
 
 
 
+@app.route('/form/register', methods=['GET'])
+def casenum_register():
+
+    #
+    # Keep generating a case number until a new record is created.
+    #
+    while True:
+        caseNum = generate_casenum() # Generate case num.
+        print("casenum_register() Case Number: " + caseNum)
+        record = get_dynamodb_record(caseNum) # Record is 'None' if not found.
+
+        if(record == None):
+            print("casenum_register() Record not found, creating new...")
+            caseNumResp, resp = create_dynamodb_record(inputJson='{"type": "new_form_submission_placeholder"}',case_number=caseNum)
+            return jsonify({ 'status': 'success', 'case_number': caseNumResp}), 200
+        else:
+            print("Case number already exists: " + caseNum + ", generating a new one.")
 
 
 
 
+@app.route('/form/submit', methods=['POST'])
+def casenum_updaterecord():
 
+    caseNum = "2019-0106-6370"
+    record = get_dynamodb_record(caseNum)
+
+    # if the record is found
+    if(record != None):
+        caseNumResp, resp = create_dynamodb_record(case_number=caseNum, inputJson='{"type": "placeholder"}')
+        return jsonify({ 'status': 'success', 'case_number': caseNumResp}), 200
+    else:
+        return jsonify({ 'status': 'error', 'record': record}), 200
+
+
+
+
+@app.route('/file/download/<path:path>', methods=['GET'])
+def file_download_uri(path):
+
+    fileUrlS3 = S3_LOCATION + path
+
+    url = s3.generate_presigned_url(
+        ExpiresIn=60, # seconds
+        ClientMethod='get_object',
+        Params={
+            'Bucket': S3_BUCKET,
+            'Key': path
+        }
+    )
+
+    print (url)
+
+    return redirect(url, code=302)
+    #return jsonify({"message": "Oh, yes: " + fileUrlS3}), 200
 
 
 
@@ -573,7 +690,7 @@ def knack_testrelationships():
 @app.route('/uploads/request-signature', methods=['GET'])
 def uploads_request_signature():
     filename = request.args.get('file')
-    casenumber = request.args.get('case')
+    casenumber = str(request.args.get('case')).lower()
 
     if(str(filename) == "None" or filename == ""):
         return json.dumps({ "status": "error", "message": "file not declared"}), 403
@@ -582,7 +699,7 @@ def uploads_request_signature():
         return json.dumps({ "status": "error", "message": "case number not declared"}), 403
 
     if(is_valid_casenumber(casenumber) == False):
-        return json.dumps({ "status": "error", "message": "invalid case number"}), 403
+        return json.dumps({ "status": "error", "message": "invalid case number: " + casenumber}), 403
 
 
     new_filename = generate_random_filename(filename)
