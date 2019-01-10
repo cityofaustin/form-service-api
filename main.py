@@ -124,7 +124,7 @@ def build_response(inputDict):
 
 def filename_timestamp():
   now = datetime.datetime.now()
-  return now.strftime("%m%d%Y")
+  return now.strftime("%m%d%Y%H%M%S")
 
 def getYyyyMmDd():
     return datetime.datetime.now().strftime('%Y%m%d')
@@ -176,16 +176,39 @@ def is_valid_casenumber(case):
 	pattern = re.compile("^([0-9]){4}-([0-9]){4}-([a-z0-9]){4}$")
 	return str(pattern.match(case)) != "None"
 
+def is_valid_uniqueid(uqid):
+	pattern = re.compile("^([a-z0-9]){64}$")
+	return str(pattern.match(uqid)) != "None"
+
 def generate_casenum():
 	datestr = datetime.datetime.now().strftime('%Y-%m%d-')
 	rndstr = generate_random_hash()[0:4]
 	return "{0}{1}".format(datestr,rndstr)
+
+def get_file_extension(filename):
+    return filename.rsplit('.', 1)[1].lower()
+
+def get_file_name(filename):
+    return filename.rsplit('.', 1)[0].lower()
 
 def generate_random_filename(filename):
   timestamp = filename_timestamp()
   original_extension = get_file_extension(filename)
   output_hash = generate_random_hash()
   return "{0}_{1}.{2}".format(timestamp, output_hash, original_extension)
+
+def clean_filename(filename):
+	fileExt = get_file_extension(filename)
+	fileName = get_file_name(filename)
+	cleanFileName = re.sub(r'\W+', '', fileName)
+	return "{0}.{1}".format(cleanFileName, fileExt)
+
+def generate_clean_filename(filename):
+  timestamp = filename_timestamp()
+  cleanFilename = clean_filename(filename)
+  shortHash = generate_random_hash()[0:5]
+  return "{0}_{1}_{2}".format(timestamp, shortHash, cleanFilename)
+
 
 def get_knack_object(tablename):
     knack_objects = load_map('./knackmaps/knack_objects.json')
@@ -394,8 +417,14 @@ def sendEmail(emailConfig):
         print("Email sent! Message ID: " + mid)
         return mid
 
+
+# 88""Yb  dP"Yb  88   88 888888 888888 .dP"Y8
+# 88__dP dP   Yb 88   88   88   88__   `Ybo."
+# 88"Yb  Yb   dP Y8   8P   88   88""   o.`Y8b
+# 88  Yb  YbodP  `YbodP'   88   888888 8bodP'
+
 #
-# Routes
+# Route Configuration
 #
 
 @app.route('/')
@@ -468,10 +497,43 @@ def file_download_uri(path):
         }
     )
 
-    print (url)
-
     return redirect(url, code=302)
-    #return jsonify({"message": "Oh, yes: " + fileUrlS3}), 200
+
+
+
+@app.route('/uploads/request-signature', methods=['GET'])
+def uploads_request_signature():
+    filename = request.args.get('file')
+    uniqueid = str(request.args.get('uniqueid')).lower()
+
+    if(str(filename) == "None" or filename == ""):
+        return json.dumps({ "status": "error", "message": "file not declared"}), 403
+
+    if(str(uniqueid) == "None" or filename == ""):
+        return json.dumps({ "status": "error", "message": "case number not declared"}), 403
+
+    if(is_valid_uniqueid(uniqueid) == False):
+        return json.dumps({ "status": "error", "message": "invalid unique id: " + uniqueid + " (it must be a 64-char alphanumeric hash)"}), 403
+
+
+    new_filename = generate_clean_filename(filename)
+
+    new_key = "uploads/" + uniqueid + "/" + new_filename
+
+    post = s3.generate_presigned_post(
+        Bucket=S3_BUCKET,
+        Key=new_key
+    )
+
+    response = {
+        "status": "success",
+        "message": "permission granted",
+        "uuid": generate_random_hash(),
+        "filename": filename,
+        "creds": post
+    }
+
+    return json.dumps(response), 200
 
 
 
@@ -482,12 +544,6 @@ def file_download_uri(path):
 
 
 
-
-
-#8  dP 88b 88    db     dP""b8 88  dP     88""Yb 888888  dP""b8  dP"Yb  88""Yb 8888b.  .dP"Y8
-#8odP  88Yb88   dPYb   dP   `" 88odP      88__dP 88__   dP   `" dP   Yb 88__dP  8I  Yb `Ybo."
-#8"Yb  88 Y88  dP__Yb  Yb      88"Yb      88"Yb  88""   Yb      Yb   dP 88"Yb   8I  dY o.`Y8b
-#8  Yb 88  Y8 dP""""Yb  YboodP 88  Yb     88  Yb 888888  YboodP  YbodP  88  Yb 8888Y"  8bodP'
 
 @app.route('/emailtest', methods=['GET', 'POST'])
 def emailtest():
@@ -513,337 +569,7 @@ def emailtest():
         return render_template('email_form.html', url=url_for('emailtest')), 200
 
 
-@app.route('/knack/getrecord/<string:record_id>', methods=['GET'])
-def get_record(record_id):
-    print("Record: " + record_id)
-    dynamodb_response = dynamodb_client.get_item(
-        TableName=LOG_TABLE,
-        Key={
-            'entryId': { 'S': str(record_id) }
-        }
-    )
 
-    item = dynamodb_response.get('Item')
-    print(item)
-
-    if not item:
-        return jsonify({'error': 'User does not exist'}), 404
-
-    return jsonify({
-        'entryId': item.get('entryId').get('S'),
-        'timestamp': item.get('timestamp').get('N'),
-        'type': item.get('type').get('S'),
-        'data': item.get('data').get('S')
-    }), 200
-
-
-
-
-@app.route('/knack/submit', methods=['POST'])
-def knack_testrelationships():
-    jsonInputData = None
-
-    try:
-        jsonInputData = request.get_json()
-    except:
-        return "Invalid JSON request", 403
-
-    knack_officer_map = load_map("./knackmaps/knack_officer_map.json")
-    knack_officer_record = load_map("./knackmaps/knack_officer_record.json")
-
-    knack_witness_map = load_map("./knackmaps/knack_witness_map.json")
-    knack_witness_record = load_map("./knackmaps/knack_witness_record.json")
-
-    knack_evidence_map = load_map("./knackmaps/knack_evidence_map.json")
-    knack_evidence_record = load_map("./knackmaps/knack_evidence_record.json")
-
-    knack_complaint_map = load_map("./knackmaps/knack_complaint_map.json")
-    knack_complaint_record = load_map("./knackmaps/knack_complaint_record.json")
-
-    knack_compliment_map = load_map("./knackmaps/knack_compliment_map.json")
-    knack_compliment_record = load_map("./knackmaps/knack_compliment_record.json")
-
-    officersId = []
-    witnessesId = []
-    evidenceFileIds = []
-
-    #
-    # Response Structure
-    #
-
-    api_response = {
-        "status": "error",
-        "message": "",
-        "httpcode": 403
-    }
-
-    jsonObject = json.loads(json_string)
-
-
-    if 'type' in jsonInputData.keys():
-        submissionType = jsonInputData['type']
-    else:
-        api_response["message"] = "No submission type specified."
-        return jsonify(api_response), api_response["httpcode"]
-
-
-
-    #
-    # First create the officers' records (if any provided)
-    #
-    if 'officers' in jsonInputData.keys():
-        for officer in jsonInputData["officers"]:
-            knack_record = build_knack_item(officer, knack_officer_map, knack_officer_record)
-            entry_id, response = knack_create_record(knack_record, table="officers")
-            officersId.append(entry_id)
-            print("New Officer creted: " +  entry_id)
-
-
-
-    if 'witnesses' in jsonInputData.keys():
-        for witness in jsonInputData["witnesses"]:
-            knack_record = build_knack_item(witness, knack_witness_map, knack_witness_record)
-            entry_id, response = knack_create_record(knack_record, table="witnesses")
-            witnessesId.append(entry_id)
-            print("New witness creted: " +  entry_id)
-
-
-
-    #
-    #  Now the evidence records
-    #
-    if 'evidence' in jsonInputData.keys():
-    #try:
-        for knackFileId in jsonInputData["evidence"]:
-            new_evidence_data = knack_evidence_map.copy()
-            new_evidence_data["evidenceFile"] = knackFileId
-            new_evidence_data["evidenceName"] = "Knack Attachment Id: {0}".format(knackFileId)
-            new_evidence_data["evidenceUploadDate"] = getCurrentDateTime()
-            new_evidence_record = build_knack_item(new_evidence_data, knack_evidence_map, knack_evidence_record)
-            entry_id, response = knack_create_record(new_evidence_record, table="evidence")
-            evidenceFileIds.append(entry_id)
-            print("New Evidence File Creted: " +  entry_id)
-    # except Exception as e:
-    #     print("Error while creating evidence records: " + e.message)
-
-    #
-    # We now build the full record
-    #
-    knack_record = build_knack_item(jsonInputData, knack_complaint_map, knack_complaint_record)
-
-    # We begin associating officers and evidence records to the full record.
-    # Get the knack key for the officers & witnesses column & assign the value to that key
-    knack_record[knack_complaint_map["officers"]] = officersId
-    knack_record[knack_complaint_map["witnesses"]] = witnessesId
-    knack_record[knack_complaint_map["evidence"]] = evidenceFileIds
-
-    knack_record_raw = json.dumps(jsonInputData)
-    knack_record_plain = json.dumps(knack_record)
-
-    knack_record_id, response = knack_create_record(knack_record)
-    dyn_record_id, dynamodb_response = create_dynamodb_record(knack_record_raw, type='complaint', knack_record_id=knack_record_id)
-    print("New Record Created! knack_record_id: {0}, dynamo_record_id: {1}".format(knack_record_id, dyn_record_id))
-
-    response = {}
-    return jsonify(response), 200
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-#88888 88 88     888888     88   88 88""Yb 88      dP"Yb     db    8888b.  .dP"Y8
-#8__   88 88     88__       88   88 88__dP 88     dP   Yb   dPYb    8I  Yb `Ybo."
-#8""   88 88  .o 88""       Y8   8P 88"""  88  .o Yb   dP  dP__Yb   8I  dY o.`Y8b
-#8     88 88ood8 888888     `YbodP' 88     88ood8  YbodP  dP""""Yb 8888Y"  8bodP'
-
-
-
-#
-# AWS Direct Upload (from browser)
-#
-# 1. Request Signature: /uploads/request-signature
-# 2. Generate fields:   JavaScript
-# 3. Upload Files   :   Direct to S3
-#
-@app.route('/uploads/request-signature', methods=['GET'])
-def uploads_request_signature():
-    filename = request.args.get('file')
-    casenumber = str(request.args.get('case')).lower()
-
-    if(str(filename) == "None" or filename == ""):
-        return json.dumps({ "status": "error", "message": "file not declared"}), 403
-
-    if(str(casenumber) == "None" or filename == ""):
-        return json.dumps({ "status": "error", "message": "case number not declared"}), 403
-
-    if(is_valid_casenumber(casenumber) == False):
-        return json.dumps({ "status": "error", "message": "invalid case number: " + casenumber}), 403
-
-
-    new_filename = generate_random_filename(filename)
-
-    new_key = "uploads/" + casenumber + "/" + new_filename
-
-    post = s3.generate_presigned_post(
-        Bucket=S3_BUCKET,
-        Key=new_key
-    )
-
-    response = {
-        "status": "success",
-        "message": "permission granted",
-        "uuid": generate_random_hash(),
-        "filename": filename,
-        "creds": post
-    }
-
-    return json.dumps(response), 200
-
-#
-# First method: local file, then to knack api.
-#
-
-@app.route('/upload-knack-form', methods=['GET'])
-def upload_file_knack():
-    return '''
-    <!doctype html>
-    <title>Upload new File</title>
-    <h1>Upload new File</h1>
-    <form action='/upload-knack' method=post enctype=multipart/form-data>
-      <input type=file name=file>
-      <input type=submit value=Upload>
-    </form>
-    '''
-
-@app.route('/upload-knack', methods=['GET', 'POST'])
-def upload_file():
-
-    response = {
-        "status": "error",
-        "status_code": 403,
-        "knack-file-id": "",
-        "message": "Failed to upload file."
-    }
-
-    # Check if the method is post
-    if request.method == 'POST':
-
-        # check if the post request has the file part
-        if 'file' not in request.files:
-            response["message"] = "No file part"
-            return build_response(response)
-
-        # Gather file from request
-        file = request.files['file']
-
-        # if user does not select file, browser also submit an empty part without filename
-        if file.filename == '':
-            response["message"] = "No selected file"
-            return build_response(response)
-
-        # If the file has a permitted extension
-        if file and allowed_file(file.filename):
-            filename = secure_filename(file.filename)
-            new_filename = generate_random_filename(filename)
-            file_path = os.path.join(app.config['UPLOAD_FOLDER'], new_filename)
-
-            # We are going to try to save the file first, then upload to knack
-            try:
-                file.save(file_path)
-                r = knack_upload_image(file_path)
-
-                # If the response is a JSON file, then we are OK
-                if(is_json(r.text)):
-                    file_record = r.json()
-                    response["status"] = "success"
-                    response["status_code"] = 200
-                    response["knack-file-record"] = file_record["id"]
-                    response["message"] = file_record["public_url"]
-                    dyn_rid, dyn_resp = create_dynamodb_record(json.dumps(response), type='attachment', knack_record_id=file_record["id"])
-                    print("New Image uploaded: " + file_record["id"])
-                else:
-                    print("We have a problem: " + r.text)
-                    response["message"] = "Error: " + r.text
-
-
-            except Exception as e:
-                response["message"] = "Error while uploading: " + str(e)
-
-            return build_response(response)
-
-    # Not a POST request, redirect to form
-    else:
-        response["message"] = "Not a POST request"
-
-    return build_response(response)
-
-@app.route('/uploads-knack/<filename>')
-def uploaded_file(filename):
-    return send_from_directory(app.config['UPLOAD_FOLDER'], filename)
-
-
-
-
-#
-# Second Method: S3 File Uploader, then add url to knack image field.
-#
-
-@app.route("/upload-s3", methods=["GET"])
-def upload_file_s3_form():
-    return render_template('index.html', url=url_for('upload_file_s3')), 200
-
-@app.route("/upload-s3", methods=["POST"])
-def upload_file_s3():
-
-	# A. Check if there
-    if "user_file" not in request.files:
-        return "No user_file key in request.files"
-
-	# B. Instantiate file handle
-    file    = request.files["user_file"]
-
-    """
-        These attributes are also available
-        file.filename               # The actual name of the file
-        file.content_type
-        file.content_length
-        file.mimetype
-    """
-
-	# C. Check filename is not empty
-    if file.filename == "":
-        return "Please select a file"
-
-	# D. if there is a file and is allowed
-    if file and allowed_file(file.filename):
-        file.filename = secure_filename(file.filename)
-        output   	  = upload_file_to_s3(file, app.config["S3_BUCKET"])
-        return str(output), 200
-
-    else:
-        return redirect("/")
 
 
 # We only need this for local development.
