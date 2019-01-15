@@ -615,7 +615,7 @@ def emailtest():
     email_language = load_language_file(email_lang_file)
 
     print(json.dumps(email_language))
-    user_email = "sergiogcx@gmail.com"
+    user_email = request.json['recipient']
 
     print("User email: " + user_email)
     print("submission_type: " + submission_type)
