@@ -44,6 +44,8 @@ import knackpy, json
 
 UPLOAD_FOLDER = '/tmp'
 DEPLOYMENT_MODE           = os.getenv("DEPLOYMENT_MODE", "LOCAL")
+AVAILABLE_LANGUAGES       = ['en', 'es']
+AVAILABLE_TYPES           = ['thanks', 'complaint']
 ALLOWED_IMAGE_EXTENSIONS = set(['png', 'jpg', 'jpeg', 'gif'])
 ALLOWED_EXTENSIONS = set(['pdf', 'png', 'jpg', 'jpeg', 'gif'])
 
@@ -74,7 +76,7 @@ if(DEPLOYMENT_MODE == "LOCAL"):
     # Initialize S3 Client
     s3 = boto3.client("s3",region_name=DEFALUT_REGION, aws_access_key_id=S3_KEY, aws_secret_access_key=S3_SECRET)
     dynamodb_client = boto3.client('dynamodb', region_name=DEFALUT_REGION, aws_access_key_id=S3_KEY, aws_secret_access_key=S3_SECRET)
-    client = boto3.client('ses', region_name=DEFALUT_REGION, aws_access_key_id=S3_KEY, aws_secret_access_key=S3_SECRET)
+    ses_client = boto3.client('ses', region_name=DEFALUT_REGION, aws_access_key_id=S3_KEY, aws_secret_access_key=S3_SECRET)
 else:
     # We should already have access to these resources
     s3 = boto3.client("s3", region_name=DEFALUT_REGION)
@@ -378,6 +380,51 @@ def upload_file_to_s3(file, bucket_name, acl="public-read"):
 
     return "{}{}".format(app.config["S3_LOCATION"], newFilename)
 
+# Gets the language code from the from submission:
+# Use: submission_type = get_submission_type(request.json)
+# submission_type contains 'thank' (example)
+def get_submission_type(formJson):
+    try:
+        return formJson['type'] if formJson['type'] != "" else "thanks"
+    except:
+        return AVAILABLE_TYPES[0]
+
+# Gets the language code from the from submission:
+# Use: language_code = get_language(request.json)
+# language_code contains 'en' (example)
+def get_language(formJson):
+    try:
+        return formJson['language'] if formJson['language'] != "" else "en"
+    except:
+        return AVAILABLE_LANGUAGES[0]
+
+# Returns True if the language code is supported
+# Use: is_lang_supported = is_language_supported(request.json)
+# is_lang_supported contains True
+def is_language_supported(formJson):
+    try:
+        return True if get_language(formJson) in AVAILABLE_LANGUAGES else False
+    except:
+        return False
+
+def load_language_file(filepath):
+
+    isfile = os.path.isfile(filepath)
+
+    print("load_language_file() filepath: " + filepath)
+    print("load_language_file() isfile: " + str(isfile))
+
+    try:
+        with open(filepath) as data_file:
+            return json.load(data_file)
+
+
+    except Exception as e:
+        print("load_language_file() We have an error:")
+        print(e)
+        return None
+
+
 #
 # Send Email Function
 #
@@ -540,7 +587,16 @@ def uploads_request_signature():
 
 
 
+@app.route('/languagetest', methods=['POST'])
+def spanish_test():
+    language = get_language(request.json)
+    language_supported = is_language_supported(request.json)
+    response = {
+        "language_supported": str(language_supported),
+        "language": language
+    }
 
+    return jsonify(response), 200
 
 
 
@@ -550,23 +606,54 @@ def emailtest():
     #
     # E-Mail Configuration
     #
+    submission_type = get_submission_type(request.json)
+    language_code = get_language(request.json)
+    is_lang_supported = is_language_supported(request.json)
+
+    email_lang_file = "./templates/email/" + language_code + "/" + submission_type + "/language.json"
+
+    email_language = load_language_file(email_lang_file)
+
+    print(json.dumps(email_language))
+    user_email = "sergiogcx@gmail.com"
+
+    print("User email: " + user_email)
+    print("submission_type: " + submission_type)
+    print("language_code: " + language_code)
+    print("is_lang_supported: " + str(is_lang_supported))
+
+
 
     # Check if the method is post
-    if request.method == 'POST':
-        stringOutput = render_template('email.html', type='Office Of Design and Delivery', content='This is a test.')
+    # if request.method == 'POST':
+    htmlTemplate = render_template(
+        "email/" + language_code + "/" + submission_type + "/template.html",
+        type=submission_type,
+        casenumber='2018-1212-5fe3',
+        data="The data goes here",
+        attachment_urls=["http://s3.url/here"])
 
-        user_email = request.form["user_email"]
-        print("User email: " + user_email)
+    txtTemplate = render_template(
+        "email/" + language_code + "/" + submission_type + "/template.txt",
+        type=submission_type,
+        casenumber='2018-1212-5fe3',
+        data="The data goes here",
+        attachment_urls=["http://s3.url/here"])
 
-        emailConfig = emailConfigDefault.copy()
-        emailConfig['html'] = stringOutput
-        emailConfig['recipient'] = user_email
 
-        response = sendEmail(emailConfig)
-        return "Output: " + response, 200
 
-    else:
-        return render_template('email_form.html', url=url_for('emailtest')), 200
+    emailConfig = emailConfigDefault.copy()
+    emailConfig['recipient'] = user_email
+    emailConfig['html'] = htmlTemplate
+    emailConfig['text'] = txtTemplate
+    emailConfig['subject'] = email_language['emailSubject']
+
+    response = sendEmail(emailConfig)
+    print ("Email Response: " + response)
+    return jsonify(emailConfig), 200
+
+    # else:
+    #     return render_template('email_form.html', url=url_for('emailtest')), 200
 
 
 
