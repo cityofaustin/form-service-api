@@ -264,10 +264,29 @@ def knack_create_record(record, table='complaints'):
     return response["id"], response
 
 
+#
+# Registers a new unique case number by
+# constantly running a loop checking if the random string is unique
+#
+def register_unique_casenum():
+    # Forever
+    while True:
+        # Generate case number (random string)
+        caseNum = generate_casenum() # Generate case num.
+        # Try to find it & hold a None value if not found.
+        record = get_dynamodb_record(caseNum) # Record is 'None' if not found.
+        # Since it is not found, we can create it!
+        if(record == None):
+            caseNumResp, resp = create_dynamodb_record(inputJson='{"type": "new_form_submission_placeholder"}',case_number=caseNum)
+            # Stop the loop, return value
+            return caseNumResp
+        # Else, continue loop.
 
 
+#
+# Returns the case number if it exists, None if it doesn't.
+#
 def get_dynamodb_record(identifierHash):
-    print("get_dynamodb_record() Record: " + identifierHash)
     dynamodb_response = dynamodb_client.get_item(
         TableName=LOG_TABLE,
         Key={
@@ -446,39 +465,51 @@ def post_debug():
 
 
 
-@app.route('/form/register', methods=['GET'])
-def casenum_register():
-
-    #
-    # Keep generating a case number until a new record is created.
-    #
-    while True:
-        caseNum = generate_casenum() # Generate case num.
-        print("casenum_register() Case Number: " + caseNum)
-        record = get_dynamodb_record(caseNum) # Record is 'None' if not found.
-
-        if(record == None):
-            print("casenum_register() Record not found, creating new...")
-            caseNumResp, resp = create_dynamodb_record(inputJson='{"type": "new_form_submission_placeholder"}',case_number=caseNum)
-            return jsonify({ 'status': 'success', 'case_number': caseNumResp}), 200
-        else:
-            print("Case number already exists: " + caseNum + ", generating a new one.")
-
-
-
-
 @app.route('/form/submit', methods=['POST'])
-def casenum_updaterecord():
+def form_submit():
 
-    caseNum = "2019-0106-6370"
-    record = get_dynamodb_record(caseNum)
+    uniqueCaseNumber = register_unique_casenum()
 
-    # if the record is found
-    if(record != None):
-        caseNumResp, resp = create_dynamodb_record(case_number=caseNum, inputJson='{"type": "placeholder"}')
-        return jsonify({ 'status': 'success', 'case_number': caseNumResp}), 200
-    else:
-        return jsonify({ 'status': 'error', 'record': record}), 200
+    #
+    # Response Format
+    #
+    jsonResponse = {
+        'status': 'error',
+        'message': '',
+        'http_code': 403,
+        'case_number': uniqueCaseNumber
+    }
+
+    print("/form/submit: Final Case Number: " + jsonResponse['case_number'])
+
+    #
+    # Once we have a case number, we submit emails ...
+    #
+
+    try:
+        #
+        #
+        #
+        #print("E-Mail Generated")
+
+        #
+        # We then prepare the response
+        #
+        jsonResponse['http_code'] = 200
+        jsonResponse['status'] = 'success'
+        jsonResponse['message'] = 'Form submitted successfully.'
+    except Exception as e:
+        #
+        #
+        #
+        print("/form/submit: Error: " + str(e))
+        jsonResponse['message'] = "Failed to process form: {0}".format(str(e))
+
+
+    #
+    # Our Final Response
+    #
+    return jsonify(jsonResponse), jsonResponse['http_code']
 
 
 
@@ -567,9 +598,6 @@ def emailtest():
 
     else:
         return render_template('email_form.html', url=url_for('emailtest')), 200
-
-
-
 
 
 # We only need this for local development.
