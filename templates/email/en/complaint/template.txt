@@ -1,0 +1,32 @@
+Confirmation for Complaint
+
+Thank you for sharing your experience with us. This helps us better serve you and your community.
+
+Your confirmation number is: {{casenumber}}.
+
+You can email us or call us at 512-972-2676 [link to call on mobile] any time with your confirmation number to check the status of your complaint. If you provided your contact information, a staff person from the Office of Police Oversight will contact you within two to four business days.
+
+{{data}}
+
+{{attachment_urls}}
+
+What happens next
+
+Once we receive your complaint we conduct a preliminary review. This includes reviewing the information we received as well as any additional information like videos, body camera videos, or talking to people who witnessed the event. During that review, our team looks for any potential violations of Austin Police Department policies or the law.
+
+Once the review is complete, we write up a brief summary of events, make recommendations, then classify the complaint based on our findings. If policy is violated, the complaint will be made public without any identifying information.
+
+If there are no policy violations we will let you know in an email or a mailed letter, as long as you provided your contact information.
+
+If, however, we have found policy violations then we send the write up to Internal Affairs within seven days of concluding our review. It is reviewed and assigned a sergeant, who handles the Internal Affairs investigation alongside the Office of Police Oversight. Once their investigation is concluded, the sergeant drafts a report using our findings and additional information like videos, body camera videos, or talking to people who witnessed the event. That report is sent up the chain of command for review.
+
+Once reviewed, the Chief of Police decides the outcome based on the severity of the event and any disciplinary action.
+
+We notify you of the outcome via email or mail. If the officer in question received a suspension of two or more days as a consequence of your complaint, we will point you to their discipline memo describing the circumstances of their suspension in our email or letter to you.
+
+You also have the option of a close-out meeting to discuss the outcome with the director and a complaint specialist from the Office of Police Oversight, a translator if you requested it, and an Internal Affairs officer.
+
+For a full explanation of the investigative process, as well as a ranking of policy violations visit the Complaint Investigative Process page. Again, thank you for sharing your experience with us.
+
+
+Copyright (C) {{year}} - Office of Design and Delivery, Austin TX
