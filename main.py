@@ -470,8 +470,74 @@ def casenum_register():
 @app.route('/form/submit', methods=['POST'])
 def casenum_updaterecord():
 
-    caseNum = "2019-0106-6370"
-    record = get_dynamodb_record(caseNum)
+    #
+    # Response Format
+    #
+    jsonResponse = {
+        'status': 'error',
+        'message': '',
+        'http_code': 403,
+        'case_number': ''
+    }
+
+    #
+    # Keep generating a case number until a new record is created.
+    #
+
+    while True:
+        caseNum = generate_casenum() # Generate case num.
+        print("casenum_register() Case Number: " + caseNum)
+        record = get_dynamodb_record(caseNum) # Record is 'None' if not found.
+
+        if(record == None):
+            print("casenum_register() Record not found, creating new...")
+            caseNumResp, resp = create_dynamodb_record(inputJson='{"type": "new_form_submission_placeholder"}',case_number=caseNum)
+            #return jsonify({ 'status': 'success', 'case_number': caseNumResp}), 200
+            print("/form/submit: We have a case number, caseNumResp: " + caseNumResp + ", caseNum: " + caseNum)
+            caseNum = caseNumResp
+            jsonResponse['case_number'] = caseNumResp
+            break
+        else:
+            print("/form/submit: Case number already exists, caseNumResp: " + caseNumResp + ", caseNum: " + caseNum)
+        print("/form/submit: Iterating loop ...")
+
+    print("\n----------------------------------------------------------------------\n")
+    print("/form/submit: Final Case Number: " + jsonResponse['case_number'])
+    print("\n----------------------------------------------------------------------\n")
+
+    #
+    # Once we have a case number, we submit emails ...
+    #
+
+    try:
+        #
+        #
+        #
+        print("E-Mail Generated")
+
+        #
+        # We then prepare the response
+        #
+        jsonResponse['http_code'] = 200
+        jsonResponse['status'] = 'success'
+        jsonResponse['message'] = 'Form submitted successfully.'
+    except Exception as e:
+        #
+        #
+        #
+        print("/form/submit: Error: " + str(e))
+        jsonResponse['status'] = 'error'
+        jsonResponse['message'] = "Failed to process form: {0}".format(str(e))
+
+
+    #
+    # Our Final Response
+    #
+    return jsonify(jsonResponse), jsonResponse['http_code']
+
+
+
+
 
     # if the record is found
     if(record != None):
