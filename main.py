@@ -446,29 +446,8 @@ def post_debug():
 
 
 
-@app.route('/form/register', methods=['GET'])
-def casenum_register():
-
-    #
-    # Keep generating a case number until a new record is created.
-    #
-    while True:
-        caseNum = generate_casenum() # Generate case num.
-        print("casenum_register() Case Number: " + caseNum)
-        record = get_dynamodb_record(caseNum) # Record is 'None' if not found.
-
-        if(record == None):
-            print("casenum_register() Record not found, creating new...")
-            caseNumResp, resp = create_dynamodb_record(inputJson='{"type": "new_form_submission_placeholder"}',case_number=caseNum)
-            return jsonify({ 'status': 'success', 'case_number': caseNumResp}), 200
-        else:
-            print("Case number already exists: " + caseNum + ", generating a new one.")
-
-
-
-
 @app.route('/form/submit', methods=['POST'])
-def casenum_updaterecord():
+def form_submit():
 
     #
     # Response Format
@@ -486,11 +465,11 @@ def casenum_updaterecord():
 
     while True:
         caseNum = generate_casenum() # Generate case num.
-        print("casenum_register() Case Number: " + caseNum)
+        print("/form/submit: Case Number: " + caseNum)
         record = get_dynamodb_record(caseNum) # Record is 'None' if not found.
 
         if(record == None):
-            print("casenum_register() Record not found, creating new...")
+            print("/form/submit: Record not found, creating new...")
             caseNumResp, resp = create_dynamodb_record(inputJson='{"type": "new_form_submission_placeholder"}',case_number=caseNum)
             #return jsonify({ 'status': 'success', 'case_number': caseNumResp}), 200
             print("/form/submit: We have a case number, caseNumResp: " + caseNumResp + ", caseNum: " + caseNum)
@@ -534,17 +513,6 @@ def casenum_updaterecord():
     # Our Final Response
     #
     return jsonify(jsonResponse), jsonResponse['http_code']
-
-
-
-
-
-    # if the record is found
-    if(record != None):
-        caseNumResp, resp = create_dynamodb_record(case_number=caseNum, inputJson='{"type": "placeholder"}')
-        return jsonify({ 'status': 'success', 'case_number': caseNumResp}), 200
-    else:
-        return jsonify({ 'status': 'error', 'record': record}), 200
 
 
 
@@ -633,9 +601,6 @@ def emailtest():
 
     else:
         return render_template('email_form.html', url=url_for('emailtest')), 200
-
-
-
 
 
 # We only need this for local development.
