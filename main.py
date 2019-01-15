@@ -264,10 +264,29 @@ def knack_create_record(record, table='complaints'):
     return response["id"], response
 
 
+#
+# Registers a new unique case number by
+# constantly running a loop checking if the random string is unique
+#
+def register_unique_casenum():
+    # Forever
+    while True:
+        # Generate case number (random string)
+        caseNum = generate_casenum() # Generate case num.
+        # Try to find it & hold a None value if not found.
+        record = get_dynamodb_record(caseNum) # Record is 'None' if not found.
+        # Since it is not found, we can create it!
+        if(record == None):
+            caseNumResp, resp = create_dynamodb_record(inputJson='{"type": "new_form_submission_placeholder"}',case_number=caseNum)
+            # Stop the loop, return value
+            return caseNumResp
+        # Else, continue loop.
 
 
+#
+# Returns the case number if it exists, None if it doesn't.
+#
 def get_dynamodb_record(identifierHash):
-    print("get_dynamodb_record() Record: " + identifierHash)
     dynamodb_response = dynamodb_client.get_item(
         TableName=LOG_TABLE,
         Key={
@@ -449,6 +468,8 @@ def post_debug():
 @app.route('/form/submit', methods=['POST'])
 def form_submit():
 
+    uniqueCaseNumber = register_unique_casenum()
+
     #
     # Response Format
     #
@@ -456,33 +477,10 @@ def form_submit():
         'status': 'error',
         'message': '',
         'http_code': 403,
-        'case_number': ''
+        'case_number': uniqueCaseNumber
     }
 
-    #
-    # Keep generating a case number until a new record is created.
-    #
-
-    while True:
-        caseNum = generate_casenum() # Generate case num.
-        print("/form/submit: Case Number: " + caseNum)
-        record = get_dynamodb_record(caseNum) # Record is 'None' if not found.
-
-        if(record == None):
-            print("/form/submit: Record not found, creating new...")
-            caseNumResp, resp = create_dynamodb_record(inputJson='{"type": "new_form_submission_placeholder"}',case_number=caseNum)
-            #return jsonify({ 'status': 'success', 'case_number': caseNumResp}), 200
-            print("/form/submit: We have a case number, caseNumResp: " + caseNumResp + ", caseNum: " + caseNum)
-            caseNum = caseNumResp
-            jsonResponse['case_number'] = caseNumResp
-            break
-        else:
-            print("/form/submit: Case number already exists, caseNumResp: " + caseNumResp + ", caseNum: " + caseNum)
-        print("/form/submit: Iterating loop ...")
-
-    print("\n----------------------------------------------------------------------\n")
     print("/form/submit: Final Case Number: " + jsonResponse['case_number'])
-    print("\n----------------------------------------------------------------------\n")
 
     #
     # Once we have a case number, we submit emails ...
@@ -492,7 +490,7 @@ def form_submit():
         #
         #
         #
-        print("E-Mail Generated")
+        #print("E-Mail Generated")
 
         #
         # We then prepare the response
@@ -505,7 +503,6 @@ def form_submit():
         #
         #
         print("/form/submit: Error: " + str(e))
-        jsonResponse['status'] = 'error'
         jsonResponse['message'] = "Failed to process form: {0}".format(str(e))
 
 
