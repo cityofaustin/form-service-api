@@ -407,6 +407,9 @@ def is_language_supported(formJson):
     except:
         return False
 
+#
+# Returns the language file as a json object
+#
 def load_language_file(filepath):
 
     isfile = os.path.isfile(filepath)
