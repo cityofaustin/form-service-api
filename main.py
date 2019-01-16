@@ -87,9 +87,9 @@ else:
 emailConfigDefault = {
     "charset": "UTF-8",
     "html": "",
-    "text": "Test sent from API",
-    "subject": "Amazon SES Test (SDK for Python)",
-    "sender": "Office of Design and Delivery <no-reply@austintexas.io>",
+    "text": "",
+    "subject": "Thank You",
+    "sender": "Office of Police Oversight <no-reply@austintexas.io>",
     "recipient": "no-reply@austintexas.io"
 }
 
@@ -604,7 +604,7 @@ def spanish_test():
 
 
 
-@app.route('/emailtest', methods=['GET', 'POST'])
+@app.route('/emailtest', methods=['POST'])
 def emailtest():
     #
     # E-Mail Configuration
