@@ -1,2 +1,3 @@
 # ignore virtual env directory
 /pmenv
+.DS_Store
