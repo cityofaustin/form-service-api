@@ -519,16 +519,75 @@ def casenum_register():
 
 @app.route('/form/submit', methods=['POST'])
 def casenum_updaterecord():
+    caseNum = ""
+    requestJson = json.dumps(request.json)
 
-    caseNum = "2019-0106-6370"
-    record = get_dynamodb_record(caseNum)
+    while True:
+        caseNum = generate_casenum() # Generate case num.
+        record = get_dynamodb_record(caseNum) # Record is 'None' if not found.
+        if(record == None):
+            break
 
-    # if the record is found
-    if(record != None):
-        caseNumResp, resp = create_dynamodb_record(case_number=caseNum, inputJson='{"type": "placeholder"}')
+    caseNumResp, resp = create_dynamodb_record(case_number=caseNum, inputJson='{"type": "placeholder"}')
+
+    #
+    # Submission Type
+    #
+    submission_type = get_submission_type(request.json)
+    language_code = get_language(request.json)
+    is_lang_supported = is_language_supported(request.json)
+
+    #
+    #
+    #
+    email_lang_file = "./templates/email/" + language_code + "/" + submission_type + "/language.json"
+    email_language = load_language_file(email_lang_file)
+
+    #
+    #
+    #
+    print(json.dumps(email_language))
+    user_email = 'sergio.garcia@austintexas.gov' #request.json['recipient']
+
+    # print("User email: " + user_email)
+    # print("submission_type: " + submission_type)
+    # print("language_code: " + language_code)
+    # print("is_lang_supported: " + str(is_lang_supported))
+
+
+    # Check if the method is post
+    # if request.method == 'POST':
+    htmlTemplate = render_template(
+        "email/" + language_code + "/" + submission_type + "/template.html",
+        type=submission_type,
+        casenumber=caseNumResp,
+        data=requestJson,
+        attachment_urls=request.json['evidenceFiles'])
+
+    txtTemplate = render_template(
+        "email/" + language_code + "/" + submission_type + "/template.txt",
+        type=submission_type,
+        casenumber=requestJson,
+        data=requestJson,
+        attachment_urls=request.json['evidenceFiles'])
+
+
+    #
+    # We set up the email submission.
+    #
+    emailConfig = emailConfigDefault.copy()
+    emailConfig['recipient'] = user_email
+    emailConfig['html'] = htmlTemplate
+    emailConfig['text'] = txtTemplate
+    emailConfig['subject'] = email_language['emailSubject']
+
+    try:
+        response = sendEmail(emailConfig)
         return jsonify({ 'status': 'success', 'case_number': caseNumResp}), 200
-    else:
-        return jsonify({ 'status': 'error', 'record': record}), 200
+    except:
+        return jsonify({ 'status': 'error', 'case_number': caseNumResp}), 200
+
+
 
 
 

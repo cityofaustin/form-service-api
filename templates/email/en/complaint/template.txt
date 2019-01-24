@@ -6,11 +6,19 @@ Your confirmation number is: {{casenumber}}.
 
 You can email us or call us at 512-972-2676 [link to call on mobile] any time with your confirmation number to check the status of your complaint. If you provided your contact information, a staff person from the Office of Police Oversight will contact you within two to four business days.
 
+Submission:
+
 {{data}}
 
-{{attachment_urls}}
 
-What happens next
+Downloads:
+
+{% for attachment_item in attachment_urls %}
+https://6jm8rnjkxf.execute-api.us-east-1.amazonaws.com/staging/{{attachment_item}}
+{% endfor %}
+
+
+What happens next?
 
 Once we receive your complaint we conduct a preliminary review. This includes reviewing the information we received as well as any additional information like videos, body camera videos, or talking to people who witnessed the event. During that review, our team looks for any potential violations of Austin Police Department policies or the law.
 

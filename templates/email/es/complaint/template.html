@@ -41,7 +41,7 @@
     </style>
   </head>
 <body>
-  <h1>Confirmación de Queja</h1>
+  <h1>Confirmation for Complaint</h1>
 
   <div class='form-data'>
     <p>Thank you for sharing your experience with us. This helps us better serve you and your community.</p>
@@ -55,12 +55,14 @@
     </div>
 
     <div class='form-data-block'>
-    {{attachment_urls}}
+      {% for attachment_item in attachment_urls %}
+          <a href="https://6jm8rnjkxf.execute-api.us-east-1.amazonaws.com/staging/{{attachment_item}}">{{ attachment_item }}</a>
+      {% endfor %}
     </div>
 
 
 
-    <h2>Que sucederá ahora?</h2>
+    <h2>What happens next</h2>
 
     <p>Once we receive your complaint we conduct a preliminary review. This includes reviewing the information we received as well as any additional information like videos, body camera videos, or talking to people who witnessed the event. During that review, our team looks for any potential violations of Austin Police Department policies or the law.</p>
 

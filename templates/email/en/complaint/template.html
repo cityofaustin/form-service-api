@@ -55,7 +55,9 @@
     </div>
 
     <div class='form-data-block'>
-    {{attachment_urls}}
+      {% for attachment_item in attachment_urls %}
+          <a href="https://6jm8rnjkxf.execute-api.us-east-1.amazonaws.com/staging/{{attachment_item}}">{{ attachment_item }}</a>
+      {% endfor %}
     </div>
 
 
