@@ -1,0 +1,136 @@
+---
+common:
+  referrer:
+    en: "Referrer"
+    es: "Referente"
+  gender:
+    en: "Gender"
+    es: "Genero"
+  race:
+    en: "Race"
+    es: "Raza"
+  zipcode:
+    en: "Zip Code"
+    es: "Codigo de Area"
+  true:
+    en: "✅"
+    es: "✅"
+  false:
+    en: "❌"
+    es: "❌"
+  description:
+    en: "Description"
+    es: "Descripcion"
+  date_and_time:
+    en: "Date & Time"
+    es: "Fecha y Hora"
+  location:
+    en: "Location"
+    es: "Ubicacion"
+  address:
+    en: "Address"
+    es: "Direccion"
+  position:
+    en: "Position"
+    es: "Posicion"
+  officers:
+    en: "Officer(s)"
+    es: "Oficial(es)"
+  officer:
+    en: "Officer"
+    es: "Oficial"
+  witnesses:
+    en: "Witness(es)"
+    es: "Testigo(s)"
+  witness:
+    en: "Witness"
+    es: "Testigo"
+  attachments:
+    en: "Attachments"
+    es: "Archivos Adjuntos"
+  evidence:
+    en: "Evidence"
+    es: "Evidencia"
+  latitude:
+    en: "Latitude"
+    es: "Latitud"
+  longitude:
+    en: "Longitude"
+    es: "Longitud"
+  name:
+    en: "Name"
+    es: "Nombre"
+  badge_number:
+    en: "Badge Number"
+    es: "Numero de Placa"
+  uniformed:
+    en: "Uniformed"
+    es: "Uniformado"
+  transportation:
+    en: "Transportation"
+    es: "Transporte"
+  phone:
+    en: "Phone"
+    es: "Telefono"
+  email:
+    en: "E-Mail"
+    es: "E-Mail"
+  needTranslator:
+    en: "Needs Translator"
+    es: "Necesita Traductor"
+  office:
+    en: "Office of Police Oversight"
+    es: "Office of Police Oversight"
+  requiredfield:
+    en: "Required"
+    es: "Requerido"
+complaint:
+  emailSubject:
+    en: "Your complaint was submitted successfully."
+    es: "Su queja ha sido enviada."
+  title:
+    en: "Your complaint was submitted successfully."
+    es: "Su queja ha sido enviada."
+  demographics:
+    en: "Demographic Information"
+    es: "Informacion Demografica"
+  willingcontact:
+    en: "Willing to be Contacted"
+    es: "Desea ser contactado"
+  has_officer_details:
+    en: "Has Officer Details"
+    es: "Tiene Detalles del Oficial"
+  has_witness_information:
+    en: "Has Witness Information"
+    es: "Tiene Informacion de Testigos"
+  aware_of_evidence:
+    en: "Aware of Evidence"
+    es: "Tiene Evidencia"
+  additional_information:
+    en: "Additional Information"
+    es: "Informacion Adicional"
+  tell_us_what_happened:
+    en: "Tell us what happened"
+    es: "Diganos que sucedio"
+  has_ticket:
+    en: "Has Ticket"
+    es: "Tiene Ticket"
+  ticket_number:
+    en: "Ticket Number"
+    es: "Numero de Ticket"
+  review_your_evidence:
+    en: "Review your evidence"
+    es: "Revise su evidencia"
+  tell_us_about_the_officers:
+    en: "Tell us about the officer(s)"
+    es: "Diganos acerca de los oficiales"
+  tell_us_about_the_witness:
+    en: "Tell us about any witnesses"
+    es: "Diganos acerca de algun testigo"
+thanks:
+  title:
+    en: "Confirmation for Thanks"
+    es: "Confirmacion de Agradecimiento"
+  emailSubject:
+    en: "Your thank you was submitted successfully!"
+    es: "Su nota de agradecimiento ha sido enviada!"

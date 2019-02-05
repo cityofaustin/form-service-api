@@ -1,0 +1,20 @@
+** {{ t('title') }}
+------------------------------------------------------------
+{% if language_code() == 'es' %}
+
+Thank you for telling us about your experience with us. This helps us better serve you and your community.
+
+Your feedback will go to the Office of Police Oversight and the Austin Police Department’s Internal Affairs Division, as well as to the officer’s chain of command.
+
+{% else %}
+
+Thank you for telling us about your experience with us. This helps us better serve you and your community.
+
+Your feedback will go to the Office of Police Oversight and the Austin Police Department’s Internal Affairs Division, as well as to the officer’s chain of command.
+
+{% endif %}
+
+{% include 'email/officepoliceoversight/thanks/form-data.txt' %}
+
+------------------------------------------------------------
+{% include 'email/officepoliceoversight/common/footer.txt' %}

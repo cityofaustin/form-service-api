@@ -1,0 +1,66 @@
+
+{{t('demographics')}}:
+{{t('referrer')}}: {{data['howDidYouGetHere'] or 'N/A' }}
+{{t('gender')}}: {{data['gender'] or 'N/A' }}
+{{t('race')}}: {{data['race'] or 'N/A' }}
+{{t('zipcode')}}: {{data['zipCode'] or 'N/A' }}
+{{t('willingcontact')}}: {{data['view:contactPreferences']['willingToBeContacted'] or 'N/A' }}
+{{t('has_officer_details')}}: {{ data['hasOfficerDetails'] or 'N/A' }}
+{{t('has_witness_information')}}: {{data['hasWitnessInformation'] or 'N/A' }}
+{{t('aware_of_evidence')}}: {{data['awareOfEvidence'] or 'N/A' }}
+
+
+
+{{t('description')}}:
+{{data['description'] or 'N/A' }}
+
+
+
+
+{{t('date_and_time')}}:
+{{data['datetime'] or 'N/A' }}
+
+
+
+{{t('location')}}:
+{{t('address')}}: {{data['location']['address'] or 'N/A'}}
+{{t('position')}}:
+
+{{t('longitude')}}: {{data['location']['position']['lng'] or 'N/A'}}
+{{t('latitude')}}: {{data['location']['position']['lat'] or 'N/A'}}
+
+
+
+{{t('officers')}}:
+{% for officer in data['officers'] %}
+
+{{t('name')}}: {{officer['name'] or 'N/A' }}
+{{t('description')}}: {{officer['description'] or 'N/A' }}
+{{t('race')}}: {{officer['race'] or 'N/A' }}
+{{t('gender')}}: {{officer['gender'] or 'N/A' }}
+{{t('badge_number')}}: {{officer['badgeNumber'] or 'N/A' }}
+{{t('uniformed')}}: {{officer['uniformed'] or 'N/A' }}
+{{t('transportation')}}: {{officer['transportation'] or 'N/A' }}
+
+{% endfor %}
+
+
+
+{{t('witnesses')}}:
+{% for witness in data['witnesses'] %}
+
+{{t('name')}}: {{witness['name'] or 'N/A' }}
+{{t('email')}}: {{witness['email'] or 'N/A' }}
+{{t('phone')}}: {{witness['phoneNumber'] or 'N/A' }}
+{{t('additional_information')}}: {{witness['anythingElse'] or 'N/A' }}
+
+{% endfor %}
+
+
+
+
+{{t('attachments')}} / {{t('evidence')}}
+
+{% for attachment_item in attachment_urls %}
+- Link: {{api_endpoint}}{{attachment_item}}
+{% endfor %}
