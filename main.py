@@ -1,23 +1,39 @@
 # Flask
 from flask import Flask, flash, request, render_template, \
                     redirect, url_for, send_from_directory, jsonify
+
 from flask_cors import CORS
-from werkzeug.utils import secure_filename
 
 # File Management
 import os, io, base64, boto3, datetime, time, calendar, requests
-from PIL import Image
+
 from botocore.exceptions import ClientError
 
 # Random hash generation
 import uuid, hashlib, hmac, re
 
 # Knack integrator
-import knackpy, json
+import knackpy, json, yaml
+
+from premailer import transform
+
+from jinja2 import Environment, FileSystemLoader, StrictUndefined, Undefined, Template
 
 
+class SilentUndefined(Undefined):
 
+    def _fail_with_undefined_error(self, *args, **kwargs):
+        return ''
 
+    def _new(*args, **kwargs):
+        return SilentUndefined()
+
+    __call__ = __getitem__ = __getattr__ = _new
+    __add__ = __radd__ = __mul__ = __rmul__ = __div__ = __rdiv__ = \
+        __truediv__ = __rtruediv__ = __floordiv__ = __rfloordiv__ = \
+        __mod__ = __rmod__ = __pos__ = __neg__ = __lt__ = __le__ = \
+        __gt__ = __ge__ = __int__ = __float__ = __complex__ = __pow__ = \
+        __rpow__ = _fail_with_undefined_error
 
 
 
@@ -42,6 +58,8 @@ import knackpy, json
 # Configuration & Environment Variables
 #
 
+OPO_ENV = Environment(undefined=SilentUndefined,loader=FileSystemLoader('templates'))
+
 UPLOAD_FOLDER = '/tmp'
 DEPLOYMENT_MODE           = os.getenv("DEPLOYMENT_MODE", "LOCAL")
 AVAILABLE_LANGUAGES       = ['en', 'es']
@@ -59,6 +77,15 @@ S3_LOCATION               = 'http://{}.s3.amazonaws.com/'.format(S3_BUCKET)
 DEFALUT_REGION            = os.getenv("AWS_DEFAULT_REGION", "us-east-1")
 LOG_TABLE                 = os.getenv("PM_LOGTABLE", "police-monitor-records")
 
+EMAIL_ADDRESS_USER        = os.getenv("EMAIL_ADDRESS_USER")
+EMAIL_ADDRESS_OPO         = os.getenv("EMAIL_ADDRESS_OPO")
+EMAIL_ADDRESS_APD         = os.getenv("EMAIL_ADDRESS_APD")
+
+TRANSLATION_DICT          = {
+    "___default_language___": "en",
+    "___default_section___": ""
+}
+
 app = Flask(__name__, static_folder='static', static_url_path='/static')
 CORS(app) # Get rid of me!!!!
 # https://github.com/corydolphin/flask-cors
@@ -71,6 +98,7 @@ app.config['DEFALUT_REGION'] = DEFALUT_REGION
 app.config['LOG_TABLE'] = LOG_TABLE
 app.config['S3_KEY']      = S3_KEY
 app.config['S3_SECRET']   = S3_SECRET
+app.config['DEBUG'] = False
 
 if(DEPLOYMENT_MODE == "LOCAL"):
     # Initialize S3 Client
@@ -100,6 +128,10 @@ emailConfigDefault = {
 
 
 
+#
+# TRANSLATION
+#
+
 
 
 
@@ -121,6 +153,49 @@ emailConfigDefault = {
 #
 # Helper Functions
 #
+
+def load_tanslation(file_path, section, language):
+    global TRANSLATION_DICT
+    with open(file_path, 'r') as stream:
+        try:
+            TRANSLATION_DICT = yaml.load(stream)
+            TRANSLATION_DICT["___default_section___"] = section
+            TRANSLATION_DICT["___default_language___"] = language
+        except Exception as e:
+            print(str(e))
+
+def translate(key):
+    global TRANSLATION_DICT
+    section = TRANSLATION_DICT["___default_section___"]
+    language = TRANSLATION_DICT["___default_language___"]
+
+    try:
+        return TRANSLATION_DICT['common'][key][language]
+    except:
+        """ Not found in common words, trying section """
+
+    try:
+        return TRANSLATION_DICT[section][key][language]
+    except:
+        print("translate() Section: '{0}', Key: '{1}', Language: '{2}' -- NOT FOUND".format(section, key, language))
+
+    return ""
+
+def get_language_code():
+    global TRANSLATION_DICT
+    try:
+        return TRANSLATION_DICT["___default_language___"]
+    except:
+        return "en"
+
+#
+# We are going to register a custom filter, to get the file name
+#
+OPO_ENV.filters['basename'] = os.path.basename
+OPO_ENV.globals['t'] = translate
+OPO_ENV.globals['language_code'] = get_language_code
+
+
 def build_response(inputDict):
     return jsonify(inputDict), inputDict["status_code"]
 
@@ -385,7 +460,7 @@ def upload_file_to_s3(file, bucket_name, acl="public-read"):
 # submission_type contains 'thank' (example)
 def get_submission_type(formJson):
     try:
-        return formJson['type'] if formJson['type'] != "" else "thanks"
+        return formJson['type'] if formJson['type'] != "" else "complaint"
     except:
         return AVAILABLE_TYPES[0]
 
@@ -427,6 +502,11 @@ def load_language_file(filepath):
         print(e)
         return None
 
+def render_email_template(template_filepath, **kwargs):
+    template_file = os.path.basename(template_filepath)
+    template = OPO_ENV.get_template(template_filepath)
+    return(template.render(**kwargs))
+
 
 #
 # Send Email Function
@@ -466,6 +546,10 @@ def sendEmail(emailConfig):
         mid = response['MessageId']
         print("Email sent! Message ID: " + mid)
         return mid
+
+
+
+
 
 
 # 88""Yb  dP"Yb  88   88 888888 888888 .dP"Y8
@@ -513,81 +597,6 @@ def casenum_register():
             return jsonify({ 'status': 'success', 'case_number': caseNumResp}), 200
         else:
             print("Case number already exists: " + caseNum + ", generating a new one.")
-
-
-
-
-@app.route('/form/submit', methods=['POST'])
-def casenum_updaterecord():
-    caseNum = ""
-    requestJson = json.dumps(request.json)
-
-    while True:
-        caseNum = generate_casenum() # Generate case num.
-        record = get_dynamodb_record(caseNum) # Record is 'None' if not found.
-        if(record == None):
-            break
-
-    caseNumResp, resp = create_dynamodb_record(case_number=caseNum, inputJson='{"type": "placeholder"}')
-
-    #
-    # Submission Type
-    #
-    submission_type = get_submission_type(request.json)
-    language_code = get_language(request.json)
-    is_lang_supported = is_language_supported(request.json)
-
-    #
-    #
-    #
-    email_lang_file = "./templates/email/" + language_code + "/" + submission_type + "/language.json"
-    email_language = load_language_file(email_lang_file)
-
-    #
-    #
-    #
-    print(json.dumps(email_language))
-    user_email = 'sergio.garcia@austintexas.gov' #request.json['recipient']
-
-    # print("User email: " + user_email)
-    # print("submission_type: " + submission_type)
-    # print("language_code: " + language_code)
-    # print("is_lang_supported: " + str(is_lang_supported))
-
-
-    # Check if the method is post
-    # if request.method == 'POST':
-    htmlTemplate = render_template(
-        "email/" + language_code + "/" + submission_type + "/template.html",
-        type=submission_type,
-        casenumber=caseNumResp,
-        data=requestJson,
-        attachment_urls=request.json['evidenceFiles'])
-
-    txtTemplate = render_template(
-        "email/" + language_code + "/" + submission_type + "/template.txt",
-        type=submission_type,
-        casenumber=requestJson,
-        data=requestJson,
-        attachment_urls=request.json['evidenceFiles'])
-
-
-    #
-    # We set up the email submission.
-    #
-    emailConfig = emailConfigDefault.copy()
-    emailConfig['recipient'] = user_email
-    emailConfig['html'] = htmlTemplate
-    emailConfig['text'] = txtTemplate
-    emailConfig['subject'] = email_language['emailSubject']
-
-    try:
-        response = sendEmail(emailConfig)
-        return jsonify({ 'status': 'success', 'case_number': caseNumResp}), 200
-    except:
-        return jsonify({ 'status': 'error', 'case_number': caseNumResp}), 200
-
-
 
 
 
@@ -663,62 +672,273 @@ def spanish_test():
 
 
 
-@app.route('/emailtest', methods=['POST'])
-def emailtest():
+
+@app.route('/form/submit', methods=['POST'])
+def casenum_updaterecord():
+    global EMAIL_ADDRESS_USER, EMAIL_ADDRESS_OPO, EMAIL_ADDRESS_APD
+
+    caseNum = ""
+    data = request.json
+    print(data)
+    requestJson = json.dumps(request.json)
+
+    while True:
+        caseNum = generate_casenum() # Generate case num.
+        record = get_dynamodb_record(caseNum) # Record is 'None' if not found.
+        if(record == None):
+            break
+
+    caseNumResp, resp = create_dynamodb_record(case_number=caseNum, inputJson='{"type": "placeholder"}')
+
     #
-    # E-Mail Configuration
+    # Submission Type
     #
-    submission_type = get_submission_type(request.json)
-    language_code = get_language(request.json)
-    is_lang_supported = is_language_supported(request.json)
-
-    email_lang_file = "./templates/email/" + language_code + "/" + submission_type + "/language.json"
-
-    email_language = load_language_file(email_lang_file)
-
-    print(json.dumps(email_language))
-    user_email = request.json['recipient']
-
-    print("User email: " + user_email)
-    print("submission_type: " + submission_type)
-    print("language_code: " + language_code)
-    print("is_lang_supported: " + str(is_lang_supported))
+    submission_type = get_submission_type(data)
+    language_code = get_language(data)
+    is_lang_supported = is_language_supported(data)
 
 
+    #
+    # Evidence
+    #
+    try:
+        evidenceFiles = json.loads(data['evidenceFiles'])
+    except:
+        evidenceFiles = []
 
-    # Check if the method is post
-    # if request.method == 'POST':
-    htmlTemplate = render_template(
-        "email/" + language_code + "/" + submission_type + "/template.html",
-        type=submission_type,
-        casenumber='2018-1212-5fe3',
-        data="The data goes here",
-        attachment_urls=["http://s3.url/here"])
+    #
+    # Location
+    #
+    if 'location' in data:
+        dataLocationTemp = data['location']
 
-    txtTemplate = render_template(
-        "email/" + language_code + "/" + submission_type + "/template.txt",
-        type=submission_type,
-        casenumber='2018-1212-5fe3',
-        data="The data goes here",
-        attachment_urls=["http://s3.url/here"])
+        try:
+            data['location'] = json.loads(data['location'])
+        except:
+            data['location'] = dataLocationTemp
+    else:
+        data['location'] = { "address": "", "position": {"lat": "", "lng": ""}}
 
 
 
-    emailConfig = emailConfigDefault.copy()
-    emailConfig['recipient'] = user_email
-    emailConfig['html'] = htmlTemplate
-    emailConfig['text'] = txtTemplate
-    emailConfig['subject'] = email_language['emailSubject']
+    # Our Flask Output, assume success
+    email_status = {
+        'status': 'success',
+        'message': 'success',
+        'case_number': caseNumResp
+    }
 
-    response = sendEmail(emailConfig)
-    print ("Email Response: " + response)
-    return jsonify(emailConfig), 200
+    #
+    # Let's now sort out the user's email address...
+    #
 
-    # else:
-    #     return render_template('email_form.html', url=url_for('emailtest')), 200
+    try:
+        EMAIL_ADDRESS_USER = data['view:contactPreferences']['yourEmail']
+    except:
+        print("Error accessing data['view:contactPreferences']['yourEmail'] using default EMAIL_ADDRESS_USER: " + EMAIL_ADDRESS_USER)
+
+    #
+    # We now set up our email list, at least two recipients...
+    #
+    email_list = {
+        "recipient": EMAIL_ADDRESS_USER,
+        "opo": EMAIL_ADDRESS_OPO
+    }
+    # If this is a 'thank' note, then it goes to APD too...
+    if(submission_type == 'compliment'):
+        email_list['apd'] = EMAIL_ADDRESS_APD
+
+    # For each party, send an email.
+    for party, party_email in email_list.items():
+
+        # Don't send email if email is empty...
+        if (party_email == ""):
+            continue
+
+        # We load the language of the recipiant, for opo or apd must default to english.
+        currentLangCode = language_code if party == "recipient" else "en"
+
+        # load given language
+        load_tanslation('templates/email/officepoliceoversight/language.yaml',
+            section=submission_type,
+            language=currentLangCode)
+
+        print("E-Mail Language Loaded: " + currentLangCode)
+
+        # Now we specify the destination email, and translated subject
+        emailConfig = emailConfigDefault.copy()
+        emailConfig['recipient'] = party_email
+        emailConfig['subject'] = translate('emailSubject')
+        print("Subject: " + emailConfig['subject'])
+        print("Sending E-Mail to '" + party + "': " + party_email)
+
+        # Render HTML template
+        htmlTemplate = render_email_template("email/officepoliceoversight/" + submission_type + "/template.html",
+            casenumber=caseNumResp,
+            data=data,
+            attachment_urls=evidenceFiles,
+            api_endpoint=url_for('file_download_uri', path='', _external=True)
+        )
+
+        # Render TXT template (for non-html compatible services)
+        txtTemplate = render_email_template("email/officepoliceoversight/" + submission_type + "/template.txt",
+            casenumber=caseNumResp,
+            data=data,
+            attachment_urls=evidenceFiles,
+            api_endpoint=url_for('file_download_uri', path='', _external=True)
+        )
+
+        emailConfig['html'] = htmlTemplate
+        emailConfig['text'] = txtTemplate
+
+        # Try to submit, capture status
+        try:
+            response = sendEmail(emailConfig)
+        except Exception as e:
+            email_status = {
+                'status': 'error',
+                'message': str(e),
+                'case_number': caseNumResp
+            }
+
+    #
+    # Finally return if submission attempt presents with no errors
+    #
+    return jsonify(email_status), 200
 
 
 
+@app.route('/email-template', methods=['GET'])
+def emailtemplate():
+    jsonObj = {
+    	"language": "en",
+    	"type": "complaint",
+        "view:infoObject": {},
+        "gender": "male",
+        "race": "latino",
+        "zipCode": "78727",
+        "view:contactHeader": {},
+        "willingToBeContacted": True,
+        "view:contactPreferences": {
+            "yourName": "Sergio Garcia",
+            "yourPhone": "5127585487",
+            "yourEmail": "sergiogcx@gmail.com",
+            "needTranslator": True
+        },
+        "hasWitnessInformation": True,
+        "witnesses": [
+            {
+                "name": "Witness #1 Name",
+                "email": "witness1-email@here.com",
+                "phoneNumber": "512-987-6543",
+                "anythingElse": "Witness #1 Additional Details here"
+            },
+            {
+                "name": "Witness #2 Name",
+                "email": "wit2@email.com",
+                "phoneNumber": "512-654-9876",
+                "anythingElse": "Witness #2 Additional Details here"
+            }
+        ],
+        "hasOfficerDetails": True,
+        "officers": [
+            {
+                "name": "Officer #1 Name Here",
+                "physicalDescription": "Officer #1 Description",
+                "race": "latino",
+                "gender": "male",
+                "badgeNumber": "123-567",
+                "uniformed": True,
+                "transportation": "patrol"
+            },
+            {
+                "name": "Officer #2 Name",
+                "physicalDescription": "Officer #2 Description",
+                "race": "other",
+                "otherRace": "Not Sure",
+                "gender": "male",
+                "badgeNumber": "2272026",
+                "uniformed": True,
+                "transportation": "other",
+                "otherTransportation": "Totally on foot"
+            }
+        ],
+        "awareOfEvidence": True,
+        "evidenceFiles": "[\"uploads/24f4ba858d34ee3a6fb6d3460ee64248499fd8d17d7b86997ca50c0f3c8c17f6/01312019182438_adb80_austinseal.gif\", \"uploads/24f4ba858d34ee3a6fb6d3460ee64248499fd8d17d7b86997ca50c0f3c8c17f6/01312019182438_adb80_austinseal.gif\",\"uploads/24f4ba858d34ee3a6fb6d3460ee64248499fd8d17d7b86997ca50c0f3c8c17f6/01312019182438_adb80_austinseal.gif\"]",
+        "description": "This is the description of the incident.",
+        "datetime": "2019-01-31 12:00",
+        "hasTicket": True,
+        "ticket": "7202621",
+        "location": "{\"address\":\"436 W 8th St, Austin, TX 78701, United States\",\"position\":{\"lng\":-97.745934,\"lat\":30.271272}}"
+    }
+
+
+
+
+
+    #
+    # ---------------------------------------------------------------
+    # ---------------------------------------------------------------
+    # ---------------------------------------------------------------
+    #
+
+    data = jsonObj
+
+    #
+    # Submission Type
+    #
+    submission_type = get_submission_type(data)
+    language_code = get_language(data)
+    is_lang_supported = is_language_supported(data)
+
+    #
+    # We now load the needed translation
+    #
+    load_tanslation('templates/email/officepoliceoversight/language.yaml',
+        section=submission_type,
+        language=language_code)
+
+
+
+    #
+    # Evidence
+    #
+    try:
+    	evidenceFiles = json.loads(data['evidenceFiles'])
+    except:
+    	evidenceFiles = []
+
+    #
+    # Location
+    #
+    if 'location' in data:
+    	dataLocationTemp = data['location']
+
+    	try:
+    		data['location'] = json.loads(data['location'])
+    	except:
+    		data['location'] = dataLocationTemp
+    else:
+    	data['location'] = { "address": "", "position": {"lat": "", "lng": ""}}
+
+    htmlTemplate = transform(render_email_template("email/officepoliceoversight/" + submission_type + "/template.html",
+        casenumber= '2018-1212-5fe3',
+        data=data,
+        attachment_urls=evidenceFiles,
+        api_endpoint=url_for('file_download_uri', path='', _external=True)
+    ))
+
+    txtTemplate = render_email_template("email/officepoliceoversight/" + submission_type + "/template.txt",
+        casenumber= '2018-1212-5fe3',
+        data=data,
+        attachment_urls=evidenceFiles,
+        api_endpoint=url_for('file_download_uri', path='', _external=True)
+    )
+
+    print("\n\n\n\n\n")
+    print(txtTemplate)
+
+    return htmlTemplate, 200
 
 
 # We only need this for local development.
