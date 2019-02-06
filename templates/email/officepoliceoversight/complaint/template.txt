@@ -1,0 +1,28 @@
+** {{ t('title') }}
+------------------------------------------------------------
+{% if language_code() == 'es' %}
+
+Gracias por compartir su experiencia con nosotros. Esto nos ayuda a servirle mejor a usted y a su comunidad.
+
+Su numero de confirmacion es: {{casenumber}}
+
+Usted nos puede contactar por email a policeoversight@austintexas.gov o llamar al 512-972-2676 a cualquier hora con su numero de confirmation para checar el estado de su queja. Si usted ha proveido su informacion de contacto, una persona de la oficina 'Office of Police Oversight' se comunicara con usted en dos o cuatro dias nominales.
+
+Para una explicacion completa de que sigue despues, visite la pagina 'Complaint Investigative Process' asi como ver el rango de violaciones de leyes. De nuevo, le agradecemos por compartir su experience con nosotros.
+
+{% else %}
+
+Thank you for sharing your experience with us. This helps us better serve you and your community.
+
+Your confirmation number is: {{casenumber}}
+
+You can email-us at policeoversight@austintexas.gov or call us at 512-972-2676 any time with your confirmation number to check the status of your complaint. If you provided your contact information, a staff person from the Office of Police Oversight will contact you within two to four business days.
+
+For a full explanation of what happens next, as well as a ranking of policy violations, visit the Complaint Investigative Process page. Again, thank you for sharing your experience with us.
+
+{% endif %}
+
+{% include 'email/officepoliceoversight/complaint/form-data.txt' %}
+
+------------------------------------------------------------
+{% include 'email/officepoliceoversight/common/footer.txt' %}
