@@ -4,13 +4,23 @@
         "profile_name": null,
         "project_name": "police-monitor",
         "runtime": "python3.6",
-        "s3_bucket": "police-monitor-uploads-staging"
+        "s3_bucket": "police-monitor-uploads-staging",
+        "extra_permissions": [{
+            "Effect": "Allow",
+            "Action": ["ses:*"],
+            "Resource": "arn:aws:lambda:us-east-1:445025639710:function:police-monitor-staging"
+        }]
     },
     "production": {
         "app_function": "main.app",
         "profile_name": null,
         "project_name": "police-monitor",
         "runtime": "python3.6",
-        "s3_bucket": "police-monitor-uploads-production"
+        "s3_bucket": "police-monitor-uploads-production",
+        "extra_permissions": [{
+            "Effect": "Allow",
+            "Action": ["ses:*"],
+            "Resource": "arn:aws:lambda:us-east-1:445025639710:function:police-monitor-production"
+        }]
     }
 }
