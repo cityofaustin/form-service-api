@@ -5,18 +5,50 @@
 }
 
 body {
-  margin: 20px;
+  margin: 0;
   font-family: "Arial", "Open Sans", sans-serif;
   color: #171717;
-  margin-top: 50px;
+  margin-bottom: 20px
+}
+
+.form-header {
+  background-color: #0050D8;
+  height: 157px;
+  color: white;
+  text-align: center;
+}
+.form-header > img {
+  width: 44px;
+  height: 44px;
+  margin-top: 23px;
+}
+
+.form-header > p {
+  margin-top: 10px;
+  font-size: 24px;
 }
 
 h3 {
-  text-shadow: 2px 2px 3px #d1d1d1;
   font-size: 24px;
   text-align: center;
-  margin:0;
+  margin: 0;
+  margin-top: 15px;
   mso-line-height-rule: exactly;
+  color: #0050D8;
+}
+
+.form-title {
+    background-color: #F0F0F0;
+    border-radius: 4px;
+    box-shadow: #C0C0C0 0 1px 3px;
+    color: #0050D8;
+    font-size: 12px;
+    position: relative;
+    top: -25px;
+    line-height: 50px;
+    text-align: center;
+    text-transform: uppercase;
+    font-weight: bold;
 }
 
 footer {
@@ -60,12 +92,23 @@ ol {
   ul, ol {
     padding-left: 10px;
   }
+  .form-header-container {
+    width: 100%;
+  }
 
+  .form-header {
+    width: 100%;
+  }
 
+  .form-title {
+    width: 89% !important; 
+    margin-left: 5.5% !important;
+  }
 
   /* For mobile phones: */
   .form-content {
-      width: 100%;
+    width: 92%;
+    padding: 4%;
   }
 
   .form-confirmation {
@@ -109,9 +152,22 @@ ol {
 }
 
 @media only screen and (min-width: 601px) {
+  .form-header {
+    width: 600px;
+  }
+
+  .form-header-container {
+    width: 600px;
+    margin: auto;
+  }
+  .form-title {
+    width: 69.5% !important; 
+    margin-left: 15% !important;
+  }
+
   .form-content {
       width: 600px;
-      margin-left: calc(50vw - 325px);
+      margin: auto;
   }
 
   .form-confirmation {

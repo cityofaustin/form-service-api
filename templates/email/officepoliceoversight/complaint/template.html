@@ -2,9 +2,9 @@
 <html>
 {% include 'email/officepoliceoversight/common/head.html' %}
 <body>
+  {% include 'email/officepoliceoversight/common/header.html' %}
   <div class='form-content'>
-
-    <h3 style="margin:0; mso-line-height-rule:exactly;">{{t('title')}}</h3>
+    <h3>{{t('title')}}</h3>
 
     <div class="form-confirmation">
       {% if language_code() == 'es' %}

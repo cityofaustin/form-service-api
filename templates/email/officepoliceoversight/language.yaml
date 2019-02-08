@@ -84,6 +84,9 @@ common:
   requiredfield:
     en: "Required"
     es: "Requerido"
+  your_answers:
+    en: "Your Answers"
+    es: "Sus Respuestas"
 complaint:
   emailSubject:
     en: "Your complaint was submitted successfully."
