@@ -921,15 +921,15 @@ def emailtemplate():
     else:
     	data['location'] = { "address": "", "position": {"lat": "", "lng": ""}}
 
-    htmlTemplate = transform(render_email_template("email/officepoliceoversight/" + submission_type + "/template.html",
-        casenumber= '2018-1212-5fe3',
+    htmlTemplate = (render_email_template("email/officepoliceoversight/" + submission_type + "/template.html",
+        casenumber= '2019-0208-6cff',
         data=data,
         attachment_urls=evidenceFiles,
         api_endpoint=url_for('file_download_uri', path='', _external=True)
     ))
 
     txtTemplate = render_email_template("email/officepoliceoversight/" + submission_type + "/template.txt",
-        casenumber= '2018-1212-5fe3',
+        casenumber= '2019-0208-6cff',
         data=data,
         attachment_urls=evidenceFiles,
         api_endpoint=url_for('file_download_uri', path='', _external=True)
