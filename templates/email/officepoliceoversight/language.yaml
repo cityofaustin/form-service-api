@@ -87,13 +87,6 @@ common:
   your_answers:
     en: "Your Answers"
     es: "Sus Respuestas"
-complaint:
-  emailSubject:
-    en: "Your complaint was submitted successfully."
-    es: "Su queja ha sido enviada."
-  title:
-    en: "Your complaint was submitted successfully."
-    es: "Su queja ha sido enviada."
   demographics:
     en: "Demographic Information"
     es: "Informacion Demografica"
@@ -115,12 +108,6 @@ complaint:
   tell_us_what_happened:
     en: "Tell us what happened"
     es: "Diganos que sucedio"
-  has_ticket:
-    en: "Has Ticket"
-    es: "Tiene Ticket"
-  ticket_number:
-    en: "Ticket Number"
-    es: "Numero de Ticket"
   review_your_evidence:
     en: "Review your evidence"
     es: "Revise su evidencia"
@@ -130,10 +117,23 @@ complaint:
   tell_us_about_the_witness:
     en: "Tell us about any witnesses"
     es: "Diganos acerca de algun testigo"
+  has_ticket:
+    en: "Has Ticket"
+    es: "Tiene Ticket"
+  ticket_number:
+    en: "Ticket Number"
+    es: "Numero de Ticket"
+complaint:
+  emailSubject:
+    en: "Your complaint was submitted successfully."
+    es: "Correo electrónico de confirmación de la queja."
+  title:
+    en: "Your complaint was submitted successfully."
+    es: "Hemos recibido su queja."
 thanks:
   title:
     en: "Confirmation for Thanks"
-    es: "Confirmacion de Agradecimiento"
+    es: "¡Su nota de agradecimiento fue enviada!"
   emailSubject:
     en: "Your thank you was submitted successfully!"
-    es: "Su nota de agradecimiento ha sido enviada!"
+    es: "Confirmación de agradecimiento"

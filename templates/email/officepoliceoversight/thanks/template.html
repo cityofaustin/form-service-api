@@ -1,25 +1,28 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
 {% include 'email/officepoliceoversight/common/head.html' %}
+<body>
+  {% include 'email/officepoliceoversight/common/header.html' %}
+  <div class='form-content'>
+    <h3>{{t('title')}}</h3>
 
-  <h2>{{ t('title') }}</h2>
+    <div>
+      {% if language_code() == 'es' %}
+          <p>Gracias por compartir su experiencia con nosotros, esto nos ayuda a servirles mejor a usted y a su comunidad.</p>
 
-  {% if language_code() == 'es' %}
-      <p>Gracias por compartir su experiencia con nosotros. Esto nos ayuda a servirle mejor a usted y a su comunidad.</p>
+          <p>Sus comentarios serán enviados a la Oficina de Fiscalización de la Policía y a la División de Asuntos Internos del Departamento de Policía de Austin, así como a la cadena de comando del oficial.</p>
+      {% else %}
+          <p>Thank you for sharing your experience with us. This helps us better serve you and your community.</p>
 
-      <p>Su numero de confirmacion es: <span class="form-data-casenumber">{{casenumber}}</span></p>
+          <p>Your feedback will go to the Office of Police Oversight and the Austin Police Department’s Internal Affairs Division, as well as to the officer’s chain of command.</p>
+      {% endif %}
+    </div>
 
-      <p>Usted nos puede contactar por <a class='form-data-link' href="mailto:policeoversight@austintexas.gov">email</a> o llamar al <a class='form-data-link' href="tel:512-972-2676">512-972-2676</a> a cualquier hora con su numero de confirmation para checar el estado de su queja. Si usted ha proveido su informacion de contacto, una persona de la oficina 'Office of Police Oversight' se comunicara con usted en dos o cuatro dias nominales. </p>
+  {% include 'email/officepoliceoversight/complaint/form-data.html' %}
 
-      <p>Para una explicacion completa de que sigue despues, visite la pagina 'Complaint Investigative Process' asi como ver el rango de violaciones de leyes. De nuevo, le agradecemos por compartir su experience con nosotros.</p>
-  {% else %}
-      <p>Thank you for sharing your experience with us. This helps us better serve you and your community.</p>
+  {% include 'email/officepoliceoversight/common/footer.html' %}
 
-      <p>Your confirmation number is: <span class="form-data-casenumber">{{casenumber}}</span></p>
+  </div>
 
-      <p>You can <a class='form-data-link' href="mailto:policeoversight@austintexas.gov">email-us</a> or call us at <a class='form-data-link' href="tel:512-972-2676">512-972-2676</a> any time with your confirmation number to check the status of your complaint. If you provided your contact information, a staff person from the Office of Police Oversight will contact you within two to four business days. </p>
-
-      <p>For a full explanation of what happens next, as well as a ranking of policy violations, visit the Complaint Investigative Process page. Again, thank you for sharing your experience with us.</p>
-  {% endif %}
-
-{% include 'email/officepoliceoversight/thanks/form-data.html' %}
-
-{% include 'email/officepoliceoversight/common/footer.html' %}
+</body>
+</html>

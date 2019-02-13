@@ -1,81 +1,113 @@
 <div class='form-data'>
-  <!-- start of data block -->
+
   <div class='form-data-block'>
-    <div class='form-data-item'>
-      <span>{{t('demographics')}}:</span>
-      <p>{{t('referrer')}}: {{data['howDidYouGetHere'] or 'N/A' }}</p>
-      <p>{{t('gender')}}: {{data['gender'] or 'N/A' }}</p>
-      <p>{{t('race')}}: {{data['race'] or 'N/A' }}</p>
-      <p>{{t('zipcode')}}: {{data['zipCode'] or 'N/A' }}</p>
-      <p>{{t('willingcontact')}}: {{data['view:contactPreferences']['willingToBeContacted'] or 'N/A' }}</p>
-      <p>{{t('has_officer_details')}}: {{ data['hasOfficerDetails'] or 'N/A' }}</p>
-      <p>{{t('has_witness_information')}}: {{data['hasWitnessInformation'] or 'N/A' }}</p>
-      <p>{{t('aware_of_evidence')}}: {{data['awareOfEvidence'] or 'N/A' }}</p>
+    <p class="form-data-block_title">{{t('your_answers')}}</p>
+
+    <div>
+      <div class='form-data-section_title'>{{t('tell_us_what_happened')}}</div>
+      <div class='form-data-section'>
+        <div class='form-data-section_item'>
+          <span>{{t('description')}}:</span><span class="blue"> (*{{t('requiredfield')}})</span>
+          <p class="nocapitalize">{{data['description'] or 'N/A' }}</p>
+        </div>
+
+        <div class='form-data-section_item'>
+          <span>{{t('date_and_time')}}:</span>
+          <p>{{data['datetime'] or 'N/A' }}</p>
+        </div>
+
+        <div class='form-data-section_item'>
+          <span>{{t('has_ticket')}}:</span>
+          <p>{{data['hasTicket'] or 'N/A' }}</p>
+
+          <span>{{t('ticket_number')}}:</span>
+          <p>{{data['ticket'] or 'N/A' }}</p>
+        </div>
+
+        <div class='form-data-section_item'>
+          <span>{{t('location')}}:</span>
+          <p>{{t('address')}}: {{data['location']['address'] or 'N/A'}}</p>
+          <p>{{t('position')}}: </p>
+          <ul>
+            <li>{{t('longitude')}}: {{data['location']['position']['lng'] or 'N/A'}}</li>
+            <li>{{t('latitude')}}: {{data['location']['position']['lat'] or 'N/A'}}</li>
+          </ul>
+        </div>
+
+      </div>
     </div>
 
-    <div class='form-data-item'>
-      <span>{{t('description')}}:</span>
-      <p>{{data['description'] or 'N/A' }}</p>
+    <div>
+      <div class='form-data-section_title'>{{t('review_your_evidence')}}</div>
+      <div class='form-data-section'>
+          <span><br/>{{t('attachments')}} / {{t('evidence')}}</span>
+          <ol>
+          {% for attachment_item in attachment_urls %}
+            <li><a href="{{api_endpoint}}{{attachment_item}}">{{ attachment_item | basename }}</a></li>
+          {% endfor %}
+          </ol>
+      </div>
     </div>
 
-
-    <div class='form-data-item'>
-      <span>{{t('date_and_time')}}:</span>
-      <p>{{data['datetime'] or 'N/A' }}</p>
+    <div>
+      <div class='form-data-section_title'>{{t('tell_us_about_the_officers')}}</div>
+      <div class='form-data-section'>
+          {% for officer in data['officers'] %}
+          <div class='form-data-section_item'>
+            <span>{{t('officer')}} #{{loop.index}}:</span>
+            <ul>
+              <li>{{t('name')}}: {{officer['name'] or 'N/A' }}</li>
+              <li>{{t('description')}}: {{officer['physicalDescription'] or 'N/A' }}</li>
+              <li>{{t('race')}}: {{officer['race'] or 'N/A' }}</li>
+              <li>{{t('gender')}}: {{officer['gender'] or 'N/A' }}</li>
+              <li>{{t('badge_number')}}: {{officer['badgeNumber'] or 'N/A' }}</li>
+              <li>{{t('uniformed')}}: {{officer['uniformed'] or 'N/A' }}</li>
+              <li>{{t('transportation')}}: {{officer['transportation'] or 'N/A' }}</li>
+            </ul>
+          </div>
+          {% endfor %}
+      </div>
     </div>
 
+    <div>
+      <div class='form-data-section_title'>{{t('demographics')}}</div>
+      <div class='form-data-section'>
+        {% for witness in data['witnesses'] %}
+        <div class='form-data-section_item'>
+          <span>{{t('witness')}} #{{loop.index}}:</span>
 
-    <div class='form-data-item'>
-      <span>{{t('location')}}:</span>
-      <p>{{t('address')}}: {{data['location']['address'] or 'N/A'}}</p>
-      <p>{{t('position')}}: </p>
-      <ul>
-        <li>{{t('longitude')}}: {{data['location']['position']['lng'] or 'N/A'}}</li>
-        <li>{{t('latitude')}}: {{data['location']['position']['lat'] or 'N/A'}}</li>
-      </ul>
+          <ul>
+            <li>{{t('name')}}: {{witness['name'] or 'N/A' }}</li>
+            <li  class="nocapitalize">{{t('email')}}: <a href='mailto:{{witness['email'] or ';'}}'>{{witness['email'] or 'N/A' }}</a></li>
+            <li>{{t('phone')}}: {{witness['phoneNumber'] or 'N/A' }}</li>
+            <li  class="nocapitalize">{{t('additional_information')}}: {{witness['anythingElse'] or 'N/A' }}</li>
+          </ul>
+        </div>
+        {% endfor %}
+      </div>
     </div>
 
-
-     <div class='form-data-item'>
-      <span>{{t('officers')}}:</span>
-      {% for officer in data['officers'] %}
-      <ul>
-        <li>{{t('name')}}: {{officer['name'] or 'N/A' }}</li>
-        <li>{{t('description')}}: {{officer['description'] or 'N/A' }}</li>
-        <li>{{t('race')}}: {{officer['race'] or 'N/A' }}</li>
-        <li>{{t('gender')}}: {{officer['gender'] or 'N/A' }}</li>
-        <li>{{t('badge_number')}}: {{officer['badgeNumber'] or 'N/A' }}</li>
-        <li>{{t('uniformed')}}: {{officer['uniformed'] or 'N/A' }}</li>
-        <li>{{t('transportation')}}: {{officer['transportation'] or 'N/A' }}</li>
-      </ul>
-      {% endfor %}
-    </div>
-
-    <div class='form-data-item'>
-      <span>{{t('witnesses')}}:</span>
-      {% for witness in data['witnesses'] %}
-      <ul>
-        <li>{{t('name')}}: {{witness['name'] or 'N/A' }}</li>
-        <li>{{t('email')}}: <a href='mailto:{{witness['email'] or ';'}}'>{{witness['email'] or 'N/A' }}</a></li>
-        <li>{{t('phone')}}: {{witness['phoneNumber'] or 'N/A' }}</li>
-        <li>{{t('additional_information')}}: {{witness['anythingElse'] or 'N/A' }}</li>
-      </ul>
-      {% endfor %}
+    <div>
+      <div class='form-data-section_title'>Demographic information</div>
+      <div class='form-data-section'>
+        <div class='form-data-section_item'>
+          <span>{{t('additional_information')}}:</span>
+          <p>{{t('name')}}: {{data['view:contactPreferences']['yourName'] or 'N/A' }}</p>
+          <p>{{t('phone')}}: {{data['view:contactPreferences']['yourPhone'] or 'N/A' }}</p>
+          <p class="nocapitalize">{{t('email')}}: {{data['view:contactPreferences']['yourEmail'] or 'N/A' }}</p>
+          <p>{{t('willingcontact')}}: {{data['view:contactPreferences']['willingToBeContacted'] or 'N/A' }}</p>
+          <p>{{t('needTranslator')}}: {{data['view:contactPreferences']['needTranslator'] or 'N/A' }}</p>
+          <p>&nbsp;</p>
+          <p>{{t('referrer')}}: {{data['howDidYouGetHere'] or 'N/A' }}</p>
+          <p>{{t('gender')}}: {{data['gender'] or 'N/A' }}</p>
+          <p>{{t('race')}}: {{data['race'] or 'N/A' }}</p>
+          <p>{{t('zipcode')}}: {{data['zipCode'] or 'N/A' }}</p>
+          <p>{{t('has_officer_details')}}: {{ data['hasOfficerDetails'] or 'N/A' }}</p>
+          <p>{{t('has_witness_information')}}: {{data['hasWitnessInformation'] or 'N/A' }}</p>
+          <p>{{t('aware_of_evidence')}}: {{data['awareOfEvidence'] or 'N/A' }}</p>
+        </div>
+      </div>
     </div>
   </div>
-  <!-- End of data block -->
-
-
-
-  <!-- start of data block -->
-  <div class='form-data-block'>
-    <h4>{{t('attachments')}} / {{t('evidence')}}</h4>
-    <ol>
-    {% for attachment_item in attachment_urls %}
-        <li><a href="{{api_endpoint}}{{attachment_item}}">{{ attachment_item | basename }}</a></li>
-    {% endfor %}
-    </ol>
-  </div>
-  <!-- start of data block -->
 
 </div>

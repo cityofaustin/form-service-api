@@ -1,10 +1,15 @@
 
 {{t('demographics')}}:
+{{t('name')}}: {{data['view:contactPreferences']['yourName'] or 'N/A' }}
+{{t('phone')}}: {{data['view:contactPreferences']['yourPhone'] or 'N/A' }}
+{{t('email')}}: {{data['view:contactPreferences']['yourEmail'] or 'N/A' }}
+{{t('willingcontact')}}: {{data['view:contactPreferences']['willingToBeContacted'] or 'N/A' }}
+{{t('needTranslator')}}: {{data['view:contactPreferences']['needTranslator'] or 'N/A' }}
+
 {{t('referrer')}}: {{data['howDidYouGetHere'] or 'N/A' }}
 {{t('gender')}}: {{data['gender'] or 'N/A' }}
 {{t('race')}}: {{data['race'] or 'N/A' }}
 {{t('zipcode')}}: {{data['zipCode'] or 'N/A' }}
-{{t('willingcontact')}}: {{data['view:contactPreferences']['willingToBeContacted'] or 'N/A' }}
 {{t('has_officer_details')}}: {{ data['hasOfficerDetails'] or 'N/A' }}
 {{t('has_witness_information')}}: {{data['hasWitnessInformation'] or 'N/A' }}
 {{t('aware_of_evidence')}}: {{data['awareOfEvidence'] or 'N/A' }}
