@@ -15,8 +15,6 @@ import uuid, hashlib, hmac, re
 # Knack integrator
 import knackpy, json, yaml
 
-from premailer import transform
-
 from jinja2 import Environment, FileSystemLoader, StrictUndefined, Undefined, Template
 
 
@@ -261,8 +259,6 @@ def generate_casenum():
 	rndstr = generate_random_hash()[0:4]
 	return "{0}{1}".format(datestr,rndstr)
 
-def get_file_extension(filename):
-    return filename.rsplit('.', 1)[1].lower()
 
 def get_file_name(filename):
     return filename.rsplit('.', 1)[0].lower()
@@ -394,30 +390,6 @@ def create_dynamodb_record(inputJson, type='record', case_number="", knack_recor
     )
     return identifierHash, resp
 
-def update_dynamodb_record(case_number, inputJson, type='record', knack_record_id=''):
-    if(isinstance(inputJson, str) == False):
-        jsonString = json.dumps(inputJson)
-    else:
-        jsonString = inputJson
-
-    if(knack_record_id == ""):
-        knack_record_id = generate_random_hash()
-
-    resp = table.update_item(
-        TableName=LOG_TABLE,
-        Key={
-            'entryId': 'identifierHash'
-        },
-        UpdateExpression="set data = :d, dateCreated=:c, knackRecordId = :k",
-        ExpressionAttributeValues={
-            ':d': jsonString,
-            ':c': getCurrentDateTime(),
-            ':k': knack_record_id
-        },
-        ReturnValues="UPDATED_NEW"
-    )
-
-    return identifierHash, resp
 
 def knack_upload_image(filepath):
     # First try uploading the image and parse the response
@@ -720,7 +692,7 @@ def casenum_updaterecord():
     caseNum = ""
     recipiant = ""
     data = request.json
-    print(data)
+    
     requestJson = json.dumps(request.json)
 
     while True:
@@ -796,6 +768,11 @@ def casenum_updaterecord():
 
 @app.route('/email-template', methods=['GET'])
 def emailtemplate():
+
+    mode = request.args.get('mode')
+    submission_type_override = request.args.get('type')
+    language_override = request.args.get('lang')
+
     jsonObj = {
     	"language": "en",
     	"type": "complaint",
@@ -873,8 +850,11 @@ def emailtemplate():
     #
     # Submission Type
     #
-    submission_type = get_submission_type(data)
-    language_code = get_language(data)
+    submission_type = get_submission_type(data) if submission_type_override == None else submission_type_override
+
+    print("Submission Type: {0}, Submission Override: {1}".format(submission_type, submission_type_override))
+
+    language_code = get_language(data) if language_override == None else language_override
     is_lang_supported = is_language_supported(data)
 
     #
@@ -921,10 +901,13 @@ def emailtemplate():
         api_endpoint=url_for('file_download_uri', path='', _external=True)
     )
 
-    print("\n\n\n\n\n")
-    print(txtTemplate)
+    output = ""
+    if(mode == "text"):
+        output = txtTemplate
+    else:
+        output = htmlTemplate
 
-    return htmlTemplate, 200
+    return output, 200
 
 
 # We only need this for local development.
