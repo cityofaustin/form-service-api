@@ -36,4 +36,3 @@ urllib3==1.24.1
 Werkzeug==0.14.1
 wsgi-request-logger==0.4.6
 zappa==0.47.1
-premailer==3.2.0
