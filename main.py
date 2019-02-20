@@ -15,8 +15,6 @@ import uuid, hashlib, hmac, re
 # Knack integrator
 import knackpy, json, yaml
 
-from premailer import transform
-
 from jinja2 import Environment, FileSystemLoader, StrictUndefined, Undefined, Template
 
 
@@ -77,7 +75,6 @@ S3_LOCATION               = 'http://{}.s3.amazonaws.com/'.format(S3_BUCKET)
 DEFALUT_REGION            = os.getenv("AWS_DEFAULT_REGION", "us-east-1")
 LOG_TABLE                 = os.getenv("PM_LOGTABLE", "police-monitor-records")
 
-EMAIL_ADDRESS_USER        = os.getenv("EMAIL_ADDRESS_USER")
 EMAIL_ADDRESS_OPO         = os.getenv("EMAIL_ADDRESS_OPO")
 EMAIL_ADDRESS_APD         = os.getenv("EMAIL_ADDRESS_APD")
 
@@ -262,8 +259,6 @@ def generate_casenum():
 	rndstr = generate_random_hash()[0:4]
 	return "{0}{1}".format(datestr,rndstr)
 
-def get_file_extension(filename):
-    return filename.rsplit('.', 1)[1].lower()
 
 def get_file_name(filename):
     return filename.rsplit('.', 1)[0].lower()
@@ -395,30 +390,6 @@ def create_dynamodb_record(inputJson, type='record', case_number="", knack_recor
     )
     return identifierHash, resp
 
-def update_dynamodb_record(case_number, inputJson, type='record', knack_record_id=''):
-    if(isinstance(inputJson, str) == False):
-        jsonString = json.dumps(inputJson)
-    else:
-        jsonString = inputJson
-
-    if(knack_record_id == ""):
-        knack_record_id = generate_random_hash()
-
-    resp = table.update_item(
-        TableName=LOG_TABLE,
-        Key={
-            'entryId': 'identifierHash'
-        },
-        UpdateExpression="set data = :d, dateCreated=:c, knackRecordId = :k",
-        ExpressionAttributeValues={
-            ':d': jsonString,
-            ':c': getCurrentDateTime(),
-            ':k': knack_record_id
-        },
-        ReturnValues="UPDATED_NEW"
-    )
-
-    return identifierHash, resp
 
 def knack_upload_image(filepath):
     # First try uploading the image and parse the response
@@ -517,7 +488,7 @@ def sendEmail(emailConfig):
         response = ses_client.send_email(
             Destination={
                 'ToAddresses': [
-                    emailConfig['recipient'],
+                    emailConfig['recipiant'],
                 ],
             },
             Message={
@@ -547,7 +518,48 @@ def sendEmail(emailConfig):
         print("Email sent! Message ID: " + mid)
         return mid
 
+def is_recipient(email):
+    return email not in [EMAIL_ADDRESS_OPO, EMAIL_ADDRESS_APD]
 
+def send_opo_email(submission_type, language_code, recipiant, caseNumResp, data, evidenceFiles):
+    # We load the language of the recipiant, for opo or apd must default to english.
+    currentLangCode = language_code if is_recipient(recipiant) else "en"
+
+    # load given language
+    load_tanslation('templates/email/officepoliceoversight/language.yaml',
+        section=submission_type,
+        language=currentLangCode)
+
+    # Now we specify the destination email, and translated subject
+    emailConfig = None
+    emailConfig = emailConfigDefault.copy()
+    emailConfig['recipiant'] = recipiant
+    emailConfig['subject'] = translate('emailSubject')
+
+    # Render HTML template
+    htmlTemplate = render_email_template("email/officepoliceoversight/" + submission_type + "/template.html",
+        casenumber=caseNumResp,
+        data=data,
+        attachment_urls=evidenceFiles,
+        api_endpoint=url_for('file_download_uri', path='', _external=True)
+    )
+
+    # Render TXT template (for non-html compatible services)
+    txtTemplate = render_email_template("email/officepoliceoversight/" + submission_type + "/template.txt",
+        casenumber=caseNumResp,
+        data=data,
+        attachment_urls=evidenceFiles,
+        api_endpoint=url_for('file_download_uri', path='', _external=True)
+    )
+
+    emailConfig['html'] = htmlTemplate
+    emailConfig['text'] = txtTemplate
+
+    # Try to submit, capture status
+    try:
+        response = sendEmail(emailConfig)
+    except Exception as e:
+        return False
 
 
 
@@ -678,8 +690,9 @@ def casenum_updaterecord():
     global EMAIL_ADDRESS_USER, EMAIL_ADDRESS_OPO, EMAIL_ADDRESS_APD
 
     caseNum = ""
+    recipiant = ""
     data = request.json
-    print(data)
+    
     requestJson = json.dumps(request.json)
 
     while True:
@@ -728,78 +741,23 @@ def casenum_updaterecord():
         'case_number': caseNumResp
     }
 
-    #
-    # Let's now sort out the user's email address...
-    #
+    try:
+        recipiant = data['view:contactPreferences']['yourEmail']
+    except:
+        recipiant = ""
 
     try:
-        EMAIL_ADDRESS_USER = data['view:contactPreferences']['yourEmail']
-    except:
-        print("Error accessing data['view:contactPreferences']['yourEmail'] using default EMAIL_ADDRESS_USER: " + EMAIL_ADDRESS_USER)
+        send_opo_email(submission_type, language_code, recipiant, caseNumResp, data, evidenceFiles)
+        send_opo_email(submission_type, language_code, EMAIL_ADDRESS_OPO, caseNumResp, data, evidenceFiles)
 
-    #
-    # We now set up our email list, at least two recipients...
-    #
-    email_list = {
-        "recipient": EMAIL_ADDRESS_USER,
-        "opo": EMAIL_ADDRESS_OPO
-    }
-    # If this is a 'thank' note, then it goes to APD too...
-    if(submission_type == 'compliment'):
-        email_list['apd'] = EMAIL_ADDRESS_APD
-
-    # For each party, send an email.
-    for party, party_email in email_list.items():
-
-        # Don't send email if email is empty...
-        if (party_email == ""):
-            continue
-
-        # We load the language of the recipiant, for opo or apd must default to english.
-        currentLangCode = language_code if party == "recipient" else "en"
-
-        # load given language
-        load_tanslation('templates/email/officepoliceoversight/language.yaml',
-            section=submission_type,
-            language=currentLangCode)
-
-        print("E-Mail Language Loaded: " + currentLangCode)
-
-        # Now we specify the destination email, and translated subject
-        emailConfig = emailConfigDefault.copy()
-        emailConfig['recipient'] = party_email
-        emailConfig['subject'] = translate('emailSubject')
-        print("Subject: " + emailConfig['subject'])
-        print("Sending E-Mail to '" + party + "': " + party_email)
-
-        # Render HTML template
-        htmlTemplate = render_email_template("email/officepoliceoversight/" + submission_type + "/template.html",
-            casenumber=caseNumResp,
-            data=data,
-            attachment_urls=evidenceFiles,
-            api_endpoint=url_for('file_download_uri', path='', _external=True)
-        )
-
-        # Render TXT template (for non-html compatible services)
-        txtTemplate = render_email_template("email/officepoliceoversight/" + submission_type + "/template.txt",
-            casenumber=caseNumResp,
-            data=data,
-            attachment_urls=evidenceFiles,
-            api_endpoint=url_for('file_download_uri', path='', _external=True)
-        )
-
-        emailConfig['html'] = htmlTemplate
-        emailConfig['text'] = txtTemplate
-
-        # Try to submit, capture status
-        try:
-            response = sendEmail(emailConfig)
-        except Exception as e:
-            email_status = {
-                'status': 'error',
-                'message': str(e),
-                'case_number': caseNumResp
-            }
+        if(submission_type=="thanks"):
+            send_opo_email(submission_type, language_code, EMAIL_ADDRESS_APD, caseNumResp, data, evidenceFiles)
+    except Exception as e:
+        email_status = {
+            'status': 'error',
+            'message': str(e),
+            'case_number': caseNumResp
+        }
 
     #
     # Finally return if submission attempt presents with no errors
@@ -810,6 +768,11 @@ def casenum_updaterecord():
 
 @app.route('/email-template', methods=['GET'])
 def emailtemplate():
+
+    mode = request.args.get('mode')
+    submission_type_override = request.args.get('type')
+    language_override = request.args.get('lang')
+
     jsonObj = {
     	"language": "en",
     	"type": "complaint",
@@ -887,8 +850,11 @@ def emailtemplate():
     #
     # Submission Type
     #
-    submission_type = get_submission_type(data)
-    language_code = get_language(data)
+    submission_type = get_submission_type(data) if submission_type_override == None else submission_type_override
+
+    print("Submission Type: {0}, Submission Override: {1}".format(submission_type, submission_type_override))
+
+    language_code = get_language(data) if language_override == None else language_override
     is_lang_supported = is_language_supported(data)
 
     #
@@ -921,24 +887,27 @@ def emailtemplate():
     else:
     	data['location'] = { "address": "", "position": {"lat": "", "lng": ""}}
 
-    htmlTemplate = transform(render_email_template("email/officepoliceoversight/" + submission_type + "/template.html",
-        casenumber= '2018-1212-5fe3',
+    htmlTemplate = (render_email_template("email/officepoliceoversight/" + submission_type + "/template.html",
+        casenumber= '2019-0208-6cff',
         data=data,
         attachment_urls=evidenceFiles,
         api_endpoint=url_for('file_download_uri', path='', _external=True)
     ))
 
     txtTemplate = render_email_template("email/officepoliceoversight/" + submission_type + "/template.txt",
-        casenumber= '2018-1212-5fe3',
+        casenumber= '2019-0208-6cff',
         data=data,
         attachment_urls=evidenceFiles,
         api_endpoint=url_for('file_download_uri', path='', _external=True)
     )
 
-    print("\n\n\n\n\n")
-    print(txtTemplate)
+    output = ""
+    if(mode == "text"):
+        output = txtTemplate
+    else:
+        output = htmlTemplate
 
-    return htmlTemplate, 200
+    return output, 200
 
 
 # We only need this for local development.

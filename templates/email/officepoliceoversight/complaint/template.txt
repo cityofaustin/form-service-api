@@ -1,14 +1,11 @@
-** {{ t('title') }}
-------------------------------------------------------------
+{% include 'email/officepoliceoversight/common/header.txt' %}
+
+{{t('title')}} 
+
 {% if language_code() == 'es' %}
-
-Gracias por compartir su experiencia con nosotros. Esto nos ayuda a servirle mejor a usted y a su comunidad.
-
-Su numero de confirmacion es: {{casenumber}}
-
-Usted nos puede contactar por email a policeoversight@austintexas.gov o llamar al 512-972-2676 a cualquier hora con su numero de confirmation para checar el estado de su queja. Si usted ha proveido su informacion de contacto, una persona de la oficina 'Office of Police Oversight' se comunicara con usted en dos o cuatro dias nominales.
-
-Para una explicacion completa de que sigue despues, visite la pagina 'Complaint Investigative Process' asi como ver el rango de violaciones de leyes. De nuevo, le agradecemos por compartir su experience con nosotros.
+Muchas gracias por compartir su experiencia con nosotros, esto nos ayuda a servirles mejor a usted y a su comunidad.
+    
+Su número de confirmación es: {{casenumber}}
 
 {% else %}
 
@@ -16,13 +13,21 @@ Thank you for sharing your experience with us. This helps us better serve you an
 
 Your confirmation number is: {{casenumber}}
 
-You can email-us at policeoversight@austintexas.gov or call us at 512-972-2676 any time with your confirmation number to check the status of your complaint. If you provided your contact information, a staff person from the Office of Police Oversight will contact you within two to four business days.
+{% endif %}
 
-For a full explanation of what happens next, as well as a ranking of policy violations, visit the Complaint Investigative Process page. Again, thank you for sharing your experience with us.
+{% if language_code() == 'es' %}
+
+Nos puede enviar un correo electrónico o llamar al 512-972-2676 en cualquier momento con su número de confirmación para averiguar el estado de su queja. Si usted nos dio su información de contacto, un empleado de la Oficina de Fiscalización de la Policía se comunicará con usted en un periodo de dos a cuatro días laborales.
+
+Para una explicación completa de lo que va a suceder ahora, así como una clasificación de las infracciones a las políticas, visite la página del Proceso de Investigación de Quejas. Nuevamente, muchas gracias por compartir su experiencia con nosotros.
+{% else %}
+
+You can email-us or call us at 512-972-2676 any time with your confirmation number to check the status of your complaint. If you provided your contact information, a staff person from the Office of Police Oversight will contact you within two to four business days.
+
+For a full explanation of what happens next, as well as a ranking of policy violations, visit the Complaint Investigative Process page. Again, thank you for sharing your experience with us. 
 
 {% endif %}
 
 {% include 'email/officepoliceoversight/complaint/form-data.txt' %}
-
-------------------------------------------------------------
+    
 {% include 'email/officepoliceoversight/common/footer.txt' %}

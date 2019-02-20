@@ -1,8 +1,7 @@
 <div class='form-data'>
 
   <div class='form-data-block'>
-    <p class="form-data-block_title">Your answers</p>
-
+    <p class="form-data-block_title">{{t('your_answers')}}</p>
 
     <div>
       <div class='form-data-section_title'>{{t('tell_us_what_happened')}}</div>
@@ -35,10 +34,8 @@
           </ul>
         </div>
 
-
       </div>
     </div>
-
 
     <div>
       <div class='form-data-section_title'>{{t('review_your_evidence')}}</div>
@@ -51,7 +48,6 @@
           </ol>
       </div>
     </div>
-
 
     <div>
       <div class='form-data-section_title'>{{t('tell_us_about_the_officers')}}</div>
@@ -72,7 +68,6 @@
           {% endfor %}
       </div>
     </div>
-
 
     <div>
       <div class='form-data-section_title'>{{t('demographics')}}</div>
@@ -100,7 +95,7 @@
           <p>{{t('name')}}: {{data['view:contactPreferences']['yourName'] or 'N/A' }}</p>
           <p>{{t('phone')}}: {{data['view:contactPreferences']['yourPhone'] or 'N/A' }}</p>
           <p class="nocapitalize">{{t('email')}}: {{data['view:contactPreferences']['yourEmail'] or 'N/A' }}</p>
-          <p>{{t('willingcontact')}}: {{data['view:contactPreferences']['willingToBeContacted'] or 'N/A' }}</p>
+          <p>{{t('willingcontact')}}: {{data['willingToBeContacted'] or 'N/A' }}</p>
           <p>{{t('needTranslator')}}: {{data['view:contactPreferences']['needTranslator'] or 'N/A' }}</p>
           <p>&nbsp;</p>
           <p>{{t('referrer')}}: {{data['howDidYouGetHere'] or 'N/A' }}</p>
@@ -114,6 +109,5 @@
       </div>
     </div>
   </div>
-
 
 </div>
