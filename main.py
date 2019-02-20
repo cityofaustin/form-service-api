@@ -77,6 +77,8 @@ LOG_TABLE                 = os.getenv("PM_LOGTABLE", "police-monitor-records")
 
 EMAIL_ADDRESS_OPO         = os.getenv("EMAIL_ADDRESS_OPO")
 EMAIL_ADDRESS_APD         = os.getenv("EMAIL_ADDRESS_APD")
+EMAIL_ADDRESS_SENDER      = os.getenv("EMAIL_ADDRESS_SENDER")
+EMAIL_ADDRESS_REPLYTO     = os.getenv("EMAIL_ADDRESS_REPLYTO")
 
 TRANSLATION_DICT          = {
     "___default_language___": "en",
@@ -114,7 +116,8 @@ emailConfigDefault = {
     "html": "",
     "text": "",
     "subject": "Thank You",
-    "sender": "Office of Police Oversight <no-reply@austintexas.io>",
+    "source": EMAIL_ADDRESS_SENDER, # Who sends the email
+    "sender": EMAIL_ADDRESS_REPLYTO, # What it looks like in reply-to.
     "recipient": "no-reply@austintexas.io"
 }
 
@@ -692,7 +695,7 @@ def casenum_updaterecord():
     caseNum = ""
     recipiant = ""
     data = request.json
-    
+
     requestJson = json.dumps(request.json)
 
     while True:
