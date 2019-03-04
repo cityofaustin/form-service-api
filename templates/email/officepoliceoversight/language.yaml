@@ -5,13 +5,13 @@ common:
     es: "Referente"
   gender:
     en: "Gender"
-    es: "Genero"
+    es: "Género"
   race:
     en: "Race"
     es: "Raza"
   zipcode:
     en: "Zip Code"
-    es: "Codigo de Area"
+    es: "Código de Area"
   true:
     en: "✅"
     es: "✅"
@@ -20,19 +20,19 @@ common:
     es: "❌"
   description:
     en: "Description"
-    es: "Descripcion"
+    es: "Descripción"
   date_and_time:
     en: "Date & Time"
     es: "Fecha y Hora"
   location:
     en: "Location"
-    es: "Ubicacion"
+    es: "Ubicación"
   address:
     en: "Address"
-    es: "Direccion"
+    es: "Dirección"
   position:
     en: "Position"
-    es: "Posicion"
+    es: "Posición"
   officers:
     en: "Officer(s)"
     es: "Oficial(es)"
@@ -62,7 +62,7 @@ common:
     es: "Nombre"
   badge_number:
     en: "Badge Number"
-    es: "Numero de Placa"
+    es: "Número de Placa"
   uniformed:
     en: "Uniformed"
     es: "Uniformado"
@@ -71,7 +71,7 @@ common:
     es: "Transporte"
   phone:
     en: "Phone"
-    es: "Telefono"
+    es: "Teléfono"
   email:
     en: "E-Mail"
     es: "E-Mail"
@@ -80,7 +80,7 @@ common:
     es: "Necesita Traductor"
   office:
     en: "Office of Police Oversight"
-    es: "Office of Police Oversight"
+    es: "Oficina de Fiscalización de la Policía"
   requiredfield:
     en: "Required"
     es: "Requerido"
@@ -89,7 +89,7 @@ common:
     es: "Sus Respuestas"
   demographics:
     en: "Demographic Information"
-    es: "Informacion Demografica"
+    es: "Información Demográfica"
   willingcontact:
     en: "Willing to be Contacted"
     es: "Desea ser contactado"
@@ -98,31 +98,31 @@ common:
     es: "Tiene Detalles del Oficial"
   has_witness_information:
     en: "Has Witness Information"
-    es: "Tiene Informacion de Testigos"
+    es: "Tiene Información de Testigos"
   aware_of_evidence:
     en: "Aware of Evidence"
     es: "Tiene Evidencia"
   additional_information:
     en: "Additional Information"
-    es: "Informacion Adicional"
+    es: "Información Adicional"
   tell_us_what_happened:
     en: "Tell us what happened"
-    es: "Diganos que sucedio"
+    es: "Díganos que sucedió"
   review_your_evidence:
     en: "Review your evidence"
     es: "Revise su evidencia"
   tell_us_about_the_officers:
     en: "Tell us about the officer(s)"
-    es: "Diganos acerca de los oficiales"
+    es: "Díganos acerca de los oficiales"
   tell_us_about_the_witness:
     en: "Tell us about any witnesses"
-    es: "Diganos acerca de algun testigo"
+    es: "Díganos acerca de algun testigo"
   has_ticket:
     en: "Has Ticket"
     es: "Tiene Ticket"
   ticket_number:
     en: "Ticket Number"
-    es: "Numero de Ticket"
+    es: "Número de Ticket"
 complaint:
   emailSubject:
     en: "Your complaint was submitted successfully."
