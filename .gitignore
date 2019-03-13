@@ -1,4 +1,5 @@
 # ignore virtual env directory
 /pmenv
 .DS_Store
-.vscode
+.vscode/
+.idea/
