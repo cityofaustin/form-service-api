@@ -17,14 +17,14 @@ Your confirmation number is: {{casenumber}}
 
 {% if language_code() == 'es' %}
 
-Nos puede enviar un correo electrónico o llamar al 512-972-2676 en cualquier momento con su número de confirmación para averiguar el estado de su queja. Si usted nos dio su información de contacto, un empleado de la Oficina de Fiscalización de la Policía se comunicará con usted en un periodo de dos a cuatro días laborales.
+Nos puede enviar un correo electrónico o llamar al (512) 972-2676 en cualquier momento con su número de confirmación para averiguar el estado de su queja. Si usted nos dio su información de contacto, un empleado de la Oficina de Fiscalización de la Policía se comunicará con usted en un periodo de dos a cuatro días laborales.
 
-Para una explicación completa de lo que va a suceder ahora, así como una clasificación de las infracciones a las políticas, visite la página del Proceso de Investigación de Quejas. Nuevamente, muchas gracias por compartir su experiencia con nosotros.
+Para una explicación completa de lo que va a suceder ahora, así como una clasificación de las infracciones a las políticas, visite la página del proceso de investigación de quejas (https://alpha.austin.gov/es/police-oversight/complaint-investigation-process). Nuevamente, muchas gracias por compartir su experiencia con nosotros.
 {% else %}
 
-You can email-us or call us at 512-972-2676 any time with your confirmation number to check the status of your complaint. If you provided your contact information, a staff person from the Office of Police Oversight will contact you within two to four business days.
+You can email us or call us at (512) 972-2676 any time with your confirmation number to check the status of your complaint. If you provided your contact information, a staff person from the Office of Police Oversight will contact you within two to four business days.
 
-For a full explanation of what happens next, as well as a ranking of policy violations, visit the Complaint Investigative Process page. Again, thank you for sharing your experience with us. 
+For a full explanation of what happens next, as well as a ranking of policy violations, visit the complaint investigation process page (https://alpha.austin.gov/police-oversight/complaint-investigation-process/). Again, thank you for sharing your experience with us. 
 
 {% endif %}
 
