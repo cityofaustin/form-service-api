@@ -13,7 +13,7 @@
 
         <div class='form-data-section_item'>
           <span>{{t('date_and_time')}}:</span>
-          <p>{{data['datetime']['date']}} {{data['datetime']['time']}}</p>
+          <p>{{data['datetime']['date'] or 'N/A'}} {{data['datetime']['time'] or ''}}</p>
         </div>
 
         <div class='form-data-section_item'>
