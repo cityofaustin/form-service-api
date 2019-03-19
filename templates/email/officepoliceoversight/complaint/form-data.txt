@@ -23,7 +23,7 @@
 
 
 {{t('date_and_time')}}:
-{{data['datetime'] or 'N/A' }}
+{{data['datetime']['date']}} {{data['datetime']['time']}}
 
 
 
