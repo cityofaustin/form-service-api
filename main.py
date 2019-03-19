@@ -698,13 +698,30 @@ def casenum_updaterecord():
 
     requestJson = json.dumps(request.json)
 
-    while True:
-        caseNum = generate_casenum() # Generate case num.
-        record = get_dynamodb_record(caseNum) # Record is 'None' if not found.
-        if(record == None):
-            break
+    #
+    # User Confirmation Only?
+    #
+    try:
+        user_confirmation_only = data["userConfirmationOnly"]
+        caseNumResp = data["confirmationCaseNumber"]
+    except:
+        user_confirmation_only = False
+        caseNumResp = ""
 
-    caseNumResp, resp = create_dynamodb_record(case_number=caseNum, inputJson='{"type": "placeholder"}')
+    #
+    # If this is not a user confirmation only, then generate a new number...
+    #
+    if(caseNumResp == ""):
+
+        while True:
+            caseNum = generate_casenum() # Generate case num.
+            record = get_dynamodb_record(caseNum) # Record is 'None' if not found.
+            if(record == None):
+                break
+
+        caseNumResp, resp = create_dynamodb_record(case_number=caseNum, inputJson='{"type": "placeholder"}')
+
+
 
     #
     # Submission Type
@@ -736,25 +753,41 @@ def casenum_updaterecord():
         data['location'] = { "address": "", "position": {"lat": "", "lng": ""}}
 
 
-
+    #
     # Our Flask Output, assume success
+    #
     email_status = {
         'status': 'success',
         'message': 'success',
         'case_number': caseNumResp
     }
 
+
+    #
+    # We are going to try parsing the recipiant
+    #
     try:
         recipiant = data['view:contactPreferences']['yourEmail']
     except:
         recipiant = ""
 
+    #
+    # Now we will attempt to send the emails
+    #
     try:
-        send_opo_email(submission_type, language_code, recipiant, caseNumResp, data, evidenceFiles)
-        send_opo_email(submission_type, language_code, EMAIL_ADDRESS_OPO, caseNumResp, data, evidenceFiles)
 
-        if(submission_type=="thanks"):
-            send_opo_email(submission_type, language_code, EMAIL_ADDRESS_APD, caseNumResp, data, evidenceFiles)
+        # Send the user an email
+        send_opo_email(submission_type, language_code, recipiant, caseNumResp, data, evidenceFiles)
+
+        # If this is not a user confirmation only, then submit to OPO and/or APD
+        if(user_confirmation_only == False):
+            # Send to OPO
+            send_opo_email(submission_type, language_code, EMAIL_ADDRESS_OPO, caseNumResp, data, evidenceFiles)
+
+            # If this is a thank you note, send to APD
+            if(submission_type=="thanks"):
+                send_opo_email(submission_type, language_code, EMAIL_ADDRESS_APD, caseNumResp, data, evidenceFiles)
+
     except Exception as e:
         email_status = {
             'status': 'error',
