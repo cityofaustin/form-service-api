@@ -5,13 +5,13 @@ common:
     es: "Referente"
   gender:
     en: "Gender"
-    es: "Genero"
+    es: "Sexo"
   race:
     en: "Race"
     es: "Raza"
   zipcode:
-    en: "Zip Code"
-    es: "Codigo de Area"
+    en: "Zip code"
+    es: "Código postal"
   true:
     en: "✅"
     es: "✅"
@@ -20,19 +20,19 @@ common:
     es: "❌"
   description:
     en: "Description"
-    es: "Descripcion"
+    es: "Descripción"
   date_and_time:
-    en: "Date & Time"
-    es: "Fecha y Hora"
+    en: "Date & time"
+    es: "Fecha y hora"
   location:
     en: "Location"
-    es: "Ubicacion"
+    es: "Ubicación"
   address:
     en: "Address"
-    es: "Direccion"
+    es: "Dirección"
   position:
     en: "Position"
-    es: "Posicion"
+    es: "Posición"
   officers:
     en: "Officer(s)"
     es: "Oficial(es)"
@@ -47,7 +47,7 @@ common:
     es: "Testigo"
   attachments:
     en: "Attachments"
-    es: "Archivos Adjuntos"
+    es: "Archivos adjuntos"
   evidence:
     en: "Evidence"
     es: "Evidencia"
@@ -61,8 +61,8 @@ common:
     en: "Name"
     es: "Nombre"
   badge_number:
-    en: "Badge Number"
-    es: "Numero de Placa"
+    en: "Badge number"
+    es: "Número de credencial"
   uniformed:
     en: "Uniformed"
     es: "Uniformado"
@@ -71,58 +71,58 @@ common:
     es: "Transporte"
   phone:
     en: "Phone"
-    es: "Telefono"
+    es: "Teléfono"
   email:
-    en: "E-Mail"
-    es: "E-Mail"
+    en: "Email"
+    es: "Email"
   needTranslator:
-    en: "Needs Translator"
-    es: "Necesita Traductor"
+    en: "Needs interpreter"
+    es: "Necesita intérprete"
   office:
     en: "Office of Police Oversight"
     es: "Oficina de Fiscalización de la Policía"
   requiredfield:
     en: "Required"
-    es: "Requerido"
+    es: "Obligatoria"
   your_answers:
-    en: "Your Answers"
-    es: "Sus Respuestas"
+    en: "Your answers"
+    es: "Sus respuestas"
   demographics:
-    en: "Demographic Information"
-    es: "Informacion Demografica"
+    en: "Demographic information"
+    es: "Información demográfica"
   willingcontact:
-    en: "Willing to be Contacted"
+    en: "Willing to be contacted"
     es: "Desea ser contactado"
   has_officer_details:
-    en: "Has Officer Details"
-    es: "Tiene Detalles del Oficial"
+    en: "Has officer details"
+    es: "Tiene detalles del oficial"
   has_witness_information:
-    en: "Has Witness Information"
-    es: "Tiene Informacion de Testigos"
+    en: "Has witness information"
+    es: "Tiene información de testigos"
   aware_of_evidence:
-    en: "Aware of Evidence"
-    es: "Tiene Evidencia"
+    en: "Aware of evidence"
+    es: "Tiene evidencia"
   additional_information:
-    en: "Additional Information"
-    es: "Informacion Adicional"
+    en: "Additional information"
+    es: "Información adicional"
   tell_us_what_happened:
     en: "Tell us what happened"
-    es: "Diganos que sucedio"
+    es: "Díganos que sucedió"
   review_your_evidence:
-    en: "Review your evidence"
-    es: "Revise su evidencia"
+    en: "Share your photos or video"
+    es: "Comparta fotos o videos"
   tell_us_about_the_officers:
     en: "Tell us about the officer(s)"
-    es: "Diganos acerca de los oficiales"
+    es: "Díganos acerca de los oficiales"
   tell_us_about_the_witness:
     en: "Tell us about any witnesses"
-    es: "Diganos acerca de algun testigo"
+    es: "Díganos acerca de algun testigo"
   has_ticket:
-    en: "Has Ticket"
-    es: "Tiene Ticket"
+    en: "Has ticket"
+    es: "Tiene ticket"
   ticket_number:
-    en: "Ticket Number"
-    es: "Numero de Ticket"
+    en: "Ticket number"
+    es: "Número de ticket"
 complaint:
   emailSubject:
     en: "Your complaint was submitted successfully."
