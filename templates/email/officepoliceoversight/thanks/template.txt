@@ -1,26 +1,10 @@
 {% include 'email/officepoliceoversight/common/header.txt' %}
 
-{{t('title')}} 
+{{t('title')}}
 
-{% if language_code() == 'es' %}
+{{ t('thanksSharingThanksExperience') }}
 
-Gracias por compartir su experiencia con nosotros, esto nos ayuda a servirles mejor a usted y a su comunidad.
-
-{% else %}
-
-Thank you for sharing your experience with us. This helps us better serve you and your community.
-
-{% endif %}
-
-{% if language_code() == 'es' %}
-
-Sus comentarios serán enviados a la Oficina de Fiscalización de la Policía y a la División de Asuntos Internos del Departamento de Policía de Austin, así como a la cadena de comando del oficial.
-
-{% else %}
-
-Your feedback will go to the Office of Police Oversight and the Austin Police Department’s Internal Affairs Division, as well as to the officer’s chain of command.
-
-{% endif %}
+{{ t('yourFeedback') }}
 
 {% include 'email/officepoliceoversight/thanks/form-data.txt' %}
 
