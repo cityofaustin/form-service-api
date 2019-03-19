@@ -4,6 +4,10 @@
           color: #0050D8;
       }
 
+      .outlook {
+          display: none;
+      }
+
       body {
         margin: 0;
         font-family: "Arial", "Open Sans", sans-serif;
@@ -114,10 +118,6 @@
 
 
       @media only screen and (max-width: 600px) {
-        table {
-          display: none;
-        }
-
         ul, ol {
           padding-left: 10px;
         }
@@ -182,9 +182,7 @@
       }
 
       @media only screen and (min-width: 601px) {
-        table {
-          display: none;
-        }
+
 
         .form-header {
           display: block !important;
@@ -245,6 +243,8 @@
           text-transform: capitalize;
         }
       }
+
+
       .form-content > p {
         text-align: justify;
       }
@@ -302,7 +302,6 @@
       }
 
 
-
       .form-data-section span {
         font-weight: bold;
       }
@@ -312,3 +311,18 @@
       }
 
       </style>
+
+
+<!--[if mso]>
+<style>
+
+.outlook {
+    display: table;
+}
+
+.non-outlook {
+    display: none;
+}
+
+</style>
+<![endif]-->

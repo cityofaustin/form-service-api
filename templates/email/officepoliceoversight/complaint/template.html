@@ -2,37 +2,9 @@
 <html>
 {% include 'email/officepoliceoversight/common/head.html' %}
 <body>
-  {% include 'email/officepoliceoversight/common/header.html' %}
-  <div class='form-content'>
-    <h3>{{t('title')}}</h3>
 
-    <div class="form-confirmation">
-      {% if language_code() == 'es' %}
-          <p>Muchas gracias por compartir su experiencia con nosotros, esto nos ayuda a servirles mejor a usted y a su comunidad.</p>
-
-          <p class="blue">Su número de confirmación es: <span class="form-data-casenumber">{{casenumber}}</span></p>
-      {% else %}
-          <p>Thank you for sharing your experience with us. This helps us better serve you and your community.</p>
-
-          <p class="blue">Your confirmation number is: <span class="form-data-casenumber">{{casenumber}}</span></p>
-      {% endif %}
-    </div>
-
-    {% if language_code() == 'es' %}
-        <p>Nos puede enviar un <a class='form-data-link' href="mailto:policeoversight@austintexas.gov">correo electrónico</a> o llamar al <a class='form-data-link' href="tel:512-972-2676">(512) 972-2676</a> en cualquier momento con su número de confirmación para averiguar el estado de su queja. Si usted nos dio su información de contacto, un empleado de la Oficina de Fiscalización de la Policía se comunicará con usted en un periodo de dos a cuatro días laborales.</p>
-
-        <p>Para una explicación completa de lo que va a suceder ahora, así como una clasificación de las infracciones a las políticas, visite la página del <a href="https://alpha.austin.gov/es/police-oversight/complaint-investigation-process">proceso de investigación de quejas</a>. Nuevamente, muchas gracias por compartir su experiencia con nosotros.</p>
-    {% else %}
-        <p>You can <a class='form-data-link' href="mailto:policeoversight@austintexas.gov">email us</a> or call us at <a class='form-data-link' href="tel:512-972-2676">(512) 972-2676</a> any time with your confirmation number to check the status of your complaint. If you provided your contact information, a staff person from the Office of Police Oversight will contact you within two to four business days. </p>
-
-        <p>For a full explanation of what happens next, as well as a ranking of policy violations, visit the <a href="https://alpha.austin.gov/police-oversight/complaint-investigation-process">complaint investigation process</a> page. Again, thank you for sharing your experience with us.</p>
-    {% endif %}
-
-  {% include 'email/officepoliceoversight/complaint/form-data.html' %}
-
-  {% include 'email/officepoliceoversight/common/footer.html' %}
-
-  </div>
-
+{% include 'email/officepoliceoversight/complaint/template-nonoutlook.html' %}
+{% include 'email/officepoliceoversight/complaint/template-outlook.html' %}
+{% include 'email/officepoliceoversight/common/footer.html' %}
 </body>
 </html>

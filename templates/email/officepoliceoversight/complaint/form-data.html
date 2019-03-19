@@ -13,7 +13,7 @@
 
         <div class='form-data-section_item'>
           <span>{{t('date_and_time')}}:</span>
-          <p>{{data['datetime']['date']}} {{data['datetime']['time']}}</p>
+          <p>{{data['datetime']['date'] or 'N/A'}} {{data['datetime']['time'] or ''}}</p>
         </div>
 
         <div class='form-data-section_item'>
@@ -88,7 +88,7 @@
     </div>
 
     <div>
-      <div class='form-data-section_title'>Demographic information</div>
+      <div class='form-data-section_title'>{{t('demographics')}}</div>
       <div class='form-data-section'>
         <div class='form-data-section_item'>
           <span>{{t('additional_information')}}:</span>
