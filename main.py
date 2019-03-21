@@ -690,7 +690,7 @@ def spanish_test():
 
 @app.route('/form/submit', methods=['POST'])
 def casenum_updaterecord():
-    global EMAIL_ADDRESS_USER, EMAIL_ADDRESS_OPO, EMAIL_ADDRESS_APD
+    global EMAIL_ADDRESS_OPO, EMAIL_ADDRESS_APD
 
     caseNum = ""
     recipiant = ""
