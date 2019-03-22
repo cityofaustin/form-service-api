@@ -12,7 +12,6 @@
 {{t('zipcode')}}: {{data['zipCode'] or 'N/A' }}
 {{t('has_officer_details')}}: {{ data['hasOfficerDetails'] or 'N/A' }}
 {{t('has_witness_information')}}: {{data['hasWitnessInformation'] or 'N/A' }}
-{{t('aware_of_evidence')}}: {{data['awareOfEvidence'] or 'N/A' }}
 
 
 
