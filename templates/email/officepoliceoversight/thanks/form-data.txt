@@ -60,3 +60,10 @@
 {{t('additional_information')}}: {{witness['anythingElse'] or 'N/A' }}
 
 {% endfor %}
+
+
+{{t('attachments')}}
+
+{% for attachment_item in attachment_urls %}
+- Link: {{api_endpoint}}{{attachment_item}}
+{% endfor %}
