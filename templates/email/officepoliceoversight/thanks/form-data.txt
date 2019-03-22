@@ -12,7 +12,6 @@
 {{t('zipcode')}}: {{data['zipCode'] or 'N/A' }}
 {{t('has_officer_details')}}: {{ data['hasOfficerDetails'] or 'N/A' }}
 {{t('has_witness_information')}}: {{data['hasWitnessInformation'] or 'N/A' }}
-{{t('aware_of_evidence')}}: {{data['awareOfEvidence'] or 'N/A' }}
 
 
 
@@ -59,4 +58,11 @@
 {{t('phone')}}: {{witness['phoneNumber'] or 'N/A' }}
 {{t('additional_information')}}: {{witness['anythingElse'] or 'N/A' }}
 
+{% endfor %}
+
+
+{{t('attachments')}}
+
+{% for attachment_item in attachment_urls %}
+- Link: {{api_endpoint}}{{attachment_item}}
 {% endfor %}
