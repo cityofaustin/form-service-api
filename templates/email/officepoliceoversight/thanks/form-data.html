@@ -37,18 +37,6 @@
     </div>
 
     <div>
-      <div class='form-data-section_title'>{{t('review_your_evidence')}}</div>
-      <div class='form-data-section'>
-          <span><br/>{{t('attachments')}}</span>
-          <ol>
-          {% for attachment_item in attachment_urls %}
-            <li><a href="{{api_endpoint}}{{attachment_item}}">{{ attachment_item | basename }}</a></li>
-          {% endfor %}
-          </ol>
-      </div>
-    </div>
-
-    <div>
       <div class='form-data-section_title'>{{t('tell_us_about_the_officers')}}</div>
       <div class='form-data-section'>
           {% for officer in data['officers'] %}

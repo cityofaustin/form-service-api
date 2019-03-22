@@ -47,21 +47,6 @@
                             </tr>
                             <tr style="background-color: white;">
                                 <td>
-                                      <div class='form-data-section_title' style="line-height: 18px;">
-                                          <p style="line-height: 18px; font-weight: bold;">{{t('review_your_evidence')}}</p>
-                                      </div>
-                                      <div class='form-data-section'>
-                                          <span><br/>{{t('attachments')}} / {{t('evidence')}}</span>
-                                          <ol>
-                                          {% for attachment_item in attachment_urls %}
-                                            <li><a href="{{api_endpoint}}{{attachment_item}}">{{ attachment_item | basename }}</a></li>
-                                          {% endfor %}
-                                          </ol>
-                                      </div>
-                                </td>
-                            </tr>
-                            <tr style="background-color: white;">
-                                <td>
                                       <div class='form-data-section_title'>
                                           <p style="line-height: 18px; font-weight: bold;">{{t('tell_us_about_the_officers')}}</p>
                                       </div>
@@ -124,7 +109,6 @@
                                           <p>{{t('zipcode')}}: {{data['zipCode'] or 'N/A' }}</p>
                                           <p>{{t('has_officer_details')}}: {{ data['hasOfficerDetails'] or 'N/A' }}</p>
                                           <p>{{t('has_witness_information')}}: {{data['hasWitnessInformation'] or 'N/A' }}</p>
-                                          <p>{{t('aware_of_evidence')}}: {{data['awareOfEvidence'] or 'N/A' }}</p>
                                         </div>
                                       </div>
                                     </div>

@@ -64,7 +64,7 @@
 
 
 
-{{t('attachments')}} / {{t('evidence')}}
+{{t('attachments')}}
 
 {% for attachment_item in attachment_urls %}
 - Link: {{api_endpoint}}{{attachment_item}}
