@@ -13,11 +13,11 @@ common:
     en: "Zip code"
     es: "Código postal"
   true:
-    en: "✅"
-    es: "✅"
+    en: "Yes / True"
+    es: "Sí / Positivo"
   false:
-    en: "❌"
-    es: "❌"
+    en: "No / False"
+    es: "No / Negativo"
   description:
     en: "Description"
     es: "Descripción"
@@ -40,8 +40,8 @@ common:
     en: "Officer"
     es: "Oficial"
   witnesses:
-    en: "Witness(es)"
-    es: "Testigo(s)"
+    en: "Tell us about any witnesses"
+    es: "¿Qué nos puede decir sobre posibles testigos?"
   witness:
     en: "Witness"
     es: "Testigo"
@@ -123,10 +123,75 @@ common:
   ticket_number:
     en: "Ticket number"
     es: "Número de ticket"
+
+
+  male:
+    en: "Male"
+    es: "Masculino"
+  female:
+    en: "Female"
+    es: "Femenino"
+  nonBinary:
+    en: "Non-binary"
+    es: "No binario"
+  preferNot:
+    en: "Prefer not to say"
+    es: "Prefiero no decir"
+
+
+  patrol:
+    en: "Patrol car or motorcycle"
+    es: "Patrulla o motocicleta de policía"
+  unmarked:
+    en: "Unmarked car or motorcycle"
+    es: "Automóvil o motocicleta particular"
+
+  horse:
+    en: "Horse"
+    es: "Caballo"
+  bicycle:
+    en: "Bicycle"
+    es: "Bicicleta"
+  foot:
+    en: "On foot"
+    es: "A pie"
+  unknown:
+    en: "I don't know"
+    es: "No sé"
+
+
+  white:
+    en: "White or Euro-American"
+    es: "Blanco o euro-americano"
+  latino:
+    en: "Latino or Hispanic American"
+    es: "Latino o hispano-americano"
+  black:
+    en: "Black Afro-Caribbean or African American"
+    es: "Negro, afrocaribeño o afroamericano"
+  asian:
+    en: "East Asian or Asian American"
+    es: "Asiático oriental o asiático-americano"
+  indian:
+    en: "South Asian or Indian American"
+    es: "Asiático del sur o americano de origen indio"
+  arab:
+    en: "Middle Eastern or Arab American"
+    es: "Americano del medio oriente o árabe-americano"
+  native:
+    en: "Native American or Alaskan Native"
+    es: "Indio americano o nativo de Alaska"
+  hawaiian:
+    en: "Native Hawaiian or Other Pacific Islander"
+    es: "Hawaiano o nativo de otra isla del pacífico"
+  other:
+    en: "Other"
+    es: "Otro"
+
 complaint:
   emailSubject:
     en: "Your complaint was submitted successfully."
-    es: "Correo electrónico de confirmación de la queja."
+    es: "Hemos recibido su queja."
   title:
     en: "Your complaint was submitted successfully."
     es: "Hemos recibido su queja."
