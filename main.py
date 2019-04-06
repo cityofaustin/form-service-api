@@ -819,9 +819,9 @@ def emailtemplate():
         "view:contactHeader": {},
         "willingToBeContacted": True,
         "view:contactPreferences": {
-            "yourName": "Sergio Garcia",
-            "yourPhone": "5127585487",
-            "yourEmail": "sergiogcx@gmail.com",
+            "yourName": "John Smith",
+            "yourPhone": "512-987-6543",
+            "yourEmail": "john@smith.com",
             "needTranslator": True
         },
         "hasWitnessInformation": True,
