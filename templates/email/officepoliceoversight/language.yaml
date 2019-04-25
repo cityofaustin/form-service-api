@@ -48,9 +48,9 @@ common:
   attachments:
     en: "Attachments"
     es: "Archivos adjuntos"
-  evidence:
-    en: "Evidence"
-    es: "Evidencia"
+  media:
+    en: "Media"
+    es: "Archivos"
   latitude:
     en: "Latitude"
     es: "Latitud"
@@ -99,16 +99,16 @@ common:
   has_witness_information:
     en: "Has witness information"
     es: "Tiene información de testigos"
-  aware_of_evidence:
-    en: "Aware of evidence"
-    es: "Tiene evidencia"
+  aware_of_media:
+    en: "Aware of media"
+    es: "Tiene archivos"
   additional_information:
     en: "Additional information"
     es: "Información adicional"
   tell_us_what_happened:
     en: "Tell us what happened"
     es: "Díganos que sucedió"
-  review_your_evidence:
+  review_your_media:
     en: "Share your photos or video"
     es: "Comparta fotos o videos"
   tell_us_about_the_officers:

@@ -524,7 +524,7 @@ def sendEmail(emailConfig):
 def is_recipient(email):
     return email not in [EMAIL_ADDRESS_OPO, EMAIL_ADDRESS_APD]
 
-def send_opo_email(submission_type, language_code, recipiant, caseNumResp, data, evidenceFiles):
+def send_opo_email(submission_type, language_code, recipiant, caseNumResp, data, mediaFiles):
     # We load the language of the recipiant, for opo or apd must default to english.
     currentLangCode = language_code if is_recipient(recipiant) else "en"
 
@@ -543,7 +543,7 @@ def send_opo_email(submission_type, language_code, recipiant, caseNumResp, data,
     htmlTemplate = render_email_template("email/officepoliceoversight/" + submission_type + "/template.html",
         casenumber=caseNumResp,
         data=data,
-        attachment_urls=evidenceFiles,
+        attachment_urls=mediaFiles,
         api_endpoint=url_for('file_download_uri', path='', _external=True)
     )
 
@@ -551,7 +551,7 @@ def send_opo_email(submission_type, language_code, recipiant, caseNumResp, data,
     txtTemplate = render_email_template("email/officepoliceoversight/" + submission_type + "/template.txt",
         casenumber=caseNumResp,
         data=data,
-        attachment_urls=evidenceFiles,
+        attachment_urls=mediaFiles,
         api_endpoint=url_for('file_download_uri', path='', _external=True)
     )
 
@@ -732,12 +732,12 @@ def casenum_updaterecord():
 
 
     #
-    # Evidence
+    # Media
     #
     try:
-        evidenceFiles = json.loads(data['evidenceFiles'])
+        mediaFiles = json.loads(data['mediaFiles'])
     except:
-        evidenceFiles = []
+        mediaFiles = []
 
     #
     # Location
@@ -777,16 +777,16 @@ def casenum_updaterecord():
     try:
 
         # Send the user an email
-        send_opo_email(submission_type, language_code, recipiant, caseNumResp, data, evidenceFiles)
+        send_opo_email(submission_type, language_code, recipiant, caseNumResp, data, mediaFiles)
 
         # If this is not a user confirmation only, then submit to OPO and/or APD
         if(user_confirmation_only == False):
             # Send to OPO
-            send_opo_email(submission_type, language_code, EMAIL_ADDRESS_OPO, caseNumResp, data, evidenceFiles)
+            send_opo_email(submission_type, language_code, EMAIL_ADDRESS_OPO, caseNumResp, data, mediaFiles)
 
             # If this is a thank you note, send to APD
             if(submission_type=="thanks"):
-                send_opo_email(submission_type, language_code, EMAIL_ADDRESS_APD, caseNumResp, data, evidenceFiles)
+                send_opo_email(submission_type, language_code, EMAIL_ADDRESS_APD, caseNumResp, data, mediaFiles)
 
     except Exception as e:
         email_status = {
@@ -862,8 +862,8 @@ def emailtemplate():
                 "otherTransportation": "Totally on foot"
             }
         ],
-        "awareOfEvidence": True,
-        "evidenceFiles": "[\"uploads/24f4ba858d34ee3a6fb6d3460ee64248499fd8d17d7b86997ca50c0f3c8c17f6/01312019182438_adb80_austinseal.gif\", \"uploads/24f4ba858d34ee3a6fb6d3460ee64248499fd8d17d7b86997ca50c0f3c8c17f6/01312019182438_adb80_austinseal.gif\",\"uploads/24f4ba858d34ee3a6fb6d3460ee64248499fd8d17d7b86997ca50c0f3c8c17f6/01312019182438_adb80_austinseal.gif\"]",
+        "awareOfMedia": True,
+        "mediaFiles": "[\"uploads/24f4ba858d34ee3a6fb6d3460ee64248499fd8d17d7b86997ca50c0f3c8c17f6/01312019182438_adb80_austinseal.gif\", \"uploads/24f4ba858d34ee3a6fb6d3460ee64248499fd8d17d7b86997ca50c0f3c8c17f6/01312019182438_adb80_austinseal.gif\",\"uploads/24f4ba858d34ee3a6fb6d3460ee64248499fd8d17d7b86997ca50c0f3c8c17f6/01312019182438_adb80_austinseal.gif\"]",
         "description": "This is the description of the incident.",
         "datetime": "2019-01-31 12:00",
         "hasTicket": True,
@@ -903,12 +903,12 @@ def emailtemplate():
 
 
     #
-    # Evidence
+    # Media Uploads
     #
     try:
-    	evidenceFiles = json.loads(data['evidenceFiles'])
+    	mediaFiles = json.loads(data['mediaFiles'])
     except:
-    	evidenceFiles = []
+    	mediaFiles = []
 
     #
     # Location
@@ -926,14 +926,14 @@ def emailtemplate():
     htmlTemplate = (render_email_template("email/officepoliceoversight/" + submission_type + "/template.html",
         casenumber= '2019-0208-6cff',
         data=data,
-        attachment_urls=evidenceFiles,
+        attachment_urls=mediaFiles,
         api_endpoint=url_for('file_download_uri', path='', _external=True)
     ))
 
     txtTemplate = render_email_template("email/officepoliceoversight/" + submission_type + "/template.txt",
         casenumber= '2019-0208-6cff',
         data=data,
-        attachment_urls=evidenceFiles,
+        attachment_urls=mediaFiles,
         api_endpoint=url_for('file_download_uri', path='', _external=True)
     )
 
