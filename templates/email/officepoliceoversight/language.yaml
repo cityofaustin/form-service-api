@@ -120,9 +120,9 @@ common:
   has_ticket:
     en: "Has ticket"
     es: "Tiene ticket"
-  ticket_number:
-    en: "Ticket number"
-    es: "Número de ticket"
+  ticket_name:
+    en: "Name as it appears on the ticket"
+    es: "Nombre como aparece en la infracción"
 
 
   male:
