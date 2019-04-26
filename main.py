@@ -17,8 +17,6 @@ import knackpy, json, yaml
 
 from jinja2 import Environment, FileSystemLoader, StrictUndefined, Undefined, Template
 
-from pprint import pprint
-
 class SilentUndefined(Undefined):
 
     def _fail_with_undefined_error(self, *args, **kwargs):
@@ -542,7 +540,6 @@ def send_opo_email(submission_type, language_code, recipient, caseNumResp, data,
     emailConfig['recipient'] = recipient
     emailConfig['subject'] = translate('emailSubject')
 
-    print("~~~ About to render_email_template html")
     # Render HTML template
     htmlTemplate = render_email_template("email/officepoliceoversight/" + submission_type + "/template.html",
         casenumber=caseNumResp,
@@ -550,7 +547,6 @@ def send_opo_email(submission_type, language_code, recipient, caseNumResp, data,
         attachment_urls=mediaFiles,
         api_endpoint=url_for('file_download_uri', path='', _external=True)
     )
-    print("~~~ I did I did render_email_template html")
 
     # Render TXT template (for non-html compatible services)
     txtTemplate = render_email_template("email/officepoliceoversight/" + submission_type + "/template.txt",
@@ -774,7 +770,7 @@ def casenum_updaterecord():
     try:
         recipient = data['view:contactPreferences']['yourEmail']
     except:
-        recipient = ""
+        recipient = None
 
     #
     # Now we will attempt to send the emails
@@ -782,7 +778,8 @@ def casenum_updaterecord():
     try:
 
         # Send the user an email
-        send_opo_email(submission_type, language_code, recipient, caseNumResp, data, mediaFiles)
+        if (recipient):
+            send_opo_email(submission_type, language_code, recipient, caseNumResp, data, mediaFiles)
 
         # If this is not a user confirmation only, then submit to OPO and/or APD
         if(user_confirmation_only == False):
