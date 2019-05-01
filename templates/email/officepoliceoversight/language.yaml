@@ -191,10 +191,10 @@ common:
 complaint:
   emailSubject:
     en: "Your complaint was submitted successfully."
-    es: "Su queja ha sido enviado."
+    es: "Su queja ha sido enviada."
   title:
     en: "Your complaint was submitted successfully."
-    es: "Su queja ha sido enviado."
+    es: "Su queja ha sido enviada."
   thanksSharingExperience:
     en: "Thank you for sharing your experience with us. This helps us better serve you and your community."
     es: "Muchas gracias por compartir su experiencia con nosotros, esto nos ayuda a servirles mejor a usted y a su comunidad."
