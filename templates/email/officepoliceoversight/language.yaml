@@ -127,10 +127,10 @@ common:
 
   male:
     en: "Male"
-    es: "Masculino"
+    es: "Hombre"
   female:
     en: "Female"
-    es: "Femenino"
+    es: "Mujer"
   nonBinary:
     en: "Non-binary"
     es: "No binario"
