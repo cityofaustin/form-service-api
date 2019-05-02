@@ -17,7 +17,6 @@ import knackpy, json, yaml
 
 from jinja2 import Environment, FileSystemLoader, StrictUndefined, Undefined, Template
 
-
 class SilentUndefined(Undefined):
 
     def _fail_with_undefined_error(self, *args, **kwargs):
@@ -154,7 +153,7 @@ emailConfigDefault = {
 # Helper Functions
 #
 
-def load_tanslation(file_path, section, language):
+def load_translation(file_path, section, language):
     global TRANSLATION_DICT
     with open(file_path, 'r') as stream:
         try:
@@ -491,7 +490,7 @@ def sendEmail(emailConfig):
         response = ses_client.send_email(
             Destination={
                 'ToAddresses': [
-                    emailConfig['recipiant'],
+                    emailConfig['recipient'],
                 ],
             },
             Message={
@@ -515,7 +514,9 @@ def sendEmail(emailConfig):
     # Display an error if something goes wrong.
     except ClientError as e:
         print(e.response['Error']['Message'])
-        return "error"
+        raise e
+    except Exception as e:
+        raise e
     else:
         mid = response['MessageId']
         print("Email sent! Message ID: " + mid)
@@ -524,26 +525,26 @@ def sendEmail(emailConfig):
 def is_recipient(email):
     return email not in [EMAIL_ADDRESS_OPO, EMAIL_ADDRESS_APD]
 
-def send_opo_email(submission_type, language_code, recipiant, caseNumResp, data, evidenceFiles):
-    # We load the language of the recipiant, for opo or apd must default to english.
-    currentLangCode = language_code if is_recipient(recipiant) else "en"
+def send_opo_email(submission_type, language_code, recipient, caseNumResp, data, mediaFiles):
+    # We load the language of the recipient, for opo or apd must default to english.
+    currentLangCode = language_code if is_recipient(recipient) else "en"
 
     # load given language
-    load_tanslation('templates/email/officepoliceoversight/language.yaml',
+    load_translation('templates/email/officepoliceoversight/language.yaml',
         section=submission_type,
         language=currentLangCode)
 
     # Now we specify the destination email, and translated subject
     emailConfig = None
     emailConfig = emailConfigDefault.copy()
-    emailConfig['recipiant'] = recipiant
+    emailConfig['recipient'] = recipient
     emailConfig['subject'] = translate('emailSubject')
 
     # Render HTML template
     htmlTemplate = render_email_template("email/officepoliceoversight/" + submission_type + "/template.html",
         casenumber=caseNumResp,
         data=data,
-        attachment_urls=evidenceFiles,
+        attachment_urls=mediaFiles,
         api_endpoint=url_for('file_download_uri', path='', _external=True)
     )
 
@@ -551,7 +552,7 @@ def send_opo_email(submission_type, language_code, recipiant, caseNumResp, data,
     txtTemplate = render_email_template("email/officepoliceoversight/" + submission_type + "/template.txt",
         casenumber=caseNumResp,
         data=data,
-        attachment_urls=evidenceFiles,
+        attachment_urls=mediaFiles,
         api_endpoint=url_for('file_download_uri', path='', _external=True)
     )
 
@@ -562,7 +563,7 @@ def send_opo_email(submission_type, language_code, recipiant, caseNumResp, data,
     try:
         response = sendEmail(emailConfig)
     except Exception as e:
-        return False
+        raise e
 
 
 
@@ -693,7 +694,7 @@ def casenum_updaterecord():
     global EMAIL_ADDRESS_OPO, EMAIL_ADDRESS_APD
 
     caseNum = ""
-    recipiant = ""
+    recipient = ""
     data = request.json
 
     requestJson = json.dumps(request.json)
@@ -732,12 +733,12 @@ def casenum_updaterecord():
 
 
     #
-    # Evidence
+    # Media
     #
     try:
-        evidenceFiles = json.loads(data['evidenceFiles'])
+        mediaFiles = json.loads(data['mediaFiles'])
     except:
-        evidenceFiles = []
+        mediaFiles = []
 
     #
     # Location
@@ -764,12 +765,12 @@ def casenum_updaterecord():
 
 
     #
-    # We are going to try parsing the recipiant
+    # We are going to try parsing the recipient
     #
     try:
-        recipiant = data['view:contactPreferences']['yourEmail']
+        recipient = data['view:contactPreferences']['yourEmail']
     except:
-        recipiant = ""
+        recipient = None
 
     #
     # Now we will attempt to send the emails
@@ -777,16 +778,17 @@ def casenum_updaterecord():
     try:
 
         # Send the user an email
-        send_opo_email(submission_type, language_code, recipiant, caseNumResp, data, evidenceFiles)
+        if (recipient):
+            send_opo_email(submission_type, language_code, recipient, caseNumResp, data, mediaFiles)
 
         # If this is not a user confirmation only, then submit to OPO and/or APD
         if(user_confirmation_only == False):
             # Send to OPO
-            send_opo_email(submission_type, language_code, EMAIL_ADDRESS_OPO, caseNumResp, data, evidenceFiles)
+            send_opo_email(submission_type, language_code, EMAIL_ADDRESS_OPO, caseNumResp, data, mediaFiles)
 
             # If this is a thank you note, send to APD
             if(submission_type=="thanks"):
-                send_opo_email(submission_type, language_code, EMAIL_ADDRESS_APD, caseNumResp, data, evidenceFiles)
+                send_opo_email(submission_type, language_code, EMAIL_ADDRESS_APD, caseNumResp, data, mediaFiles)
 
     except Exception as e:
         email_status = {
@@ -862,8 +864,8 @@ def emailtemplate():
                 "otherTransportation": "Totally on foot"
             }
         ],
-        "awareOfEvidence": True,
-        "evidenceFiles": "[\"uploads/24f4ba858d34ee3a6fb6d3460ee64248499fd8d17d7b86997ca50c0f3c8c17f6/01312019182438_adb80_austinseal.gif\", \"uploads/24f4ba858d34ee3a6fb6d3460ee64248499fd8d17d7b86997ca50c0f3c8c17f6/01312019182438_adb80_austinseal.gif\",\"uploads/24f4ba858d34ee3a6fb6d3460ee64248499fd8d17d7b86997ca50c0f3c8c17f6/01312019182438_adb80_austinseal.gif\"]",
+        "awareOfMedia": True,
+        "mediaFiles": "[\"uploads/24f4ba858d34ee3a6fb6d3460ee64248499fd8d17d7b86997ca50c0f3c8c17f6/01312019182438_adb80_austinseal.gif\", \"uploads/24f4ba858d34ee3a6fb6d3460ee64248499fd8d17d7b86997ca50c0f3c8c17f6/01312019182438_adb80_austinseal.gif\",\"uploads/24f4ba858d34ee3a6fb6d3460ee64248499fd8d17d7b86997ca50c0f3c8c17f6/01312019182438_adb80_austinseal.gif\"]",
         "description": "This is the description of the incident.",
         "datetime": "2019-01-31 12:00",
         "hasTicket": True,
@@ -896,19 +898,19 @@ def emailtemplate():
     #
     # We now load the needed translation
     #
-    load_tanslation('templates/email/officepoliceoversight/language.yaml',
+    load_translation('templates/email/officepoliceoversight/language.yaml',
         section=submission_type,
         language=language_code)
 
 
 
     #
-    # Evidence
+    # Media Uploads
     #
     try:
-    	evidenceFiles = json.loads(data['evidenceFiles'])
+    	mediaFiles = json.loads(data['mediaFiles'])
     except:
-    	evidenceFiles = []
+    	mediaFiles = []
 
     #
     # Location
@@ -926,14 +928,14 @@ def emailtemplate():
     htmlTemplate = (render_email_template("email/officepoliceoversight/" + submission_type + "/template.html",
         casenumber= '2019-0208-6cff',
         data=data,
-        attachment_urls=evidenceFiles,
+        attachment_urls=mediaFiles,
         api_endpoint=url_for('file_download_uri', path='', _external=True)
     ))
 
     txtTemplate = render_email_template("email/officepoliceoversight/" + submission_type + "/template.txt",
         casenumber= '2019-0208-6cff',
         data=data,
-        attachment_urls=evidenceFiles,
+        attachment_urls=mediaFiles,
         api_endpoint=url_for('file_download_uri', path='', _external=True)
     )
 

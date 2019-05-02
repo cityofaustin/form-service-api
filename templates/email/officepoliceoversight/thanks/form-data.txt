@@ -6,8 +6,6 @@
 {{t('date_and_time')}}:
 {{data['datetime']['date']}} {{data['datetime']['time']}}
 
-{{t('has_ticket')}}: {{t(data['hasTicket']) or 'N/A' }}
-
 {{t('location')}}:
 {{t('address')}}: {{data['location']['address'] or 'N/A'}}
 {{t('position')}}:
@@ -27,18 +25,6 @@
 {{t('badge_number')}}: {{officer['badgeNumber'] or 'N/A' }}
 {{t('uniformed')}}: {{t(officer['uniformed']) or 'N/A' }}
 {{t('transportation')}}: {{t(officer['transportation']) or 'N/A' }}
-
-{% endfor %}
-
-
-
-{{t('witnesses')}}:
-{% for witness in data['witnesses'] %}
-
-{{t('name')}}: {{witness['name'] or 'N/A' }}
-{{t('email')}}: {{witness['email'] or 'N/A' }}
-{{t('phone')}}: {{witness['phoneNumber'] or 'N/A' }}
-{{t('additional_information')}}: {{witness['anythingElse'] or 'N/A' }}
 
 {% endfor %}
 

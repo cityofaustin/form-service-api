@@ -176,7 +176,7 @@ Another example:
 
 #### E-Mail
 
-The e-mail templates are found in the `templates/email/officeofpoliceoversight` directory. This having in mind future growth for other departments. 
+The e-mail templates are found in the `templates/email/officeofpoliceoversight` directory. This having in mind future growth for other departments.
 
 Inside that directory, there are also three sub-directories: `common`, `complaint` and `thanks`, one for each of the current OPO forms. You should be able to create as many other directories as you need, depending on the number of templates you need to generate.
 
@@ -197,7 +197,7 @@ The first step is to load the yaml file, for that there is this method:
 
 ```
 # load a given language
-    load_tanslation('templates/email/officepoliceoversight/language.yaml',
+    load_translation('templates/email/officepoliceoversight/language.yaml',
         section=submission_type,
         language=currentLangCode)
 ```
@@ -258,6 +258,6 @@ section_b:
 		...: "..."
 ```
 
-Common is a required section, if not present the translate function is going to crash. The common section is there to help reduce redundancy, it was meant to have common words and phrases that will be shared across all sections. You can have as many sections as needed, these should be specific to a group. 
+Common is a required section, if not present the translate function is going to crash. The common section is there to help reduce redundancy, it was meant to have common words and phrases that will be shared across all sections. You can have as many sections as needed, these should be specific to a group.
 
 The translate method will try to find the section you specified, if it can't find the key in the specified section, then it will try to find it on the common section, otherwise it will fail and return an empty string.
