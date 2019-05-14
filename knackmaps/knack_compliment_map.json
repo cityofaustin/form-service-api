@@ -18,7 +18,7 @@
     "imageAttachment1":         "field_22",
     "recordCreationDatetime":   "field_42",
     "incidentOfficers":         "field_43",
-    "evidence":                 "field_63",
+    "media":                    "field_63",
     "officers":                 "field_64",
     "witnesses":                "field_92"
 }

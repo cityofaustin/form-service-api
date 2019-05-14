@@ -7,6 +7,7 @@
 {{data['datetime']['date']}} {{data['datetime']['time']}}
 
 {{t('has_ticket')}}: {{t(data['hasTicket']) or 'N/A' }}
+{{t('ticket_name')}}: {{data['ticket'] or 'N/A' }}
 
 {{t('location')}}:
 {{t('address')}}: {{data['location']['address'] or 'N/A'}}

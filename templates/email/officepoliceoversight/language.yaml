@@ -48,9 +48,9 @@ common:
   attachments:
     en: "Attachments"
     es: "Archivos adjuntos"
-  evidence:
-    en: "Evidence"
-    es: "Evidencia"
+  media:
+    en: "Media"
+    es: "Archivos"
   latitude:
     en: "Latitude"
     es: "Latitud"
@@ -99,18 +99,18 @@ common:
   has_witness_information:
     en: "Has witness information"
     es: "Tiene información de testigos"
-  aware_of_evidence:
-    en: "Aware of evidence"
-    es: "Tiene evidencia"
+  aware_of_media:
+    en: "Aware of media"
+    es: "Tiene archivos"
   additional_information:
     en: "Additional information"
     es: "Información adicional"
   tell_us_what_happened:
     en: "Tell us what happened"
     es: "Díganos que sucedió"
-  review_your_evidence:
-    en: "Share your photos or video"
-    es: "Comparta fotos o videos"
+  review_your_media:
+    en: "Share your media"
+    es: "Comparta archivos"
   tell_us_about_the_officers:
     en: "Tell us about the officer(s)"
     es: "Díganos acerca de los oficiales"
@@ -120,17 +120,17 @@ common:
   has_ticket:
     en: "Has ticket"
     es: "Tiene ticket"
-  ticket_number:
-    en: "Ticket number"
-    es: "Número de ticket"
+  ticket_name:
+    en: "Name as it appears on the ticket"
+    es: "Nombre como aparece en la infracción"
 
 
   male:
     en: "Male"
-    es: "Masculino"
+    es: "Hombre"
   female:
     en: "Female"
-    es: "Femenino"
+    es: "Mujer"
   nonBinary:
     en: "Non-binary"
     es: "No binario"
@@ -191,10 +191,10 @@ common:
 complaint:
   emailSubject:
     en: "Your complaint was submitted successfully."
-    es: "Hemos recibido su queja."
+    es: "Su queja ha sido enviada."
   title:
     en: "Your complaint was submitted successfully."
-    es: "Hemos recibido su queja."
+    es: "Su queja ha sido enviada."
   thanksSharingExperience:
     en: "Thank you for sharing your experience with us. This helps us better serve you and your community."
     es: "Muchas gracias por compartir su experiencia con nosotros, esto nos ayuda a servirles mejor a usted y a su comunidad."
@@ -210,11 +210,11 @@ complaint:
 
 thanks:
   title:
-    en: "Confirmation for Thanks"
+    en: "Your thank you was submitted successfully!"
     es: "¡Su nota de agradecimiento fue enviada!"
   emailSubject:
     en: "Your thank you was submitted successfully!"
-    es: "Confirmación de agradecimiento"
+    es: "¡Su nota de agradecimiento fue enviada!"
   thanksSharingThanksExperience:
     en: "Thank you for sharing your experience with us. This helps us better serve you and your community."
     es: "Muchas gracias por compartir su experiencia con nosotros, esto nos ayuda a servirles mejor a usted y a su comunidad."

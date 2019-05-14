@@ -15,13 +15,6 @@
           <span>{{t('date_and_time')}}:</span>
           <p>{{data['datetime']['date'] or 'N/A'}} {{data['datetime']['time'] or ''}}</p>
         </div>
-        <div class='form-data-section_item'>
-          <span>{{t('has_ticket')}}:</span>
-          <p>{{t(data['hasTicket']) or 'N/A' }}</p>
-
-          <span>{{t('ticket_number')}}:</span>
-          <p>{{data['ticket'] or 'N/A' }}</p>
-        </div>
 
         <div class='form-data-section_item'>
           <span>{{t('location')}}:</span>
@@ -53,24 +46,6 @@
             </ul>
           </div>
           {% endfor %}
-      </div>
-    </div>
-
-    <div>
-      <div class='form-data-section_title'>{{t('witnesses')}}</div>
-      <div class='form-data-section'>
-        {% for witness in data['witnesses'] %}
-        <div class='form-data-section_item'>
-          <span>{{t('witness')}} #{{loop.index}}:</span>
-
-          <ul>
-            <li>{{t('name')}}: {{witness['name'] or 'N/A' }}</li>
-            <li  class="nocapitalize">{{t('email')}}: <a href='mailto:{{witness['email'] or ';'}}'>{{witness['email'] or 'N/A' }}</a></li>
-            <li>{{t('phone')}}: {{witness['phoneNumber'] or 'N/A' }}</li>
-            <li  class="nocapitalize">{{t('additional_information')}}: {{witness['anythingElse'] or 'N/A' }}</li>
-          </ul>
-        </div>
-        {% endfor %}
       </div>
     </div>
 
