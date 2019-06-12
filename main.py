@@ -12,8 +12,8 @@ from botocore.exceptions import ClientError
 # Random hash generation
 import uuid, hashlib, hmac, re
 
-# Knack integrator
-import knackpy, json, yaml
+# Handle Data
+import json, yaml
 
 from jinja2 import Environment, FileSystemLoader, StrictUndefined, Undefined, Template
 
@@ -64,9 +64,6 @@ AVAILABLE_TYPES           = ['thanks', 'complaint']
 ALLOWED_IMAGE_EXTENSIONS = set(['png', 'jpg', 'jpeg', 'gif'])
 ALLOWED_EXTENSIONS = set(['pdf', 'png', 'jpg', 'jpeg', 'gif'])
 
-KNACK_APPLICATION_ID      = os.getenv("KNACK_APPLICATION_ID")
-KNACK_API_KEY             = os.getenv("KNACK_API_KEY")
-KNACK_API_ENDPOINT_FILE_UPLOADS="https://api.knack.com/v1/applications/" + KNACK_APPLICATION_ID + "/assets/file/upload"
 S3_KEY                    = os.getenv("AWS_ACCESS_KEY_ID")
 S3_SECRET                 = os.getenv("AWS_SECRET_ACCESS_KEY")
 S3_BUCKET                 = os.getenv("AWS_BUCKET_NAME")
@@ -283,63 +280,6 @@ def generate_clean_filename(filename):
   shortHash = generate_random_hash()[0:5]
   return "{0}_{1}_{2}".format(timestamp, shortHash, cleanFilename)
 
-
-def get_knack_object(tablename):
-    knack_objects = load_map('./knackmaps/knack_objects.json')
-    return knack_objects[tablename]
-
-def build_knack_item_raw(inputJson, map):
-    # Copy record map, we do not want it modified
-    rawRecord = map.copy()
-
-    # Convert inputJson to string (if it isn't)
-    if(isinstance(inputJson, str)):
-        jsonObject = json.loads(inputJson)
-    else:
-        jsonObject = inputJson
-
-    # For each key,val in jsonObject
-    for key, val in jsonObject.items():
-        try:
-            rawRecord[key] = val
-        except:
-            print("Invalid Key: " + key)
-
-    return rawRecord
-
-def build_knack_item(inputJson, map, record):
-    # Copy record map, we do not want it modified
-    knackRecord = record.copy()
-
-    # Convert inputJson to string (if it isn't)
-    if(isinstance(inputJson, str)):
-        jsonObject = json.loads(inputJson)
-    else:
-        jsonObject = inputJson
-
-    # For each key,val in jsonObject
-    for key, val in jsonObject.items():
-        try:
-            knackRecord[map[key]] = val
-        except:
-            print("Invalid Key: " + key)
-
-    return knackRecord
-
-def knack_create_record(record, table='complaints'):
-    response = knackpy.record(
-        record,
-        obj_key = get_knack_object(table),
-        app_id  = KNACK_APPLICATION_ID,
-        api_key = KNACK_API_KEY,
-        method='create'
-    )
-
-    return response["id"], response
-
-
-
-
 def get_dynamodb_record(identifierHash):
     print("get_dynamodb_record() Record: " + identifierHash)
     dynamodb_response = dynamodb_client.get_item(
@@ -375,9 +315,6 @@ def create_dynamodb_record(inputJson, type='record', case_number="", knack_recor
     else:
         identifierHash = case_number
 
-    if(knack_record_id == ""):
-        knack_record_id = generate_random_hash()
-
     #random_hash = generate_random_hash()
     resp = dynamodb_client.put_item(
         TableName=LOG_TABLE,
@@ -387,23 +324,10 @@ def create_dynamodb_record(inputJson, type='record', case_number="", knack_recor
             'dateCreated': {'S': getCurrentDateTime() },
             'type': {'S': type },
             'data': { 'S': jsonString },
-            'knackRecordId': {'S': knack_record_id }
+            'knackRecordId': {'S': None }
         }
     )
     return identifierHash, resp
-
-
-def knack_upload_image(filepath):
-    # First try uploading the image and parse the response
-    try:
-        headers = {'x-knack-rest-api-key': KNACK_API_KEY }
-        multiple_files = [('files', open(filepath, 'rb'))]
-        return requests.post(KNACK_API_ENDPOINT_FILE_UPLOADS, headers=headers, files=multiple_files)
-    # We've failed along the way...
-    except:
-        print("It should have never reached this point!")
-        return "error"
-
 
 def upload_file_to_s3(file, bucket_name, acl="public-read"):
     """

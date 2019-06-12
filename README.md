@@ -1,20 +1,11 @@
 # Police Monitor Server
-This is the police monitor form server for AWS Lambda, it has been written in Python, Flask, and its function is to integrate a form with Knack.
+This is the police monitor form server for AWS Lambda, it has been written in Python and Flask.
 
 To run the server, you will need to make some environment preparations as well as installing some dependencies.
 
-First the Knack environment Variables, then for AWS, in this order:
-
 ## 1. Set up Environment Variables:
 
-First, for Knack:
-
-```
-export KNACK_APPLICATION_ID="..."
-export KNACK_API_KEY="..."
-```
-
-Then, for AWS:
+For AWS:
 
 ```
 export AWS_BUCKET_NAME="..."
@@ -42,10 +33,10 @@ source pmenv/bin/activate
 
 ## 3. Dependencies
 
-You will need to install flask for our API, Zappa for deployment, boto for aws s3 integration, Pillow for file management, and knackpy for Knack integration:
+You will need to install flask for our API, Zappa for deployment, boto for aws s3 integration, Pillow for file management:
 
 ```
-pip install flask flask-cors zappa boto3 Pillow knackpy
+pip install flask flask-cors zappa boto3 Pillow
 pip freeze > requirements.txt
 ```
 
