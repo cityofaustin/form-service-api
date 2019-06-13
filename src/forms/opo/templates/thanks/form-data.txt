@@ -1,0 +1,51 @@
+{{t('description')}}:
+{{data['description'] or 'N/A' }}
+
+
+
+{{t('date_and_time')}}:
+{{data['datetime']['date']}} {{data['datetime']['time']}}
+
+{{t('location')}}:
+{{t('address')}}: {{data['location']['address'] or 'N/A'}}
+{{t('position')}}:
+
+{{t('longitude')}}: {{data['location']['position']['lng'] or 'N/A'}}
+{{t('latitude')}}: {{data['location']['position']['lat'] or 'N/A'}}
+
+
+
+{{t('officers')}}:
+{% for officer in data['officers'] %}
+
+{{t('name')}}: {{officer['name'] or 'N/A' }}
+{{t('description')}}: {{officer['description'] or 'N/A' }}
+{{t('race')}}: {{t(officer['race']) or 'N/A' }}
+{{t('gender')}}: {{t(officer['gender']) or 'N/A' }}
+{{t('badge_number')}}: {{officer['badgeNumber'] or 'N/A' }}
+{{t('uniformed')}}: {{t(officer['uniformed']) or 'N/A' }}
+{{t('transportation')}}: {{t(officer['transportation']) or 'N/A' }}
+
+{% endfor %}
+
+
+{{t('demographics')}}:
+{{t('name')}}: {{data['view:contactPreferences']['yourName'] or 'N/A' }}
+{{t('phone')}}: {{data['view:contactPreferences']['yourPhone'] or 'N/A' }}
+{{t('email')}}: {{data['view:contactPreferences']['yourEmail'] or 'N/A' }}
+{{t('willingcontact')}}: {{t(data['willingToBeContacted']) or 'N/A' }}
+{{t('needTranslator')}}: {{t(data['view:contactPreferences']['needTranslator']) or 'N/A' }}
+
+{{t('referrer')}}: {{data['howDidYouGetHere'] or 'N/A' }}
+{{t('gender')}}: {{t(data['gender']) or 'N/A' }}
+{{t('race')}}: {{t(data['race']) or 'N/A' }}
+{{t('zipcode')}}: {{data['zipCode'] or 'N/A' }}
+{{t('has_officer_details')}}: {{ t(data['hasOfficerDetails']) or 'N/A' }}
+{{t('has_witness_information')}}: {{t(data['hasWitnessInformation']) or 'N/A' }}
+
+
+{{t('attachments')}}
+
+{% for attachment_item in attachment_urls %}
+- Link: {{api_endpoint}}{{attachment_item}}
+{% endfor %}

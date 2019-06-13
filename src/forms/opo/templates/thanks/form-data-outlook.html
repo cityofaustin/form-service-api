@@ -1,0 +1,112 @@
+                    <!-- Outlook data begins here -->
+                    <table class='opo-content-data outlook' style="width: 100%; background-color: #F0F0F0; padding: 5px;" cellpadding="20px">
+                        <thead>
+                            <tr>
+                                <td style="font-size: 21px; text-align: center;">
+                                    {{t('your_answers')}}
+                                </td>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr style="background-color: white;">
+                                <td>
+                                    <div class='form-data-section_title'>
+                                        <p style="line-height: 18px; font-weight: bold;">{{t('tell_us_what_happened')}}</p>
+                                    </div>
+                                    <div class='form-data-section'>
+                                    <div class='form-data-section_item'>
+                                      <span>{{t('description')}}:</span><span class="blue"> (*{{t('requiredfield')}})</span>
+                                      <p class="nocapitalize">{{data['description'] or 'N/A' }}</p>
+                                    </div>
+
+                                    <div class='form-data-section_item'>
+                                      <span>{{t('date_and_time')}}:</span>
+                                      <p>{{data['datetime']['date'] or 'N/A'}} {{data['datetime']['time'] or ''}}</p>
+                                    </div>
+
+                                    <div class='form-data-section_item'>
+                                      <span>{{t('location')}}:</span>
+                                      <p>{{t('address')}}: {{data['location']['address'] or 'N/A'}}</p>
+                                      <p>{{t('position')}}: </p>
+                                      <ul>
+                                        <li>{{t('longitude')}}: {{data['location']['position']['lng'] or 'N/A'}}</li>
+                                        <li>{{t('latitude')}}: {{data['location']['position']['lat'] or 'N/A'}}</li>
+                                      </ul>
+                                    </div>
+
+                                    </div>
+                                </td>
+                            </tr>
+                            <tr style="background-color: white;">
+                                <td>
+                                      <div class='form-data-section_title'>
+                                          <p style="line-height: 18px; font-weight: bold;">{{t('tell_us_about_the_officers')}}</p>
+                                      </div>
+                                      <div class='form-data-section'>
+                                          {% for officer in data['officers'] %}
+                                          <div class='form-data-section_item'>
+                                            <span>{{t('officer')}} #{{loop.index}}:</span>
+                                            <ul>
+                                              <li>{{t('name')}}: {{officer['name'] or 'N/A' }}</li>
+                                              <li>{{t('description')}}: {{officer['physicalDescription'] or 'N/A' }}</li>
+                                              <li>{{t('race')}}: {{t(officer['race']) or 'N/A' }}</li>
+                                              <li>{{t('gender')}}: {{t(officer['gender']) or 'N/A' }}</li>
+                                              <li>{{t('badge_number')}}: {{officer['badgeNumber'] or 'N/A' }}</li>
+                                              <li>{{t('uniformed')}}: {{t(officer['uniformed']) or 'N/A' }}</li>
+                                              <li>{{t('transportation')}}: {{t(officer['transportation']) or 'N/A' }}</li>
+                                            </ul>
+                                          </div>
+                                          {% endfor %}
+                                      </div>
+                                </td>
+                            </tr>
+                            <tr style="background-color: white;">
+                                <td>
+                                      <div class='form-data-section_title'>
+                                          <p style="line-height: 18px; font-weight: bold;">{{t('tell_us_about_the_witness')}}</p>
+                                      </div>
+                                      <div class='form-data-section'>
+                                        {% for witness in data['witnesses'] %}
+                                        <div class='form-data-section_item'>
+                                          <span>{{t('witness')}} #{{loop.index}}:</span>
+
+                                          <ul>
+                                            <li>{{t('name')}}: {{witness['name'] or 'N/A' }}</li>
+                                            <li  class="nocapitalize">{{t('email')}}: <a href='mailto:{{witness['email'] or ';'}}'>{{witness['email'] or 'N/A' }}</a></li>
+                                            <li>{{t('phone')}}: {{witness['phoneNumber'] or 'N/A' }}</li>
+                                            <li  class="nocapitalize">{{t('additional_information')}}: {{witness['anythingElse'] or 'N/A' }}</li>
+                                          </ul>
+                                        </div>
+                                        {% endfor %}
+                                      </div>
+                                </td>
+                            </tr>
+                            <tr style="background-color: white;">
+                                <td>
+                                    <div class='form-data-section_title'>
+                                        <p style="line-height: 18px; font-weight: bold;">{{t('demographics')}}</p>
+                                    </div>
+                                      <div class='form-data-section'>
+                                        <div class='form-data-section_item'>
+                                          <span>{{t('additional_information')}}:</span>
+                                          <p>{{t('name')}}: {{data['view:contactPreferences']['yourName'] or 'N/A' }}</p>
+                                          <p>{{t('phone')}}: {{data['view:contactPreferences']['yourPhone'] or 'N/A' }}</p>
+                                          <p class="nocapitalize">{{t('email')}}: {{data['view:contactPreferences']['yourEmail'] or 'N/A' }}</p>
+                                          <p>{{t('willingcontact')}}: {{t(data['willingToBeContacted']) or 'N/A' }}</p>
+                                          <p>{{t('needTranslator')}}: {{t(data['view:contactPreferences']['needTranslator']) or 'N/A' }}</p>
+                                          <p>&nbsp;</p>
+                                          <p>{{t('referrer')}}: {{data['howDidYouGetHere'] or 'N/A' }}</p>
+                                          <p>{{t('gender')}}: {{t(data['gender']) or 'N/A' }}</p>
+                                          <p>{{t('race')}}: {{t(data['race']) or 'N/A' }}</p>
+                                          <p>{{t('zipcode')}}: {{data['zipCode'] or 'N/A' }}</p>
+                                          <p>{{t('has_officer_details')}}: {{ t(data['hasOfficerDetails']) or 'N/A' }}</p>
+                                          <p>{{t('has_witness_information')}}: {{ t(data['hasWitnessInformation']) or 'N/A' }}</p>
+                                        </div>
+                                      </div>
+                                    </div>
+                                </td>
+                            </tr>
+
+                        </tbody>
+                    </table>
+                    <!-- Outlook data ends here -->
