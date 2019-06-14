@@ -1,7 +1,7 @@
-from flask import Blueprint, current_app
+from flask import Blueprint
 
-day_labor = Blueprint('day_labor', __name__)
+bp = Blueprint('day_labor', __name__)
 
-@day_labor.route('/day', methods=('GET',))
+@bp.route('/', methods=('GET',))
 def hello():
     return "Hello, its day labor day!", 200
