@@ -3,6 +3,7 @@ import json
 
 from services.s3 import s3
 from services.helpers import generate_clean_filename, generate_random_hash
+from env import *
 
 bp = Blueprint('common', __name__)
 
@@ -38,7 +39,6 @@ def uploads_request_signature():
 
 @bp.route('/file/download/<path:path>', methods=['GET'])
 def file_download_uri(path):
-    # TODO put S3_LOCATION into scope
     fileUrlS3 = S3_LOCATION + path
     url = s3.generate_presigned_url(
         ExpiresIn=60, # seconds
