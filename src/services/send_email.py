@@ -1,6 +1,7 @@
 from jinja2 import Environment, FileSystemLoader, Undefined, Template
 import os, yaml
 
+from flask import url_for
 from env import *
 
 # ignore undefined errors within jinja
@@ -51,43 +52,41 @@ jinja_env = Environment(undefined=SilentUndefined,loader=FileSystemLoader(form_p
 jinja_env.filters['basename'] = os.path.basename #TODO: why does jinja need this?
 jinja_env.globals['t'] = translate
 jinja_env.globals['language_code'] = get_language_code
-#
-# def send_opo_email(submission_type, language_code, recipient, caseNumResp, data, mediaFiles):
-#     # We load the language of the recipient, for opo or apd must default to english.
-#     currentLangCode = language_code if is_recipient(recipient) else "en"
-#
-#     # load given language
-#     load_translation('templates/email/officepoliceoversight/language.yaml',
-#         section=submission_type,
-#         language=currentLangCode)
-#
-#     # Now we specify the destination email, and translated subject
-#     emailConfig = None
-#     emailConfig = emailConfigDefault.copy()
-#     emailConfig['recipient'] = recipient
-#     emailConfig['subject'] = translate('emailSubject')
-#
-#     # Render HTML template
-#     htmlTemplate = render_email_template("email/officepoliceoversight/" + submission_type + "/template.html",
-#         casenumber=caseNumResp,
-#         data=data,
-#         attachment_urls=mediaFiles,
-#         api_endpoint=url_for('file_download_uri', path='', _external=True)
-#     )
-#
-#     # Render TXT template (for non-html compatible services)
-#     txtTemplate = render_email_template("email/officepoliceoversight/" + submission_type + "/template.txt",
-#         casenumber=caseNumResp,
-#         data=data,
-#         attachment_urls=mediaFiles,
-#         api_endpoint=url_for('file_download_uri', path='', _external=True)
-#     )
-#
-#     emailConfig['html'] = htmlTemplate
-#     emailConfig['text'] = txtTemplate
-#
-#     # Try to submit, capture status
-#     try:
-#         response = sendEmail(emailConfig)
-#     except Exception as e:
-#         raise e
+
+def send_email(submission_type, language_code, recipient, case_number, data, media_files):
+
+    # load given language
+    load_translation('templates/email/officepoliceoversight/language.yaml',
+        section=submission_type,
+        language=currentLangCode)
+
+    # Now we specify the destination email, and translated subject
+    emailConfig = None
+    emailConfig = emailConfigDefault.copy()
+    emailConfig['recipient'] = recipient
+    emailConfig['subject'] = translate('emailSubject')
+
+    # Render HTML template
+    htmlTemplate = render_email_template("email/officepoliceoversight/" + submission_type + "/template.html",
+        casenumber=case_number,
+        data=data,
+        attachment_urls=media_files,
+        api_endpoint=url_for('file_download_uri', path='', _external=True)
+    )
+
+    # Render TXT template (for non-html compatible services)
+    txtTemplate = render_email_template("email/officepoliceoversight/" + submission_type + "/template.txt",
+        casenumber=case_number,
+        data=data,
+        attachment_urls=media_files,
+        api_endpoint=url_for('file_download_uri', path='', _external=True)
+    )
+
+    emailConfig['html'] = htmlTemplate
+    emailConfig['text'] = txtTemplate
+
+    # Try to submit, capture status
+    try:
+        response = sendEmail(emailConfig)
+    except Exception as e:
+        raise e

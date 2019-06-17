@@ -1,4 +1,4 @@
-from flask import Blueprint, request, current_app
+from flask import Blueprint, request, redirect
 import json
 
 from services.s3 import s3
@@ -37,9 +37,10 @@ def uploads_request_signature():
 
     return json.dumps(response), 200
 
+# Used in email templates.
+# Creates link to download attachments sent by form
 @bp.route('/file/download/<path:path>', methods=['GET'])
 def file_download_uri(path):
-    fileUrlS3 = S3_LOCATION + path
     url = s3.generate_presigned_url(
         ExpiresIn=60, # seconds
         ClientMethod='get_object',
