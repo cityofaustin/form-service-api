@@ -73,7 +73,6 @@ def send_email(form_type, language_code, recipient, case_number, data, media_fil
         "html": htmlTemplate,
         "text": txtTemplate,
         "subject": t('emailSubject'),
-        # "source": EMAIL_ADDRESS_SENDER, # Who sends the email # TODO: eliminate??
         "source": env.EMAIL_ADDRESS_REPLYTO, # What it looks like in reply-to.
         "recipient": recipient, # "no-reply@austintexas.io"
     }

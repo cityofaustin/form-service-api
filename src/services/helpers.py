@@ -1,3 +1,5 @@
+import datetime, uuid, hashlib
+
 #####
 # Helpers for /uploads/request-signature
 #####

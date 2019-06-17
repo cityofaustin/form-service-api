@@ -20,24 +20,15 @@ def get_dynamodb_item(id):
     return item
 
 # Post a new item to dynamodb
-def create_dynamodb_item(id, form_type, data=None):
-    # Stringify json form data
-    if (data):
-        if (not isinstance(inputJson, str)):
-            stringified_data = json.dumps(data)
-        else:
-            stringified_data = data
-    else:
-        stringified_data = None
-
+def create_dynamodb_item(id, form_type, data={}):
     # TODO: will this throw an error on duplication?
     env.dynamodb_client.put_item(
         TableName=env.LOG_TABLE,
         ConditionExpression='attribute_not_exists(id)',
         Item={
-            'id': {'S': id},
+            'id': {'S': str(id)},
             'created_at': {'S': getCurrentDateTime()},
             'form_type': {'S': form_type},
-            'data': { 'S': stringified_data }
+            'data': { 'M': data }
         }
     )

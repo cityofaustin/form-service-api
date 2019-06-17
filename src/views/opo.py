@@ -1,6 +1,7 @@
-from flask import Blueprint, request, current_app
+from flask import Blueprint, request
 
 import env
+from services.res_handlers import handle_email_success, handle_email_failure
 from services.helpers import generate_case_number
 from services.email import send_email
 from services.dynamodb import get_dynamodb_item, create_dynamodb_item
@@ -37,6 +38,7 @@ def submit():
         # Save case_number as "id" to ensure that user confirmation/case numbers are unique
         create_dynamodb_item(case_number, form_type)
 
+    print(f"~~~~ case_number: {case_number}")
     # Handle Media Data
     try:
         media_files = json.loads(data['mediaFiles'])
@@ -78,18 +80,8 @@ def submit():
             email_recipient=user_email
             send_opo_email(form_type, language_code, email_recipient, case_number, data, media_files)
 
-        # Set successful email status
-        email_status = {
-            'status': 'success',
-            'message': 'success',
-            'case_number': case_number
-        }
-        return jsonify(email_status), 200
+        # Return successful email status
+        return handle_email_success(case_number), 200
 
     except Exception as e:
-        email_status = {
-            'status': 'error',
-            'message': str(e),
-            'case_number': case_number
-        }
-        return jsonify(email_status), 500
+        return handle_email_failure(e, case_number), 500

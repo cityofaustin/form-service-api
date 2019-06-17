@@ -1,6 +1,7 @@
-# Flask
 from flask import Flask
 from flask_cors import CORS
+
+from services.res_handlers import handle_internal_server_error
 
 #####
 # Initialize App
@@ -9,6 +10,7 @@ app = Flask(__name__)
 app.config['DEBUG'] = False
 CORS(app) # Get rid of me!!!!
 # https://github.com/corydolphin/flask-cors
+app.register_error_handler(500, handle_internal_server_error)
 
 #####
 # Register Blueprints
