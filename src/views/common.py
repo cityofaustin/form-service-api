@@ -1,7 +1,6 @@
 from flask import Blueprint, request, redirect
 import json
 
-from services.s3 import s3
 from services.helpers import generate_clean_filename, generate_random_hash
 from env import *
 
@@ -22,7 +21,7 @@ def uploads_request_signature():
     new_filename = generate_clean_filename(filename)
     new_key = "uploads/" + uniqueid + "/" + new_filename
 
-    post = s3.generate_presigned_post(
+    post = env.s3.generate_presigned_post(
         Bucket=S3_BUCKET,
         Key=new_key
     )
@@ -39,9 +38,9 @@ def uploads_request_signature():
 
 # Used in email templates.
 # Creates link to download attachments sent by form
-@bp.route('/file/download/<path:path>', methods=['GET'])
+@bp.route('/file/download/<path:path>', methods=('GET',))
 def file_download_uri(path):
-    url = s3.generate_presigned_url(
+    url = env.s3.generate_presigned_url(
         ExpiresIn=60, # seconds
         ClientMethod='get_object',
         Params={

@@ -1,9 +1,8 @@
 from flask import Blueprint, request, current_app
 
-from env import *
+import env
 from services.helpers import generate_case_number
-from services.s3 import s3
-from services.send_email import send_email
+from services.email import send_email
 from services.dynamodb import get_dynamodb_item, create_dynamodb_item
 
 bp = Blueprint('opo', __name__)
@@ -66,10 +65,10 @@ def submit():
         if(user_confirmation_only == False):
             # If this is a complaint, send to OPO
             if (form_type=="complaint"):
-                email_recipient=EMAIL_ADDRESS_OPO
+                email_recipient=env.EMAIL_ADDRESS_OPO
             # If this is a thank you note, send to APD
             elif(form_type=="thanks"):
-                email_recipient=EMAIL_ADDRESS_APD
+                email_recipient=env.EMAIL_ADDRESS_APD
             else:
                 raise Exception(f"form type '{form_type}' is not valid. Should be either 'complaint' or 'thanks'.")
             send_email(form_type, "en", email_recipient, case_number, data, media_files)
