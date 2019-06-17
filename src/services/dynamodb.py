@@ -30,7 +30,7 @@ def get_dynamodb_item(id):
 def create_dynamodb_item(id, form_type, data=None):
     # Stringify json form data
     if (data):
-        if (!isinstance(inputJson, str)):
+        if (not isinstance(inputJson, str)):
             stringified_data = json.dumps(data)
         else:
             stringified_data = data

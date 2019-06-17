@@ -1,7 +1,7 @@
 from flask import Blueprint, request, current_app
 
 from env import *
-from helpers import generate_case_number
+from services.helpers import generate_case_number
 from services.s3 import s3
 from services.send_email import send_email
 from services.dynamodb import get_dynamodb_item, create_dynamodb_item
@@ -20,7 +20,7 @@ def submit():
 
     try:
         user_confirmation_only = data["userConfirmationOnly"]
-    else:
+    except:
         user_confirmation_only = False
 
     if (user_confirmation_only):
@@ -31,7 +31,7 @@ def submit():
         while True:
             case_number = generate_case_number() # Generate case num.
             item = get_dynamodb_item(case_number) # Record is 'None' if not found.
-            if(!item):
+            if (not item):
                 break
 
         # Don't send form data for OPO forms (will set "data"=None)

@@ -45,10 +45,7 @@ with open(language_file) as stream:
     TRANSLATION_DICT = yaml.load(stream, Loader=yaml.FullLoader)
 
 # Add functions and configs to use in jinja templates
-forms_dir = os.path.join(os.path.dirname(__file__), '../forms')
-form_paths = [os.path.join(os.path.dirname(__file__), f'../forms/{f}') for f in os.listdir(forms_dir)]
-jinja_env = Environment(undefined=SilentUndefined,loader=FileSystemLoader(form_paths))
-
+jinja_env = Environment(undefined=SilentUndefined,loader=FileSystemLoader(os.path.join(os.path.dirname(__file__), '../templates/')))
 jinja_env.filters['basename'] = os.path.basename #TODO: why does jinja need this?
 jinja_env.globals['t'] = translate
 jinja_env.globals['language_code'] = get_language_code

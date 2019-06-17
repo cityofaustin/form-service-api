@@ -30,11 +30,11 @@ app.config['DEBUG'] = False
 #####
 # Register Blueprints
 #####
-from forms.common import bp
+from views.common import bp
 app.register_blueprint(bp, url_prefix="/")
-from forms.opo import bp
+from views.opo import bp
 app.register_blueprint(bp, url_prefix="/forms/opo")
-from forms.day_labor import bp
+from views.day_labor import bp
 app.register_blueprint(bp, url_prefix="/forms/day_labor")
 
 # We only need this for local development.
