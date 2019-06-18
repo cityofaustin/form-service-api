@@ -3,7 +3,6 @@ import json
 
 import env
 from services.res_handlers import handle_email_success, handle_email_failure
-from services.helpers import generate_case_number
 from services.email import send_email
 from services.dynamodb import get_dynamodb_item, create_dynamodb_item
 
@@ -27,17 +26,8 @@ def submit():
     if (user_confirmation_only):
         case_number = data["confirmationCaseNumber"]
     else:
-        # Generate random case_number until a unique one is found
-        # Check that case_number is not already used in dynamodb
-        while True:
-            case_number = generate_case_number() # Generate case num.
-            item = get_dynamodb_item(case_number) # Record is 'None' if not found.
-            if (not item):
-                break
-
-        # Don't send form data for OPO forms (will set "data"=None)
-        # Save case_number as "id" to ensure that user confirmation/case numbers are unique
-        create_dynamodb_item(case_number, form_type)
+        # Don't send form data for OPO forms (will set "data"={})
+        case_number = create_dynamodb_item(form_type)
 
     # Handle Media Data
     try:

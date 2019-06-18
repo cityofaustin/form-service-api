@@ -1,7 +1,8 @@
-import json, boto3
+import json, boto3, botocore, datetime
 from flask import jsonify
+from botocore.exceptions import ClientError
 
-from services.helpers import getCurrentDateTime
+from services.helpers import getCurrentDateTime, generate_random_hash
 import env
 
 # Get an existing item from dynamodb
@@ -20,15 +21,39 @@ def get_dynamodb_item(id):
     return item
 
 # Post a new item to dynamodb
-def create_dynamodb_item(id, form_type, data={}):
-    # TODO: will this throw an error on duplication?
-    env.dynamodb_client.put_item(
-        TableName=env.LOG_TABLE,
-        ConditionExpression='attribute_not_exists(id)',
-        Item={
-            'id': {'S': str(id)},
-            'created_at': {'S': getCurrentDateTime()},
-            'form_type': {'S': form_type},
-            'data': { 'M': data }
-        }
-    )
+# Returns a newly generated case_number
+def create_dynamodb_item(form_type, data={}):
+    # Generate random case_number until a unique one is found
+    # Check that case_number is not already used in dynamodb
+    while True:
+        datestr = datetime.datetime.now().strftime('%Y-%m%d-')
+        rndstr = generate_random_hash()[0:4]
+        case_number = f"{datestr}{rndstr}"
+        item = get_dynamodb_item(case_number) # Record is 'None' if not found.
+        if (not item):
+            break
+
+    # Save case_number as "id" to ensure that user confirmation/case numbers are unique
+    try:
+        env.dynamodb_client.put_item(
+            TableName=env.LOG_TABLE,
+            ConditionExpression='attribute_not_exists(id)',
+            Item={
+                'id': {'S': str(case_number)},
+                'created_at': {'S': getCurrentDateTime()},
+                'form_type': {'S': form_type},
+                'data': { 'M': data }
+            }
+        )
+    # If a duplicate case_number was created asynchronously by another process (between "while True" loop and "dynamodb_client.put_item"),
+    # then generate another case_number
+    except ClientError as e:
+        if 'ConditionalCheckFailedException' == e.__class__.__name__:
+            print("Duplicate case_number, trying again")
+            return create_dynamodb_item(form_type, data)
+        else:
+            raise e
+    except Exception as e:
+        raise e
+    else:
+        return case_number

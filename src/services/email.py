@@ -1,7 +1,8 @@
-from jinja2 import Environment, FileSystemLoader, Undefined, Template
 import os, yaml
-
+from jinja2 import Environment, FileSystemLoader, Undefined, Template
 from flask import url_for
+from botocore.exceptions import ClientError
+
 import env
 
 # Parse translations in language.yaml into python dictionary

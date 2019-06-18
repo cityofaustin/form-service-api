@@ -23,11 +23,3 @@ def is_valid_uniqueid(uqid):
 #####
 def getCurrentDateTime():
     return datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
-
-#####
-# Dynamodb
-#####
-def generate_case_number():
-	datestr = datetime.datetime.now().strftime('%Y-%m%d-')
-	rndstr = generate_random_hash()[0:4]
-	return "{0}{1}".format(datestr,rndstr)
