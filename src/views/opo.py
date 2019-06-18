@@ -1,4 +1,5 @@
 from flask import Blueprint, request
+import json
 
 import env
 from services.res_handlers import handle_email_success, handle_email_failure
