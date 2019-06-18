@@ -8,8 +8,7 @@ from services.res_handlers import handle_internal_server_error
 #####
 app = Flask(__name__)
 app.config['DEBUG'] = False
-CORS(app) # Get rid of me!!!!
-# https://github.com/corydolphin/flask-cors
+CORS(app) # TODO: implement a more strict domain acceptance policy (e.g.: limit requests to just forms.austin.gov)
 app.register_error_handler(500, handle_internal_server_error)
 
 #####

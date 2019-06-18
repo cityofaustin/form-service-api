@@ -23,7 +23,10 @@ class SilentUndefined(Undefined):
         __rpow__ = _fail_with_undefined_error
 
 # Initialize jinja templating environment
-jinja_env = Environment(undefined=SilentUndefined,loader=FileSystemLoader(os.path.join(os.path.dirname(__file__), '../templates/')))
+jinja_env = Environment(
+    undefined=SilentUndefined,
+    loader=FileSystemLoader(os.path.join(os.path.dirname(__file__), '../templates/'))
+)
 jinja_env.filters['basename'] = os.path.basename
 
 # Builds a translation function for your form and language
@@ -42,33 +45,30 @@ def translation_factory(form_type, language_code):
         return ""
     return t
 
-def render_email_template(form_type, **kwargs):
-    template_filepath = "src/templates/form_type"
-    template_file = os.path.basename(template_filepath)
+def render_email_template(template_filepath, **kwargs):
     template = jinja_env.get_template(template_filepath)
-    return(template.render(**kwargs))
+    return template.render(**kwargs)
 
 def send_email(form_type, language_code, recipient, case_number, data, media_files, smoke_test=False):
     # Build a translation function for our form and language
     t = translation_factory(form_type, language_code)
 
     template_configs = {
-        "casenumber": case_number,
+        "case_number": case_number,
         "data": data,
         "attachment_urls": media_files,
-        "api_endpoint": url_for('file_download_uri', path='', _external=True),
+        "api_endpoint": url_for('common.file_download_uri', path='', _external=True),
         "t": t,
-        "language_code": language_code,
         "basename": os.path.basename
     }
 
     # Render HTML template
-    htmlTemplate = render_email_template(f"src/templates/{form_type}/template.html", **template_configs)
+    htmlTemplate = render_email_template(f"{form_type}/template.html", **template_configs)
 
     # Render TXT template (for non-html compatible services)
-    txtTemplate = render_email_template(f"src/templates/{form_type}/template.txt", **template_configs)
+    txtTemplate = render_email_template(f"{form_type}/template.txt", **template_configs)
 
-    emailConfig = {
+    email_config = {
         "charset": "UTF-8",
         "html": htmlTemplate,
         "text": txtTemplate,
@@ -78,33 +78,33 @@ def send_email(form_type, language_code, recipient, case_number, data, media_fil
     }
 
     if (smoke_test):
-        emailConfig["recipient"] = env.SMOKE_TEST_EMAIL
+        email_config["recipient"] = env.SMOKE_TEST_EMAIL
 
     # Try to submit, capture status
     try:
         response = env.ses_client.send_email(
             Destination={
                 'ToAddresses': [
-                    emailConfig['recipient'],
+                    email_config['recipient'],
                 ],
             },
             Message={
                 'Body': {
                     'Html': {
-                        'Charset': emailConfig['charset'],
-                        'Data': emailConfig['html'],
+                        'Charset': email_config['charset'],
+                        'Data': email_config['html'],
                     },
                     'Text': {
-                        'Charset': emailConfig['charset'],
-                        'Data': emailConfig['text'],
+                        'Charset': email_config['charset'],
+                        'Data': email_config['text'],
                     },
                 },
                 'Subject': {
-                    'Charset': emailConfig['charset'],
-                    'Data': emailConfig['subject'],
+                    'Charset': email_config['charset'],
+                    'Data': email_config['subject'],
                 },
             },
-            Source=emailConfig['source']
+            Source=email_config['source']
         )
     # Display an error if something goes wrong.
     except ClientError as e:

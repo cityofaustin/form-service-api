@@ -1,18 +1,18 @@
 <div class="non-outlook">
-  {% include 'email/officepoliceoversight/common/header.html' %}
+  {% include 'common/header.html' %}
   <div class='form-content'>
     <h3>{{t('title')}}</h3>
 
     <div class="form-confirmation">
         <p>{{ t('thanksSharingExperience') }}</p>
 
-        <p class="blue">{{ t('yourConfirmationNumberIs') }}: <span class="form-data-casenumber">{{casenumber}}</span></p>
+        <p class="blue">{{ t('yourConfirmationNumberIs') }}: <span class="form-data-case-number">{{case_number}}</span></p>
     </div>
 
     <p>{{ t('youCanEmailUs') }}</p>
 
     <p>{{ t('foraFullExplanation') }}</p>
 
-    {% include 'email/officepoliceoversight/complaint/form-data.html' %}
+    {% include 'complaint/form-data.html' %}
   </div>
 </div>

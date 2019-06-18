@@ -1,15 +1,15 @@
-{% include 'email/officepoliceoversight/common/header.txt' %}
+{% include 'common/header.txt' %}
 
 {{ t('title') }}
 
 {{ t('thanksSharingExperience') }}
 
-{{ t('yourConfirmationNumberIs') }}: {{casenumber}}
+{{ t('yourConfirmationNumberIs') }}: {{case_number}}
 
 {{ t('youCanEmailUs') }}
 
 {{ t('foraFullExplanation') }}
 
-{% include 'email/officepoliceoversight/complaint/form-data.txt' %}
+{% include 'complaint/form-data.txt' %}
 
-{% include 'email/officepoliceoversight/common/footer.txt' %}
+{% include 'common/footer.txt' %}

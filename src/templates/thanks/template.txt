@@ -1,4 +1,4 @@
-{% include 'email/officepoliceoversight/common/header.txt' %}
+{% include 'common/header.txt' %}
 
 {{t('title')}}
 
@@ -6,6 +6,6 @@
 
 {{ t('yourFeedback') }}
 
-{% include 'email/officepoliceoversight/thanks/form-data.txt' %}
+{% include 'thanks/form-data.txt' %}
 
-{% include 'email/officepoliceoversight/common/footer.txt' %}
+{% include 'common/footer.txt' %}

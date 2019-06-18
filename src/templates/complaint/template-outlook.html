@@ -3,7 +3,7 @@
         <tbody>
             <tr>
                 <td>
-                    {% include 'email/officepoliceoversight/common/header-outlook.html' %}
+                    {% include 'common/header-outlook.html' %}
 
                     <table class='opo-content outlook' style="width: 100%; padding: 0px; border: none; align-items: center;">
                         <tbody>
@@ -18,7 +18,7 @@
                                                 <td style="text-align: center;">
                                                     <p>{{ t('thanksSharingExperience') }}</p>
 
-                                                    <p class="blue" style="font-size: 18px; line-height: 24px;">{{ t('yourConfirmationNumberIs') }}: <span class="form-data-casenumber">{{casenumber}}</span></p>
+                                                    <p class="blue" style="font-size: 18px; line-height: 24px;">{{ t('yourConfirmationNumberIs') }}: <span class="form-data-case-number">{{case_number}}</span></p>
                                                 </td>
                                             </tr>
                                         </tbody>
@@ -36,7 +36,7 @@
 
                                     <br/> <br/>
 
-                                    {% include 'email/officepoliceoversight/complaint/form-data-outlook.html' %}
+                                    {% include 'complaint/form-data-outlook.html' %}
                                 </td>
                             </tr>
                         </tbody>

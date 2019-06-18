@@ -38,7 +38,6 @@ def submit():
         # Save case_number as "id" to ensure that user confirmation/case numbers are unique
         create_dynamodb_item(case_number, form_type)
 
-    print(f"~~~~ case_number: {case_number}")
     # Handle Media Data
     try:
         media_files = json.loads(data['mediaFiles'])
@@ -78,10 +77,8 @@ def submit():
         # Send the user an email, if an email was provided
         if (user_email):
             email_recipient=user_email
-            send_opo_email(form_type, language_code, email_recipient, case_number, data, media_files)
-
-        # Return successful email status
-        return handle_email_success(case_number), 200
-
+            send_email(form_type, language_code, email_recipient, case_number, data, media_files)
     except Exception as e:
-        return handle_email_failure(e, case_number), 500
+        return handle_email_failure(e, case_number)
+    else:
+        return handle_email_success(case_number)
