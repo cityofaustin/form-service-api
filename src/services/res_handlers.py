@@ -1,7 +1,11 @@
 from flask import jsonify
+import traceback
 
 # Handle uncaught 500 Internal Server Errors
 def handle_internal_server_error(e):
+    print(str(e))
+    traceback.print_tb(e.__traceback__)
+
     status = {
         'status': 'error',
         'message': str(e)
@@ -19,6 +23,9 @@ def handle_email_success(case_number):
 
 # Send response for a failed email sent
 def handle_email_failure(e, case_number):
+    print(str(e))
+    traceback.print_tb(e.__traceback__)
+
     status = {
         'status': 'error',
         'message': str(e),
