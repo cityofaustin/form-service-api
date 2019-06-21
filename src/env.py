@@ -1,35 +1,40 @@
-import os, boto3
+import os
 
 #####
 # Environment Variables
 #####
-DEPLOYMENT_MODE           = os.getenv("DEPLOYMENT_MODE", "LOCAL")
-ALLOWED_IMAGE_EXTENSIONS  = set(['png', 'jpg', 'jpeg', 'gif'])
-ALLOWED_EXTENSIONS        = set(['pdf', 'png', 'jpg', 'jpeg', 'gif'])
+DEPLOYMENT_MODE = os.getenv("DEPLOYMENT_MODE", "local")
+
+if (DEPLOYMENT_MODE == "production"):
+    S3_UPLOADS_BUCKET=os.getenv("COA_FORMS_PROD_S3_UPLOADS_BUCKET")
+    DYNAMO_DB_TABLE="coa-forms-prod"
+    EMAIL_ADDRESS_OPO=os.getenv("COA_FORMS_PROD_EMAIL_ADDRESS_OPO")
+    EMAIL_ADDRESS_APD=os.getenv("COA_FORMS_PROD_EMAIL_ADDRESS_APD")
+    EMAIL_ADDRESS_REPLYTO=os.getenv("COA_FORMS_PROD_EMAIL_ADDRESS_REPLYTO")
+    EMAIL_ADDRESS_SMOKE_TEST=os.getenv("COA_FORMS_PROD_EMAIL_ADDRESS_SMOKE_TEST")
+elif (DEPLOYMENT_MODE == "staging"):
+    DYNAMO_DB_TABLE="coa-forms-dev"
+    S3_UPLOADS_BUCKET=os.getenv("COA_FORMS_STAGING_S3_UPLOADS_BUCKET")
+    EMAIL_ADDRESS_OPO=os.getenv("COA_FORMS_STAGING_EMAIL_ADDRESS_OPO")
+    EMAIL_ADDRESS_APD=os.getenv("COA_FORMS_STAGING_EMAIL_ADDRESS_APD")
+    EMAIL_ADDRESS_REPLYTO=os.getenv("COA_FORMS_STAGING_EMAIL_ADDRESS_REPLYTO")
+    EMAIL_ADDRESS_SMOKE_TEST=os.getenv("COA_FORMS_STAGING_EMAIL_ADDRESS_SMOKE_TEST")
+elif (DEPLOYMENT_MODE == "dev"):
+    DYNAMO_DB_TABLE="coa-forms-dev"
+    S3_UPLOADS_BUCKET="coa-forms-uploads-pr"
+    EMAIL_ADDRESS_OPO=os.getenv("COA_FORMS_STAGING_EMAIL_ADDRESS_OPO")
+    EMAIL_ADDRESS_APD=os.getenv("COA_FORMS_STAGING_EMAIL_ADDRESS_APD")
+    EMAIL_ADDRESS_REPLYTO=os.getenv("COA_FORMS_STAGING_EMAIL_ADDRESS_REPLYTO")
+    EMAIL_ADDRESS_SMOKE_TEST=os.getenv("COA_FORMS_STAGING_EMAIL_ADDRESS_SMOKE_TEST")
+elif (DEPLOYMENT_MODE == "local"):
+    DYNAMO_DB_TABLE=os.getenv("COA_FORMS_LOCAL_DYNAMO_DB_TABLE")
+    S3_UPLOADS_BUCKET=os.getenv("COA_FORMS_LOCAL_S3_UPLOADS_BUCKET")
+    EMAIL_ADDRESS_OPO=os.getenv("COA_FORMS_LOCAL_EMAIL_ADDRESS_OPO")
+    EMAIL_ADDRESS_APD=os.getenv("COA_FORMS_LOCAL_EMAIL_ADDRESS_APD")
+    EMAIL_ADDRESS_REPLYTO=os.getenv("COA_FORMS_LOCAL_EMAIL_ADDRESS_REPLYTO")
+    EMAIL_ADDRESS_SMOKE_TEST=os.getenv("COA_FORMS_LOCAL_EMAIL_ADDRESS_SMOKE_TEST")
 
 S3_KEY                    = os.getenv("AWS_ACCESS_KEY_ID")
 S3_SECRET                 = os.getenv("AWS_SECRET_ACCESS_KEY")
-S3_BUCKET                 = os.getenv("AWS_BUCKET_NAME")
-S3_LOCATION               = f'http://{S3_BUCKET}.s3.amazonaws.com/'
 DEFALUT_REGION            = os.getenv("AWS_DEFAULT_REGION", "us-east-1")
-LOG_TABLE                 = os.getenv("PM_LOGTABLE", "coa-forms-dev")
-
-EMAIL_ADDRESS_OPO         = os.getenv("EMAIL_ADDRESS_OPO")
-EMAIL_ADDRESS_APD         = os.getenv("EMAIL_ADDRESS_APD")
-EMAIL_ADDRESS_REPLYTO     = os.getenv("EMAIL_ADDRESS_REPLYTO")
-EMAIL_ADDRESS_SMOKE_TEST  = "nick.ivons@austintexas.gov"
-
-#####
-# 3rd Party Configs
-#####
-
-if(DEPLOYMENT_MODE == "LOCAL"):
-    # Initialize S3 Client
-    s3 = boto3.client("s3",region_name=DEFALUT_REGION, aws_access_key_id=S3_KEY, aws_secret_access_key=S3_SECRET)
-    dynamodb_client = boto3.client('dynamodb', region_name=DEFALUT_REGION, aws_access_key_id=S3_KEY, aws_secret_access_key=S3_SECRET)
-    ses_client = boto3.client('ses', region_name=DEFALUT_REGION, aws_access_key_id=S3_KEY, aws_secret_access_key=S3_SECRET)
-else:
-    # We should already have access to these resources
-    s3 = boto3.client("s3", region_name=DEFALUT_REGION)
-    dynamodb_client = boto3.client('dynamodb', region_name=DEFALUT_REGION)
-    ses_client = boto3.client('ses', region_name=DEFALUT_REGION)
+S3_LOCATION               = f'http://{S3_UPLOADS_BUCKET}.s3.amazonaws.com/'

@@ -1,9 +1,16 @@
-import os, yaml
+import os, yaml, boto3
 from jinja2 import Environment, FileSystemLoader, Undefined, Template
 from flask import url_for
 from botocore.exceptions import ClientError
 
 import env
+
+if(env.DEPLOYMENT_MODE == "LOCAL"):
+    # Initialize S3 Client
+    ses_client = boto3.client('ses', region_name=env.DEFALUT_REGION, aws_access_key_id=env.S3_KEY, aws_secret_access_key=env.S3_SECRET)
+else:
+    # We should already have access to these resources
+    ses_client = boto3.client('ses', region_name=env.DEFALUT_REGION)
 
 # Parse translations in language.yaml into python dictionary
 language_file = os.path.join(os.path.dirname(__file__), '../language.yaml')
@@ -83,7 +90,7 @@ def send_email(form_type, language_code, recipient, case_number, data, media_fil
 
     # Try to submit, capture status
     try:
-        response = env.ses_client.send_email(
+        response = ses_client.send_email(
             Destination={
                 'ToAddresses': [
                     email_config['recipient'],

@@ -5,12 +5,19 @@ from botocore.exceptions import ClientError
 from services.helpers import getCurrentDateTime, generate_random_hash
 import env
 
+if(env.DEPLOYMENT_MODE == "LOCAL"):
+    # Initialize S3 Client
+    dynamodb_client = boto3.client('dynamodb', region_name=env.DEFALUT_REGION, aws_access_key_id=env.S3_KEY, aws_secret_access_key=env.S3_SECRET)
+else:
+    # We should already have access to these resources
+    dynamodb_client = boto3.client('dynamodb', region_name=env.DEFALUT_REGION)
+
 # Get an existing item from dynamodb
 def get_dynamodb_item(id):
     print("get_dynamodb_item() Id: " + id)
 
-    dynamodb_response = env.dynamodb_client.get_item(
-        TableName=env.LOG_TABLE,
+    dynamodb_response = dynamodb_client.get_item(
+        TableName=env.DYNAMO_DB_TABLE,
         Key={
             'id': { 'S': str(id) }
         }
@@ -35,8 +42,8 @@ def create_dynamodb_item(form_type, data={}):
 
     # Save case_number as "id" to ensure that user confirmation/case numbers are unique
     try:
-        env.dynamodb_client.put_item(
-            TableName=env.LOG_TABLE,
+        dynamodb_client.put_item(
+            TableName=env.DYNAMO_DB_TABLE,
             ConditionExpression='attribute_not_exists(id)',
             Item={
                 'id': {'S': str(case_number)},

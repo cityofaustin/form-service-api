@@ -5,3 +5,4 @@
 .idea/
 __pycache__
 /local
+zappa_settings.json
