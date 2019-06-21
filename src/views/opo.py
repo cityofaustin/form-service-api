@@ -1,10 +1,11 @@
 from flask import Blueprint, request
-import json
+import json, pprint
 
 import env
 from services.res_handlers import handle_email_success, handle_email_failure
 from services.email import send_email
 from services.dynamodb import get_dynamodb_item, create_dynamodb_item
+from services.helpers import is_smoke_test
 
 bp = Blueprint('opo', __name__)
 
@@ -63,6 +64,12 @@ def submit():
                 email_recipient=env.EMAIL_ADDRESS_APD
             else:
                 raise Exception(f"form type '{form_type}' is not valid. Should be either 'complaint' or 'thanks'.")
+
+            if (is_smoke_test(data)):
+                print("Smoke Test")
+                pprint.pprint(data)
+                email_recipient=env.EMAIL_ADDRESS_SMOKE_TEST
+
             send_email(form_type, "en", email_recipient, case_number, data, media_files)
 
         # Send the user an email, if an email was provided

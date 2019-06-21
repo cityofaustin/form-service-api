@@ -48,7 +48,8 @@ def translation_factory(form_type, language_code):
         try:
             return translations[form_type][key][language_code]
         except:
-            print("translate() Form Type: '{0}', Key: '{1}', Language: '{2}' -- NOT FOUND".format(form_type, key, language_code))
+            if key:
+                print("translate() Form Type: '{0}', Key: '{1}', Language: '{2}' -- NOT FOUND".format(form_type, key, language_code))
 
         return ""
     return t
@@ -57,7 +58,7 @@ def render_email_template(template_filepath, **kwargs):
     template = jinja_env.get_template(template_filepath)
     return template.render(**kwargs)
 
-def send_email(form_type, language_code, recipient, case_number, data, media_files, smoke_test=False):
+def send_email(form_type, language_code, recipient, case_number, data, media_files):
     # Build a translation function for our form and language
     t = translation_factory(form_type, language_code)
 
@@ -84,9 +85,6 @@ def send_email(form_type, language_code, recipient, case_number, data, media_fil
         "source": env.EMAIL_ADDRESS_REPLYTO, # What it looks like in reply-to.
         "recipient": recipient, # "no-reply@austintexas.io"
     }
-
-    if (smoke_test):
-        email_config["recipient"] = env.SMOKE_TEST_EMAIL
 
     # Try to submit, capture status
     try:
