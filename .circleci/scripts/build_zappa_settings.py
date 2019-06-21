@@ -8,7 +8,7 @@ import env
 
 zappa_settings = {
     "PLACEHOLDER_STAGE_NAME": {
-        "app_function": "src.app.app",
+        "app_function": "init.app",
         "profile_name": None,
         "project_name": "coa-forms-api",
         "runtime": "python3.6",
