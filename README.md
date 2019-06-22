@@ -8,30 +8,30 @@ Here is a list of our required Environment variables. They are sourced at src/en
 
 Common:
   - DYNAMO_DB_TABLE
-    - `COA_FORMS_LOCAL_DYNAMO_DB_TABLE`
+    - local var: `COA_FORMS_DYNAMO_DB_TABLE`
     - currently only used to cache case_numbers, we don't store any form submission data.
   - S3_UPLOADS_BUCKET
-    - `COA_FORMS_LOCAL_S3_UPLOADS_BUCKET`
+    - local var: `COA_FORMS_S3_UPLOADS_BUCKET`
     - name of the bucket where attachments/media files from coa-forms will be stored. Also used as a temp directory to store zappa build artifacts.
   - EMAIL_SMOKE_TEST
-    - `COA_FORMS_LOCAL_EMAIL_SMOKE_TEST`
+    - local var: `COA_FORMS_EMAIL_SMOKE_TEST`
     - dev email address to send to if you're debugging (overwrites EMAIL_OPO/EMAIL_APD)
   - S3_KEY
-    - `AWS_ACCESS_KEY_ID`
-    - AWS credentials
+    - local var: `AWS_ACCESS_KEY_ID`
+    - AWS credentials, probably stored in ~/.aws/credentials rather than explicit env var
   - S3_SECRET
-    - `AWS_SECRET_ACCESS_KEY`
-    - AWS credentials
+    - local var: `AWS_SECRET_ACCESS_KEY`
+    - AWS credentials, probably stored in ~/.aws/credentials rather than explicit env var
 
 OPO Specific:
   - EMAIL_OPO
-    - `COA_FORMS_LOCAL_EMAIL_OPO`
+    - local var: `COA_FORMS_EMAIL_OPO`
     - email address sent to Office of Police Oversight for opo "complaint" form
   - EMAIL_APD
-    - `COA_FORMS_LOCAL_EMAIL_APD`
+    - local var: `COA_FORMS_EMAIL_APD`
     - email address sent to Austin Police Department for opo "thanks"
   - EMAIL_OPO_REPLYTO
-    - `COA_FORMS_LOCAL_EMAIL_REPLYTO`
+    - local var: `COA_FORMS_EMAIL_REPLYTO`
     - replyto email address for both opo forms
 
 ## 2. First, set up the virtual env:

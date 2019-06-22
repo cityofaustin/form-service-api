@@ -1,6 +1,14 @@
 version: 2.1
 
 jobs:
+  log_vars:
+    docker:
+      - image: circleci/python:3.6.8-stretch
+    steps:
+      - checkout
+      - run:
+          name: "Print App Environment Variables"
+          command: bash ./.circleci/scripts/print_vars.sh
   deploy:
     docker:
       - image: circleci/python:3.6.8-stretch
@@ -15,4 +23,5 @@ workflows:
   version: 2.1
   deploy:
     jobs:
+      - log_vars
       - deploy
