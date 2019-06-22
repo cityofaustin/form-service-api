@@ -15,6 +15,10 @@ $(aws lambda get-function --function-name $ZAPPA_FUNCTION > /dev/null)
 result=$?
 set -e
 if [ "$result" == 0 ]; then
+  if [ "$DEPLOYMENT_MODE" == "dev" ] && [ -z "$CIRCLE_PR_NUMBER" ]; then
+    echo "Skipping Deploy Step. Only deploying PRs for dev branches."
+    exit 0
+  fi
   # Update zappa lambda if it exists
   zappa update $ZAPPA_STAGE
 else
