@@ -4,7 +4,9 @@ This is the backend for [coa-forms](https://github.com/cityofaustin/coa-forms), 
 To run the server, you will need to make some environment preparations as well as installing some dependencies.
 
 ## 1. Set up Environment Variables:
-Here is a list of our required Environment variables. They are sourced at src/env.py. Set up environment variables within your ~/.bash_profile or wherever you prefer to manage your variables.
+Here is a list of our required Environment variables. They are sourced at src/env.py. For local development, set up environment variables within your ~/.bash_profile or wherever you prefer to manage your variables.
+
+For environment variables to be accessed on a deployed zappa instance through `os.getenv()`, you must add any new environment variables to `zappa_settings.environment_variables` in .circleci/scripts/build_zappa_settings.py
 
 Common:
   - DYNAMO_DB_TABLE

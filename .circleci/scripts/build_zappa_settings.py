@@ -32,7 +32,7 @@ config["environment_variables"] = {
     "DYNAMO_DB_TABLE": env.DYNAMO_DB_TABLE,
     "EMAIL_OPO": env.EMAIL_OPO,
     "EMAIL_APD": env.EMAIL_APD,
-    "EMAIL_REPLYTO": env.EMAIL_REPLYTO,
+    "EMAIL_OPO_REPLYTO": env.EMAIL_OPO_REPLYTO,
     "EMAIL_SMOKE_TEST": env.EMAIL_SMOKE_TEST
 }
 

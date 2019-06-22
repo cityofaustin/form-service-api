@@ -1,20 +1,15 @@
 version: 2.1
 
 jobs:
-  log_vars:
-    docker:
-      - image: circleci/python:3.6.8-stretch
-    steps:
-      - checkout
-      - run:
-          name: "Print App Environment Variables"
-          command: bash ./.circleci/scripts/print_vars.sh
   deploy:
     docker:
       - image: circleci/python:3.6.8-stretch
     steps:
       - checkout
-      - sudo pip install awscli zappa
+      - run: sudo pip install awscli zappa
+      - run:
+          name: "Print App Environment Variables"
+          command: bash ./.circleci/scripts/print_vars.sh
       - run:
           name: "Test that CLI utilities work"
           command: bash ./.circleci/scripts/deploy.sh
@@ -23,5 +18,4 @@ workflows:
   version: 2.1
   deploy:
     jobs:
-      - log_vars
       - deploy
