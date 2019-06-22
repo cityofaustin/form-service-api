@@ -20,8 +20,8 @@ if [ "$result" == 0 ]; then
     exit 0
   fi
   # Update zappa lambda if it exists
-  zappa update $ZAPPA_STAGE
+  pipenv run zappa update $ZAPPA_STAGE
 else
   # Deploy new lambda function if it doesn't exist
-  zappa deploy $ZAPPA_STAGE
+  pipenv run zappa deploy $ZAPPA_STAGE
 fi
