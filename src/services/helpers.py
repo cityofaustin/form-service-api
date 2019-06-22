@@ -41,15 +41,3 @@ def filename_timestamp():
 def generate_random_hash():
     rand_uuid_str = "{0}".format(uuid.uuid1()).encode()
     return hashlib.sha256(rand_uuid_str).hexdigest()
-
-#####
-# Debug
-#####
-
-# If description starts with "DEBUG" or "debug", then the submission is a smoke test.
-# OPO/APD emails will be sent to dev email address
-def is_smoke_test(data):
-    try:
-        return re.match("^DEBUG", data['description'], re.IGNORECASE)
-    except:
-        return False

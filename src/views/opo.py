@@ -5,9 +5,16 @@ import env
 from services.res_handlers import handle_email_success, handle_email_failure
 from services.email import send_email
 from services.dynamodb import get_dynamodb_item, create_dynamodb_item
-from services.helpers import is_smoke_test
 
 bp = Blueprint('opo', __name__)
+
+# If description starts with "DEBUG" or "debug", then the submission is a smoke test.
+# OPO/APD emails will be sent to dev email address
+def is_smoke_test(data):
+    try:
+        return re.match("^DEBUG", data['description'], re.IGNORECASE)
+    except:
+        return False
 
 @bp.route('/', methods=('GET',))
 def index():
@@ -18,6 +25,7 @@ def submit():
     data = request.json
     language_code = data["language"]
     form_type = data["type"]
+    email_source = env.EMAIL_OPO_REPLYTO
 
     try:
         user_confirmation_only = data["userConfirmationOnly"]
@@ -58,24 +66,24 @@ def submit():
         if(user_confirmation_only == False):
             # If this is a complaint, send to OPO
             if (form_type=="complaint"):
-                email_recipient=env.EMAIL_ADDRESS_OPO
+                email_recipient=env.EMAIL_OPO
             # If this is a thank you note, send to APD
             elif(form_type=="thanks"):
-                email_recipient=env.EMAIL_ADDRESS_APD
+                email_recipient=env.EMAIL_APD
             else:
                 raise Exception(f"form type '{form_type}' is not valid. Should be either 'complaint' or 'thanks'.")
 
             if (is_smoke_test(data)):
                 print("Smoke Test")
                 pprint.pprint(data)
-                email_recipient=env.EMAIL_ADDRESS_SMOKE_TEST
+                email_recipient=env.EMAIL_SMOKE_TEST
 
-            send_email(form_type, "en", email_recipient, case_number, data, media_files)
+            send_email(form_type, "en", email_recipient, email_source, case_number, data, media_files)
 
         # Send the user an email, if an email was provided
         if (user_email):
             email_recipient=user_email
-            send_email(form_type, language_code, email_recipient, case_number, data, media_files)
+            send_email(form_type, language_code, email_recipient, email_source, case_number, data, media_files)
     except Exception as e:
         return handle_email_failure(e, case_number)
     else:

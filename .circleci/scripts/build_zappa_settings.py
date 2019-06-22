@@ -30,10 +30,10 @@ config["environment_variables"] = {
     "DEPLOYMENT_MODE": env.DEPLOYMENT_MODE,
     "S3_UPLOADS_BUCKET": env.S3_UPLOADS_BUCKET,
     "DYNAMO_DB_TABLE": env.DYNAMO_DB_TABLE,
-    "EMAIL_ADDRESS_OPO": env.EMAIL_ADDRESS_OPO,
-    "EMAIL_ADDRESS_APD": env.EMAIL_ADDRESS_APD,
-    "EMAIL_ADDRESS_REPLYTO": env.EMAIL_ADDRESS_REPLYTO,
-    "EMAIL_ADDRESS_SMOKE_TEST": env.EMAIL_ADDRESS_SMOKE_TEST
+    "EMAIL_OPO": env.EMAIL_OPO,
+    "EMAIL_APD": env.EMAIL_APD,
+    "EMAIL_REPLYTO": env.EMAIL_REPLYTO,
+    "EMAIL_SMOKE_TEST": env.EMAIL_SMOKE_TEST
 }
 
 zappa_settings_file = os.path.join(os.path.dirname(__file__), '../../zappa_settings.json')

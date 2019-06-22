@@ -58,7 +58,7 @@ def render_email_template(template_filepath, **kwargs):
     template = jinja_env.get_template(template_filepath)
     return template.render(**kwargs)
 
-def send_email(form_type, language_code, recipient, case_number, data, media_files):
+def send_email(form_type, language_code, email_recipient, email_source, case_number, data, media_files):
     # Build a translation function for our form and language
     t = translation_factory(form_type, language_code)
 
@@ -82,8 +82,8 @@ def send_email(form_type, language_code, recipient, case_number, data, media_fil
         "html": htmlTemplate,
         "text": txtTemplate,
         "subject": t('emailSubject'),
-        "source": env.EMAIL_ADDRESS_REPLYTO, # What it looks like in reply-to.
-        "recipient": recipient, # "no-reply@austintexas.io"
+        "source": email_source, # What it looks like in reply-to.
+        "recipient": email_recipient
     }
 
     # Try to submit, capture status

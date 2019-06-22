@@ -1,57 +1,76 @@
-# Police Monitor Server
-This is the police monitor form server for AWS Lambda, it has been written in Python and Flask.
+# coa-forms-api
+This is the backend for [coa-forms](https://github.com/cityofaustin/coa-forms), the Office of Design and Delivery's form service. It is deployed on AWS Lambda with Zappa and it is written in Python and Flask.
 
 To run the server, you will need to make some environment preparations as well as installing some dependencies.
 
 ## 1. Set up Environment Variables:
+Here is a list of our required Environment variables. They are sourced at src/env.py. Set up environment variables within your ~/.bash_profile or wherever you prefer to manage your variables.
 
-For AWS:
+Common:
+  - DYNAMO_DB_TABLE
+    - `COA_FORMS_LOCAL_DYNAMO_DB_TABLE`
+    - currently only used to cache case_numbers, we don't store any form submission data.
+  - S3_UPLOADS_BUCKET
+    - `COA_FORMS_LOCAL_S3_UPLOADS_BUCKET`
+    - name of the bucket where attachments/media files from coa-forms will be stored. Also used as a temp directory to store zappa build artifacts.
+  - EMAIL_SMOKE_TEST
+    - `COA_FORMS_LOCAL_EMAIL_SMOKE_TEST`
+    - dev email address to send to if you're debugging (overwrites EMAIL_OPO/EMAIL_APD)
+  - S3_KEY
+    - `AWS_ACCESS_KEY_ID`
+    - AWS credentials
+  - S3_SECRET
+    - `AWS_SECRET_ACCESS_KEY`
+    - AWS credentials
 
-```
-export AWS_BUCKET_NAME="..."
-export AWS_ACCESS_KEY_ID="..."
-export AWS_SECRET_ACCESS_KEY="..."
-```
-
-After these five variables have been set up, you can then start with your development environment:
-
-
+OPO Specific:
+  - EMAIL_OPO
+    - `COA_FORMS_LOCAL_EMAIL_OPO`
+    - email address sent to Office of Police Oversight for opo "complaint" form
+  - EMAIL_APD
+    - `COA_FORMS_LOCAL_EMAIL_APD`
+    - email address sent to Austin Police Department for opo "thanks"
+  - EMAIL_OPO_REPLYTO
+    - `COA_FORMS_LOCAL_EMAIL_REPLYTO`
+    - replyto email address for both opo forms
 
 ## 2. First, set up the virtual env:
 
-If you don't have virtualenv, be sure to follow these steps to install it: https://virtualenv.pypa.io/en/latest/installation/
-
-Once you make sure virtualenv is up and running, then set your dev environment with these two commands:
-
-
+You can use pipenv
+```
+pipenv shell
+pipenv install
+```
+Or virtualenv (https://virtualenv.pypa.io/en/latest/installation/)
 ```
 virtualenv pmenv
 source pmenv/bin/activate
 ```
 
-
-
-## 3. Dependencies
-
-You will need to install flask for our API, Zappa for deployment, boto for aws s3 integration, Pillow for file management:
-
+## 3. Run Locally:
 ```
-pip install flask flask-cors zappa boto3 Pillow
-pip freeze > requirements.txt
+python init.py
 ```
 
-
-
-## 4. Run Locally:
-
-After completing all previous steps, you can now launch the server locally:
-
+or if you have nodemon installed:
 ```
-python main.py
+nodemon --exec python3 init.py
 ```
 
+# Adding New Forms
 
-## 5. Deployment to AWS Lambda
+Common views are routes that are used by any form, common templates are the base styles and structure used by any form, all services should be compatible with any form.
+
+These are the 3 steps required to add a new form to the coa-forms-api.
+
+#### 1. Add a View
+Each form has a view in src/views/your_form.py, which contains a /submit route. This is where any data transformations happen before building an email template.
+#### 2. Add templates
+Construct the templates in src/templates/your_form/* to build emails for outlook, non-outlook clients, and text.
+#### 3. Register your View
+Import and register your flask blueprint in src/app.py
+
+# Deployment to AWS Lambda
 
 You may want to familiarize with the zappa documentation. First, the function needs to be deployed once, and updated constantly thereafter. Also, you should upload different environments (production, dev, etc). For this particular project we will be using TravisCI to manage our deployments.
 
@@ -62,8 +81,6 @@ zappa deploy dev (done only once, the first time)
 zappa update dev (re-reploy & update code)
 zappa undeploy dev (to remove service)
 ```
-
-
 
 # Templates
 
@@ -115,12 +132,11 @@ def translate(key):
 Now we make it part of our functions available to the template render engine:
 
 ```
-#
-# Make the 'translate' function and 'get_language_code' functions available
-# alias as 't' and 'language_code' respectively.
-#
-OPO_ENV.globals['t'] = translate
-OPO_ENV.globals['language_code'] = get_language_code
+template_configs = {
+      ...
+      "t": t,
+      ...
+  }
 ```
 
 And then we use them in the template:
@@ -167,7 +183,7 @@ Another example:
 
 #### E-Mail
 
-The e-mail templates are found in the `templates/email/officeofpoliceoversight` directory. This having in mind future growth for other departments.
+The e-mail templates are found in the `src/templates` directory.
 
 Inside that directory, there are also three sub-directories: `common`, `complaint` and `thanks`, one for each of the current OPO forms. You should be able to create as many other directories as you need, depending on the number of templates you need to generate.
 
@@ -177,12 +193,12 @@ Inside that directory, there are also three sub-directories: `common`, `complain
 The templates use shared components by using Jinya's include method, ie:
 
 ```
-{% include 'email/officepoliceoversight/common/head.html' %}
+{% include 'templates/common/head.html' %}
 ```
 
 # Translations
 
-The translations are put into a yaml file, and it follows a basic syntax. The file is loaded in-memory into a dicctionary in python, and from there the translations will be available to the entire application.
+The translations are put into a yaml file, and it follows a basic syntax. The file is loaded in-memory into a dictionary in python, and from there the translations will be available to the entire application.
 
 The first step is to load the yaml file, for that there is this method:
 
