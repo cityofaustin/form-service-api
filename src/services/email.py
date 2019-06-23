@@ -86,6 +86,9 @@ def send_email(form_type, language_code, email_recipient, email_source, case_num
         "recipient": email_recipient
     }
 
+    print("~~~ Here is yon email config")
+    import pprint; pprint.pprint(email_config)
+
     # Try to submit, capture status
     try:
         response = ses_client.send_email(

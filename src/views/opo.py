@@ -1,5 +1,5 @@
 from flask import Blueprint, request
-import json, pprint
+import json, pprint, re
 
 import env
 from services.res_handlers import handle_email_success, handle_email_failure
@@ -11,10 +11,7 @@ bp = Blueprint('opo', __name__)
 # If description starts with "DEBUG" or "debug", then the submission is a smoke test.
 # OPO/APD emails will be sent to dev email address
 def is_smoke_test(data):
-    try:
-        return re.match("^DEBUG", data['description'], re.IGNORECASE)
-    except:
-        return False
+    return re.match("^DEBUG", data['description'], re.IGNORECASE)
 
 @bp.route('/', methods=('GET',))
 def index():
@@ -22,6 +19,18 @@ def index():
 
 @bp.route('/submit', methods=('POST',))
 def submit():
+    print("~~~ hey we are here")
+    import inspect
+    for m in inspect.getmembers(env):
+        name = m[0]
+        val = m[1]
+        if (
+            (isinstance(val, str) or val is None)
+            and (not re.match("^__", name))
+            and (name not in ["S3_KEY", "S3_SECRET"])
+        ):
+            print(f"{m[0]}: [{m[1]}]")
+
     data = request.json
     language_code = data["language"]
     form_type = data["type"]
@@ -60,8 +69,11 @@ def submit():
     except:
         user_email = None
 
+    print("~~~ about to try sending_email!")
     # Send emails
     try:
+        print(f"Ist user_confirmation_only?? {user_confirmation_only}")
+
         # If this is not a user confirmation only, then submit to OPO and/or APD
         if(user_confirmation_only == False):
             # If this is a complaint, send to OPO
@@ -73,11 +85,14 @@ def submit():
             else:
                 raise Exception(f"form type '{form_type}' is not valid. Should be either 'complaint' or 'thanks'.")
 
+            print("~~~ about to run smoke_test!")
             if (is_smoke_test(data)):
                 print("Smoke Test")
                 pprint.pprint(data)
                 email_recipient=env.EMAIL_SMOKE_TEST
 
+            print(f"~~~~ yon email recipient: {email_recipient}")
+            print(f"~~~~ yon email source: {email_source}")
             send_email(form_type, "en", email_recipient, email_source, case_number, data, media_files)
 
         # Send the user an email, if an email was provided
