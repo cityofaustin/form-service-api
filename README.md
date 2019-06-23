@@ -51,12 +51,12 @@ source pmenv/bin/activate
 
 ## 3. Run Locally:
 ```
-python init.py
+python main.py
 ```
 
 or if you have nodemon installed:
 ```
-nodemon --exec python3 init.py
+nodemon --exec python3 main.py
 ```
 
 # Adding New Forms
