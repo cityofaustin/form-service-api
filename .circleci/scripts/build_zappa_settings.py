@@ -11,7 +11,7 @@ zappa_settings = {
         "app_function": "init.app",
         "profile_name": None,
         "project_name": "coa-forms-api",
-        "runtime": "python3.6",
+        "runtime": "python3.7",
         "s3_bucket": "PLACEHOLDER_S3_BUCKET",
         "environment_variables": {
         },

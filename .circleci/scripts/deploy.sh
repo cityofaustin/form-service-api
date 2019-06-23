@@ -3,6 +3,11 @@ set -e
 CD=`dirname $BASH_SOURCE`
 source $CD/helpers.sh
 
+if [ "$DEPLOYMENT_MODE" == "dev" ] && [ -z "$CI_PULL_REQUESTS" ]; then
+  echo "Skipping Deploy Step. Only deploying PRs for dev branches."
+  exit 0
+fi
+
 # Dynamically construct the zappa settings for our app
 python3 $CD/build_zappa_settings.py
 
@@ -15,10 +20,6 @@ $(aws lambda get-function --function-name $ZAPPA_FUNCTION > /dev/null)
 result=$?
 set -e
 if [ "$result" == 0 ]; then
-  if [ "$DEPLOYMENT_MODE" == "dev" ] && [ -z "$CIRCLE_PR_NUMBER" ]; then
-    echo "Skipping Deploy Step. Only deploying PRs for dev branches."
-    exit 0
-  fi
   # Update zappa lambda if it exists
   pipenv run zappa update $ZAPPA_STAGE
 else
