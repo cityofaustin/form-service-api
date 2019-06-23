@@ -11,6 +11,9 @@ jobs:
           name: "Print App Environment Variables"
           command: bash ./.circleci/scripts/print_vars.sh
       - run:
+          name: "Install Dependencies"
+          command: pipenv install
+      - run:
           name: "Deploy coa-forms-api Lambda with Zappa"
           command: bash ./.circleci/scripts/deploy.sh
 
