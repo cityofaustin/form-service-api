@@ -9,6 +9,7 @@ zappa_settings = {
         "project_name": "coa-forms-api",
         "runtime": "python3.7",
         "s3_bucket": "PLACEHOLDER_S3_BUCKET",
+        "log_level": "ERROR",
         "environment_variables": {
         },
         "extra_permissions": [{
