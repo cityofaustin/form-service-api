@@ -18,7 +18,6 @@ def index():
 
 @bp.route('/submit', methods=('POST',))
 def submit():
-    print("~~~ hey we are here")
     data = request.json
     language_code = data["language"]
     form_type = data["type"]
@@ -57,10 +56,8 @@ def submit():
     except:
         user_email = None
 
-    print("~~~ about to try sending_email!")
     # Send emails
     try:
-        print(f"Ist user_confirmation_only?? {user_confirmation_only}")
 
         # If this is not a user confirmation only, then submit to OPO and/or APD
         if(user_confirmation_only == False):
@@ -73,14 +70,11 @@ def submit():
             else:
                 raise Exception(f"form type '{form_type}' is not valid. Should be either 'complaint' or 'thanks'.")
 
-            print("~~~ about to run smoke_test!")
             if (is_smoke_test(data)):
-                print("Smoke Test")
+                print("Smoke Test Data")
                 pprint.pprint(data)
                 email_recipient=os.getenv("EMAIL_SMOKE_TEST")
-
-            print(f"~~~~ yon email recipient: {email_recipient}")
-            print(f"~~~~ yon email source: {email_source}")
+                
             send_email(form_type, "en", email_recipient, email_source, case_number, data, media_files)
 
         # Send the user an email, if an email was provided
