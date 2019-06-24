@@ -4,37 +4,36 @@ This is the backend for [coa-forms](https://github.com/cityofaustin/coa-forms), 
 To run the server, you will need to make some environment preparations as well as installing some dependencies.
 
 ## 1. Set up Environment Variables:
-Here is a list of our required Environment variables. They are sourced at src/env.py. For local development, set up environment variables within your ~/.bash_profile or wherever you prefer to manage your variables.
+Here is a list of our required Environment variables.
 
-For environment variables to be accessed on a deployed zappa instance through `os.getenv()`, you must add any new environment variables to `zappa_settings.environment_variables` in .circleci/scripts/build_zappa_settings.py
+`local_env.example` provides a reference of what environment variables you'll need for local development. If you want, you can `cp local_env.example local_env.sh` and fill in your preferred environment variable settings there. Or you can source them from your ~/.bash_profile.
+
+For new environment variables to be accessed on a deployed Zappa instance through `os.getenv()`, you must add them to the `vars_to_add` list in `.circleci/scripts/build_zappa_settings.py` as well as `.circleci/scripts/env.sh`.
 
 Common:
+  - DEPLOYMENT_MODE
+    - tells code which environment the code is being displayed in
   - DYNAMO_DB_TABLE
-    - local var: `COA_FORMS_DYNAMO_DB_TABLE`
     - currently only used to cache case_numbers, we don't store any form submission data.
   - S3_UPLOADS_BUCKET
-    - local var: `COA_FORMS_S3_UPLOADS_BUCKET`
     - name of the bucket where attachments/media files from coa-forms will be stored. Also used as a temp directory to store zappa build artifacts.
   - EMAIL_SMOKE_TEST
-    - local var: `COA_FORMS_EMAIL_SMOKE_TEST`
     - dev email address to send to if you're debugging (overwrites EMAIL_OPO/EMAIL_APD)
-  - S3_KEY
-    - local var: `AWS_ACCESS_KEY_ID`
-    - AWS credentials, probably stored in ~/.aws/credentials rather than explicit env var
-  - S3_SECRET
-    - local var: `AWS_SECRET_ACCESS_KEY`
-    - AWS credentials, probably stored in ~/.aws/credentials rather than explicit env var
 
 OPO Specific:
   - EMAIL_OPO
-    - local var: `COA_FORMS_EMAIL_OPO`
     - email address sent to Office of Police Oversight for opo "complaint" form
   - EMAIL_APD
-    - local var: `COA_FORMS_EMAIL_APD`
     - email address sent to Austin Police Department for opo "thanks"
   - EMAIL_OPO_REPLYTO
-    - local var: `COA_FORMS_EMAIL_REPLYTO`
     - replyto email address for both opo forms
+
+Local Only:
+  - S3_KEY
+    - AWS credentials, could be stored in ~/.aws/credentials rather than explicit env var
+  - S3_SECRET
+    - AWS credentials, could be stored in ~/.aws/credentials rather than explicit env var
+
 
 ## 2. First, set up the virtual env:
 
@@ -57,6 +56,11 @@ python main.py
 or if you have nodemon installed:
 ```
 nodemon --exec python3 main.py
+```
+
+Or optionally, for convenience of environment variable sourcing:
+```
+sh run-local.sh
 ```
 
 # Adding New Forms

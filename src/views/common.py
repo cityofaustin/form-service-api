@@ -1,15 +1,14 @@
+import os, json, boto3
 from flask import Blueprint, request, redirect
-import json, boto3
 
 from services.helpers import generate_clean_filename, generate_random_hash, is_valid_uniqueid
-import env
 
-if (env.DEPLOYMENT_MODE == "LOCAL"):
+if (os.getenv("DEPLOYMENT_MODE") == "local"):
     # Initialize S3 Client
-    s3 = boto3.client("s3",region_name=env.DEFALUT_REGION, aws_access_key_id=env.S3_KEY, aws_secret_access_key=env.S3_SECRET)
+    s3 = boto3.client("s3",region_name=os.getenv("DEFALUT_REGION"), aws_access_key_id=os.getenv("S3_KEY"), aws_secret_access_key=os.getenv("S3_SECRET"))
 else:
     # We should already have access to these resources
-    s3 = boto3.client("s3", region_name=env.DEFALUT_REGION)
+    s3 = boto3.client("s3", region_name=os.getenv("DEFALUT_REGION"))
 
 bp = Blueprint('common', __name__)
 
@@ -33,7 +32,7 @@ def uploads_request_signature():
     new_key = "uploads/" + uniqueid + "/" + new_filename
 
     post = s3.generate_presigned_post(
-        Bucket=env.S3_UPLOADS_BUCKET,
+        Bucket=os.getenv("S3_UPLOADS_BUCKET"),
         Key=new_key
     )
 
@@ -55,7 +54,7 @@ def file_download_uri(path):
         ExpiresIn=60, # seconds
         ClientMethod='get_object',
         Params={
-            'Bucket': env.S3_UPLOADS_BUCKET,
+            'Bucket': os.getenv("S3_UPLOADS_BUCKET"),
             'Key': path
         }
     )

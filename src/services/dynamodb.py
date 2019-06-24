@@ -1,23 +1,22 @@
-import json, boto3, botocore, datetime
+import os, json, boto3, botocore, datetime
 from flask import jsonify
 from botocore.exceptions import ClientError
 
 from services.helpers import getCurrentDateTime, generate_random_hash
-import env
 
-if(env.DEPLOYMENT_MODE == "LOCAL"):
+if(os.getenv("DEPLOYMENT_MODE") == "local"):
     # Initialize S3 Client
-    dynamodb_client = boto3.client('dynamodb', region_name=env.DEFALUT_REGION, aws_access_key_id=env.S3_KEY, aws_secret_access_key=env.S3_SECRET)
+    dynamodb_client = boto3.client('dynamodb', region_name=os.getenv("DEFALUT_REGION"), aws_access_key_id=os.getenv("S3_KEY"), aws_secret_access_key=os.getenv("S3_SECRET"))
 else:
     # We should already have access to these resources
-    dynamodb_client = boto3.client('dynamodb', region_name=env.DEFALUT_REGION)
+    dynamodb_client = boto3.client('dynamodb', region_name=os.getenv("DEFALUT_REGION"))
 
 # Get an existing item from dynamodb
 def get_dynamodb_item(id):
     print("get_dynamodb_item() Id: " + id)
 
     dynamodb_response = dynamodb_client.get_item(
-        TableName=env.DYNAMO_DB_TABLE,
+        TableName=os.getenv("DYNAMO_DB_TABLE"),
         Key={
             'id': { 'S': str(id) }
         }
@@ -43,7 +42,7 @@ def create_dynamodb_item(form_type, data={}):
     # Save case_number as "id" to ensure that user confirmation/case numbers are unique
     try:
         dynamodb_client.put_item(
-            TableName=env.DYNAMO_DB_TABLE,
+            TableName=os.getenv("DYNAMO_DB_TABLE"),
             ConditionExpression='attribute_not_exists(id)',
             Item={
                 'id': {'S': str(case_number)},

@@ -1,7 +1,6 @@
+import os, json, pprint, re
 from flask import Blueprint, request
-import json, pprint, re
 
-import env
 from services.res_handlers import handle_email_success, handle_email_failure
 from services.email import send_email
 from services.dynamodb import get_dynamodb_item, create_dynamodb_item
@@ -20,21 +19,10 @@ def index():
 @bp.route('/submit', methods=('POST',))
 def submit():
     print("~~~ hey we are here")
-    import inspect
-    for m in inspect.getmembers(env):
-        name = m[0]
-        val = m[1]
-        if (
-            (isinstance(val, str) or val is None)
-            and (not re.match("^__", name))
-            and (name not in ["S3_KEY", "S3_SECRET"])
-        ):
-            print(f"{m[0]}: [{m[1]}]")
-
     data = request.json
     language_code = data["language"]
     form_type = data["type"]
-    email_source = env.EMAIL_OPO_REPLYTO
+    email_source = os.getenv("EMAIL_OPO_REPLYTO")
 
     try:
         user_confirmation_only = data["userConfirmationOnly"]
@@ -78,10 +66,10 @@ def submit():
         if(user_confirmation_only == False):
             # If this is a complaint, send to OPO
             if (form_type=="complaint"):
-                email_recipient=env.EMAIL_OPO
+                email_recipient=os.getenv("EMAIL_OPO")
             # If this is a thank you note, send to APD
             elif(form_type=="thanks"):
-                email_recipient=env.EMAIL_APD
+                email_recipient=os.getenv("EMAIL_APD")
             else:
                 raise Exception(f"form type '{form_type}' is not valid. Should be either 'complaint' or 'thanks'.")
 
@@ -89,7 +77,7 @@ def submit():
             if (is_smoke_test(data)):
                 print("Smoke Test")
                 pprint.pprint(data)
-                email_recipient=env.EMAIL_SMOKE_TEST
+                email_recipient=os.getenv("EMAIL_SMOKE_TEST")
 
             print(f"~~~~ yon email recipient: {email_recipient}")
             print(f"~~~~ yon email source: {email_source}")

@@ -1,0 +1,18 @@
+#!/usr/bin/env bash
+set -a # exports all assigned variables
+
+# Copy and Paste into local_env.sh and fill in with your own preferred values
+
+# Common
+DEPLOYMENT_MODE="local"
+DYNAMO_DB_TABLE=""
+S3_UPLOADS_BUCKET=""
+EMAIL_SMOKE_TEST=""
+# OPO
+EMAIL_OPO=""
+EMAIL_APD=""
+EMAIL_OPO_REPLYTO=""
+
+S3_KEY="$AWS_ACCESS_KEY_ID"
+S3_SECRET="$AWS_SECRET_ACCESS_KEY"
+DEFALUT_REGION=${AWS_DEFAULT_REGION:-"us-east-1"}

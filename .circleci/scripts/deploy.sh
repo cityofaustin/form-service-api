@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 set -e
 CD=`dirname $BASH_SOURCE`
-source $CD/helpers.sh
+source $CD/env.sh # Source environment variables
 
 if [ "$DEPLOYMENT_MODE" == "dev" ] && [ -z "$CI_PULL_REQUESTS" ]; then
   echo "Skipping Deploy Step. Only deploying PRs for dev branches."
@@ -10,6 +10,11 @@ fi
 
 # Dynamically construct the zappa settings for our app
 python3 $CD/build_zappa_settings.py
+
+echo "########"
+echo "zappa_settings.json:"
+echo "########"
+cat zappa_settings.json
 
 set +e
 # Check if lambda function already exists.

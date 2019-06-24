@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 set -e
 CD=`dirname $BASH_SOURCE`
-source $CD/helpers.sh
+source $CD/env.sh
 
 function print_var {
   echo "$1: [${!1}]"
@@ -23,9 +23,3 @@ print_var "EMAIL_APD_PROD"
 print_var "EMAIL_APD_STAGING"
 print_var "EMAIL_REPLYTO_PROD"
 print_var "EMAIL_REPLYTO_STAGING"
-echo ""
-echo ""
-echo "########"
-echo "Here's what your app is actually using:"
-echo "########"
-python3 $CD/print_app_vars.py

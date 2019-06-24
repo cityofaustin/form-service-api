@@ -3,14 +3,12 @@ from jinja2 import Environment, FileSystemLoader, Undefined, Template
 from flask import url_for
 from botocore.exceptions import ClientError
 
-import env
-
-if(env.DEPLOYMENT_MODE == "LOCAL"):
+if(os.getenv("DEPLOYMENT_MODE") == "local"):
     # Initialize S3 Client
-    ses_client = boto3.client('ses', region_name=env.DEFALUT_REGION, aws_access_key_id=env.S3_KEY, aws_secret_access_key=env.S3_SECRET)
+    ses_client = boto3.client('ses', region_name=os.getenv("DEFALUT_REGION"), aws_access_key_id=os.getenv("S3_KEY"), aws_secret_access_key=os.getenv("S3_SECRET"))
 else:
     # We should already have access to these resources
-    ses_client = boto3.client('ses', region_name=env.DEFALUT_REGION)
+    ses_client = boto3.client('ses', region_name=os.getenv("DEFALUT_REGION"))
 
 # Parse translations in language.yaml into python dictionary
 language_file = os.path.join(os.path.dirname(__file__), '../language.yaml')

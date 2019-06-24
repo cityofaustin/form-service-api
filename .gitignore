@@ -6,3 +6,4 @@
 __pycache__
 /local
 zappa_settings.json
+local_env.sh

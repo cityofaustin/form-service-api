@@ -6,10 +6,10 @@ jobs:
       - image: circleci/python:3.7.2-stretch
     steps:
       - checkout
-      - run: sudo pip install awscli zappa
       - run:
           name: "Print App Environment Variables"
           command: bash ./.circleci/scripts/print_vars.sh
+      - run: sudo pip install awscli zappa
       - run:
           name: "Install Dependencies"
           command: pipenv install
