@@ -221,3 +221,23 @@ thanks:
   yourFeedback:
     en: "Your feedback will go to the Office of Police Oversight and the Austin Police Department’s Internal Affairs Division, as well as to the officer’s chain of command."
     es: "Sus comentarios serán enviados a la Oficina de Fiscalización de la Policía y a la División de Asuntos Internos del Departamento de Policía de Austin, así como a la cadena de comando del oficial."
+
+day_labor:
+  employer_information:
+    en: "Employer Information"
+    es: "TODO"
+  job_information:
+    en: "Job Information"
+    es: "TODO"
+  numberWorkers:
+    en: "Number of workers needed"
+    es: ""
+  numberHours:
+    en: "Number of hours you expect they'll work"
+    es: ""
+  hourlyRate:
+    en: "Hourly pay rate"
+    es: ""
+  transporation:
+    en: "Transporation"
+    es: ""

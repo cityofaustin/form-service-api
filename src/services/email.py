@@ -56,7 +56,7 @@ def render_email_template(template_filepath, **kwargs):
     template = jinja_env.get_template(template_filepath)
     return template.render(**kwargs)
 
-def send_email(form_type, language_code, email_recipient, email_source, case_number, data, media_files):
+def send_email(form_type, language_code, email_recipient, email_source, case_number, data, media_files=[]):
     # Build a translation function for our form and language
     t = translation_factory(form_type, language_code)
 

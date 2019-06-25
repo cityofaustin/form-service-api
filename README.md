@@ -30,9 +30,9 @@ OPO Specific:
 
 Local Only:
   - S3_KEY
-    - AWS credentials, could be stored in ~/.aws/credentials rather than explicit env var
+    - AWS credentials, could also be stored in ~/.aws/credentials instead of using an explicit env var
   - S3_SECRET
-    - AWS credentials, could be stored in ~/.aws/credentials rather than explicit env var
+    - AWS credentials, could also be stored in ~/.aws/credentials instead of using an explicit env var
 
 
 ## 2. First, set up the virtual env:

@@ -3,7 +3,7 @@ from flask import Blueprint, request
 
 from services.res_handlers import handle_email_success, handle_email_failure
 from services.email import send_email
-from services.dynamodb import get_dynamodb_item, create_dynamodb_item
+from services.dynamodb import create_dynamodb_item
 
 bp = Blueprint('opo', __name__)
 
@@ -74,7 +74,7 @@ def submit():
                 print("Smoke Test Data")
                 pprint.pprint(data)
                 email_recipient=os.getenv("EMAIL_SMOKE_TEST")
-                
+
             send_email(form_type, "en", email_recipient, email_source, case_number, data, media_files)
 
         # Send the user an email, if an email was provided
