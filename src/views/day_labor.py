@@ -1,14 +1,14 @@
 import os
 from flask import Blueprint, request
 
-bp = Blueprint('day_labor', __name__)
-
 from services.res_handlers import handle_email_success, handle_email_failure
 from services.email import send_email
 from services.dynamodb import create_dynamodb_item
 
+bp = Blueprint('day_labor', __name__)
+
 @bp.route('/', methods=('GET',))
-def hello():
+def index():
     return "Hello, its day labor day!", 200
 
 @bp.route('/submit', methods=('POST',))
@@ -31,6 +31,6 @@ def submit():
             send_email(form_type, language_code, user_email, email_source, confirmation_number, data)
         # TODO, send an email to day labor office, not just the confirmation email.
     except Exception as e:
-        return handle_email_failure(e, case_number)
+        return handle_email_failure(e, confirmation_number)
     else:
         return handle_email_success(confirmation_number)

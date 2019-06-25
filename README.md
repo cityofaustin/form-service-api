@@ -19,7 +19,8 @@ Common:
     - name of the bucket where attachments/media files from coa-forms will be stored. Also used as a temp directory to store zappa build artifacts.
   - EMAIL_SMOKE_TEST
     - dev email address to send to if you're debugging (overwrites EMAIL_OPO/EMAIL_APD)
-
+  - DEFALUT_REGION
+    - AWS Region, where your resources are deployed
 OPO Specific:
   - EMAIL_OPO
     - email address sent to Office of Police Oversight for opo "complaint" form
@@ -27,13 +28,16 @@ OPO Specific:
     - email address sent to Austin Police Department for opo "thanks"
   - EMAIL_OPO_REPLYTO
     - replyto email address for both opo forms
-
+Day Labor Specific:
+  - EMAIL_DAY_LABOR
+    - TBD
+  - EMAIL_DAY_LABOR_REPLYTO
+    - TBD
 Local Only:
   - S3_KEY
-    - AWS credentials, could also be stored in ~/.aws/credentials instead of using an explicit env var
+    - AWS credentials, AWS_ACCESS_KEY_ID
   - S3_SECRET
-    - AWS credentials, could also be stored in ~/.aws/credentials instead of using an explicit env var
-
+    - AWS credentials, AWS_SECRET_ACCESS_KEY
 
 ## 2. First, set up the virtual env:
 
