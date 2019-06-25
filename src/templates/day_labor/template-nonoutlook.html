@@ -4,15 +4,9 @@
     <h3>{{t('title')}}</h3>
 
     <div class="form-confirmation">
-        <p>{{ t('thanksSharingExperience') }}</p>
-
         <p class="blue">{{ t('yourConfirmationNumberIs') }}: <span class="form-data-case-number">{{case_number}}</span></p>
     </div>
 
-    <p>{{ t('youCanEmailUs') }}</p>
-
-    <p>{{ t('foraFullExplanation') }}</p>
-
-    {% include 'complaint/form-data.html' %}
+    {% include 'day_labor/form-data.html' %}
   </div>
 </div>

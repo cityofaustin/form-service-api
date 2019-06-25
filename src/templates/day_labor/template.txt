@@ -2,14 +2,8 @@
 
 {{ t('title') }}
 
-{{ t('thanksSharingExperience') }}
-
 {{ t('yourConfirmationNumberIs') }}: {{case_number}}
 
-{{ t('youCanEmailUs') }}
-
-{{ t('foraFullExplanation') }}
-
-{% include 'complaint/form-data.txt' %}
+{% include 'day_labor/form-data.txt' %}
 
 {% include 'common/footer.txt' %}

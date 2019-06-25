@@ -1,3 +1,4 @@
+import os
 from flask import Blueprint, request
 
 bp = Blueprint('day_labor', __name__)
@@ -12,13 +13,12 @@ def hello():
 
 @bp.route('/submit', methods=('POST',))
 def submit():
-    print("You made it great job")
     data = request.json
     language_code = data["language"]
     form_type = data["type"]
+    email_source = os.getenv("EMAIL_DAY_LABOR_REPLYTO")
 
     confirmation_number = create_dynamodb_item(form_type)
-    import pprint; pprint.pprint(data)
 
     # Handle user email
     try:
