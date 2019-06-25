@@ -31,7 +31,9 @@ vars_to_add = [
     "EMAIL_OPO",
     "EMAIL_APD",
     "EMAIL_OPO_REPLYTO",
-    "EMAIL_SMOKE_TEST"
+    "EMAIL_SMOKE_TEST",
+    "EMAIL_DAY_LABOR",
+    "EMAIL_DAY_LABOR_REPLYTO"
 ]
 config["environment_variables"] = {v: os.getenv(v, "") for v in vars_to_add}
 
