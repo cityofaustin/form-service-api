@@ -1,0 +1,34 @@
+    <!-- Outlook begins here -->
+    <table class="outlook">
+        <tbody>
+            <tr>
+                <td>
+                    {% include 'common/header-outlook.html' %}
+
+                    <table class='opo-content outlook' style="width: 100%; padding: 0px; border: none; align-items: center;">
+                        <tbody>
+                            <tr>
+                                <td>
+
+                                    <h3>{{t('title')}}</h3>
+
+                                    <table style="width: 100%;" cellpadding="20">
+                                        <tbody>
+                                            <tr>
+                                                <td style="text-align: center;">
+                                                    <p class="blue" style="font-size: 18px; line-height: 24px;">{{ t('yourConfirmationNumberIs') }}: <span class="form-data-case-number">{{case_number}}</span></p>
+                                                </td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                    <br/> <br/>
+                                    {% include 'day_labor/form-data-outlook.html' %}
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+    <!-- Outlook ends here -->

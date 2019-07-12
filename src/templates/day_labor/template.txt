@@ -1,0 +1,9 @@
+{% include 'common/header.txt' %}
+
+{{ t('title') }}
+
+{{ t('yourConfirmationNumberIs') }}: {{case_number}}
+
+{% include 'day_labor/form-data.txt' %}
+
+{% include 'common/footer.txt' %}

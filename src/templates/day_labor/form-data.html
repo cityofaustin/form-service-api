@@ -1,0 +1,59 @@
+<div class='form-data'>
+
+  <div class='form-data-block'>
+    <p class="form-data-block_title">{{t('your_answers')}}</p>
+    <div>
+      <div class='form-data-section_title'>{{t('employer_information')}}</div>
+      <div class='form-data-section'>
+        <div class='form-data-section_item'>
+          <span>{{t('name')}}:</span>
+          <p>{{data['employerInformation']['name'] or ''}}</p>
+        </div>
+        <div class='form-data-section_item'>
+          <span>{{t('location')}}:</span>
+          <p>{{t('address')}}: {{data['employerInformation']['address'] or ''}}</p>
+          <p>{{t('city')}}: {{data['employerInformation']['city'] or ''}} </p>
+          <p>{{t('zipcode')}}: {{data['employerInformation']['zipCode'] or ''}} </p>
+        </div>
+        <div class='form-data-section_item'>
+          <span>{{t('phone')}}:</span>
+          <p>{{data['employerInformation']['phone'] or '' }}</p>
+        </div>
+        <div class='form-data-section_item'>
+          <span>{{t('email')}}:</span>
+          <p>{{data['employerInformation']['email'] or '' }}</p>
+        </div>
+      </div>
+    </div>
+    <div>
+      <div class='form-data-section_title'>{{t('job_information')}}</div>
+      <div class='form-data-section'>
+        <div class='form-data-section_item'>
+          <span>{{t('date_and_time')}}:</span>
+          <p>{{data['jobInformation']['date'] or 'N/A'}} {{data['jobInformation']['time'] or ''}}</p>
+        </div>
+        <div class='form-data-section_item'>
+          <span>{{t('numberWorkers')}}:</span>
+          <p>{{data['jobInformation']['numberWorkers'] or 'N/A'}}</p>
+        </div>
+        <div class='form-data-section_item'>
+          <span>{{t('numberHours')}}:</span>
+          <p>{{data['jobInformation']['numberHours'] or 'N/A'}}</p>
+        </div>
+        <div class='form-data-section_item'>
+          <span>{{t('hourlyRate')}}:</span>
+          <p>{{data['jobInformation']['hourlyRate'] or 'N/A'}}</p>
+        </div>
+        <div class='form-data-section_item'>
+          <span>{{t('transportation')}}:</span>
+          <p>{{data['jobInformation']['transportation'] or 'N/A'}}</p>
+        </div>
+        <div class='form-data-section_item'>
+          <span>{{t('description')}}:</span>
+          <p class="nocapitalize">{{data['jobInformation']['description'] or 'N/A' }}</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>

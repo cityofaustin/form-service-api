@@ -1,0 +1,270 @@
+---
+common:
+  referrer:
+    en: "Referrer"
+    es: "Referente"
+  gender:
+    en: "Gender"
+    es: "Sexo"
+  race:
+    en: "Race"
+    es: "Raza"
+  zipcode:
+    en: "Zip code"
+    es: "Código postal"
+  true:
+    en: "Yes / True"
+    es: "Sí / Positivo"
+  false:
+    en: "No / False"
+    es: "No / Negativo"
+  description:
+    en: "Description"
+    es: "Descripción"
+  date_and_time:
+    en: "Date & time"
+    es: "Fecha y hora"
+  location:
+    en: "Location"
+    es: "Ubicación"
+  address:
+    en: "Address"
+    es: "Dirección"
+  position:
+    en: "Position"
+    es: "Posición"
+  officers:
+    en: "Officer(s)"
+    es: "Oficial(es)"
+  officer:
+    en: "Officer"
+    es: "Oficial"
+  witnesses:
+    en: "Tell us about any witnesses"
+    es: "¿Qué nos puede decir sobre posibles testigos?"
+  witness:
+    en: "Witness"
+    es: "Testigo"
+  attachments:
+    en: "Attachments"
+    es: "Archivos adjuntos"
+  media:
+    en: "Media"
+    es: "Archivos"
+  latitude:
+    en: "Latitude"
+    es: "Latitud"
+  longitude:
+    en: "Longitude"
+    es: "Longitud"
+  name:
+    en: "Name"
+    es: "Nombre"
+  badge_number:
+    en: "Badge number"
+    es: "Número de credencial"
+  uniformed:
+    en: "Uniformed"
+    es: "Uniformado"
+  transportation:
+    en: "Transportation"
+    es: "Transporte"
+  phone:
+    en: "Phone"
+    es: "Teléfono"
+  email:
+    en: "Email"
+    es: "Email"
+  needTranslator:
+    en: "Needs interpreter"
+    es: "Necesita intérprete"
+  requiredfield:
+    en: "Required"
+    es: "Obligatoria"
+  your_answers:
+    en: "Your answers"
+    es: "Sus respuestas"
+  demographics:
+    en: "Demographic information"
+    es: "Información demográfica"
+  willingcontact:
+    en: "Willing to be contacted"
+    es: "Desea ser contactado"
+  has_officer_details:
+    en: "Has officer details"
+    es: "Tiene detalles del oficial"
+  has_witness_information:
+    en: "Has witness information"
+    es: "Tiene información de testigos"
+  aware_of_media:
+    en: "Aware of media"
+    es: "Tiene archivos"
+  additional_information:
+    en: "Additional information"
+    es: "Información adicional"
+  tell_us_what_happened:
+    en: "Tell us what happened"
+    es: "Díganos que sucedió"
+  review_your_media:
+    en: "Share your media"
+    es: "Comparta archivos"
+  tell_us_about_the_officers:
+    en: "Tell us about the officer(s)"
+    es: "Díganos acerca de los oficiales"
+  tell_us_about_the_witness:
+    en: "Tell us about any witnesses"
+    es: "Díganos acerca de algun testigo"
+  has_ticket:
+    en: "Has ticket"
+    es: "Tiene ticket"
+  ticket_name:
+    en: "Name as it appears on the ticket"
+    es: "Nombre como aparece en la infracción"
+
+
+  male:
+    en: "Male"
+    es: "Hombre"
+  female:
+    en: "Female"
+    es: "Mujer"
+  nonBinary:
+    en: "Non-binary"
+    es: "No binario"
+  preferNot:
+    en: "Prefer not to say"
+    es: "Prefiero no decir"
+
+
+  patrol:
+    en: "Patrol car or motorcycle"
+    es: "Patrulla o motocicleta de policía"
+  unmarked:
+    en: "Unmarked car or motorcycle"
+    es: "Automóvil o motocicleta particular"
+
+  horse:
+    en: "Horse"
+    es: "Caballo"
+  bicycle:
+    en: "Bicycle"
+    es: "Bicicleta"
+  foot:
+    en: "On foot"
+    es: "A pie"
+  unknown:
+    en: "I don't know"
+    es: "No sé"
+
+
+  white:
+    en: "White or Euro-American"
+    es: "Blanco o euro-americano"
+  latino:
+    en: "Latino or Hispanic American"
+    es: "Latino o hispano-americano"
+  black:
+    en: "Black Afro-Caribbean or African American"
+    es: "Negro, afrocaribeño o afroamericano"
+  asian:
+    en: "East Asian or Asian American"
+    es: "Asiático oriental o asiático-americano"
+  indian:
+    en: "South Asian or Indian American"
+    es: "Asiático del sur o americano de origen indio"
+  arab:
+    en: "Middle Eastern or Arab American"
+    es: "Americano del medio oriente o árabe-americano"
+  native:
+    en: "Native American or Alaskan Native"
+    es: "Indio americano o nativo de Alaska"
+  hawaiian:
+    en: "Native Hawaiian or Other Pacific Islander"
+    es: "Hawaiano o nativo de otra isla del pacífico"
+  other:
+    en: "Other"
+    es: "Otro"
+
+complaint:
+  office:
+    en: "Office of Police Oversight"
+    es: "Oficina de Fiscalización de la Policía"
+  emailSubject:
+    en: "Your complaint was submitted successfully."
+    es: "Su queja ha sido enviada."
+  title:
+    en: "Your complaint was submitted successfully."
+    es: "Su queja ha sido enviada."
+  thanksSharingExperience:
+    en: "Thank you for sharing your experience with us. This helps us better serve you and your community."
+    es: "Muchas gracias por compartir su experiencia con nosotros, esto nos ayuda a servirles mejor a usted y a su comunidad."
+  yourConfirmationNumberIs:
+    en: "Your confirmation number is"
+    es: "Su número de confirmación es"
+  youCanEmailUs:
+    en: "You can <a class='form-data-link' href='mailto:policeoversight@austintexas.gov'>email us</a> or call us at <a class='form-data-link' href='tel:512-972-2676'>(512) 972-2676</a> any time with your confirmation number to check the status of your complaint. If you provided your contact information, a staff person from the Office of Police Oversight will contact you within 2 to 4 business days."
+    es: "Nos puede enviar un <a class='form-data-link' href='mailto:policeoversight@austintexas.gov'>correo electrónico</a> o llamar al <a class='form-data-link' href='tel:512-972-2676'>(512) 972-2676</a> en cualquier momento con su número de confirmación para averiguar el estado de su queja. Si usted nos dio su información de contacto, un empleado de la Oficina de Fiscalización de la Policía se comunicará con usted en un periodo de 2 a 4 días laborales."
+  foraFullExplanation:
+    en: "For a full explanation of what happens next, as well as a ranking of policy violations, visit the <a href='https://alpha.austin.gov/police-oversight/complaint-investigation-process'>Complaint investigation process</a> page. Again, thank you for sharing your experience with us."
+    es: "Para una explicación completa de lo que va a suceder ahora, así como una clasificación de las infracciones a las políticas, visite la página del <a href='https://alpha.austin.gov/es/police-oversight/complaint-investigation-process'>Proceso de investigación de quejas</a>. Nuevamente, muchas gracias por compartir su experiencia con nosotros."
+
+thanks:
+  office:
+    en: "Office of Police Oversight"
+    es: "Oficina de Fiscalización de la Policía"
+  title:
+    en: "Your thank you was submitted successfully!"
+    es: "¡Su nota de agradecimiento fue enviada!"
+  emailSubject:
+    en: "Your thank you was submitted successfully!"
+    es: "¡Su nota de agradecimiento fue enviada!"
+  thanksSharingThanksExperience:
+    en: "Thank you for sharing your experience with us. This helps us better serve you and your community."
+    es: "Muchas gracias por compartir su experiencia con nosotros, esto nos ayuda a servirles mejor a usted y a su comunidad."
+  yourFeedback:
+    en: "Your feedback will go to the Office of Police Oversight and the Austin Police Department’s Internal Affairs Division, as well as to the officer’s chain of command."
+    es: "Sus comentarios serán enviados a la Oficina de Fiscalización de la Policía y a la División de Asuntos Internos del Departamento de Policía de Austin, así como a la cadena de comando del oficial."
+
+day_labor:
+  office:
+    en: "Office of TBD"
+    es: ""
+  emailSubject:
+    en: "Your day labor request was submitted successfully"
+    es: ""
+  employer_information:
+    en: "Employer Information"
+    es: ""
+  name:
+    en: "Your name"
+    es: ""
+  location:
+    en: "Work site address"
+    es: ""
+  city:
+    en: "City"
+    es: ""
+  job_information:
+    en: "Job Information"
+    es: ""
+  numberWorkers:
+    en: "Number of workers needed"
+    es: ""
+  numberHours:
+    en: "Number of hours you expect they'll work"
+    es: ""
+  hourlyRate:
+    en: "Hourly pay rate"
+    es: ""
+  transportation:
+    en: "Transportation"
+    es: ""
+  date_and_time:
+    en: "Date and time for this job"
+    es: ""
+  title:
+    en: "Your day labor request was submitted successfully"
+    es: ""
+  yourConfirmationNumberIs:
+    en: "Your confirmation number is"
+    es: "Su número de confirmación es"

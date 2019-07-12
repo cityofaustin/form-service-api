@@ -1,0 +1,73 @@
+                    <!-- Outlook data begins here -->
+                    <table class='opo-content-data outlook' style="width: 100%; background-color: #F0F0F0; padding: 5px;" cellpadding="20px">
+                        <thead>
+                            <tr>
+                                <td style="font-size: 21px; text-align: center;">
+                                    {{t('your_answers')}}
+                                </td>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr style="background-color: white;">
+                                <td>
+                                    <div class='form-data-section_title'>
+                                        <p style="line-height: 18px; font-weight: bold;">{{t('employer_information')}}</p>
+                                    </div>
+                                    <div class='form-data-section'>
+                                      <div class='form-data-section_item'>
+                                        <span>{{t('name')}}:</span>
+                                        <p>{{data['employerInformation']['name'] or ''}}</p>
+                                      </div>
+                                      <div class='form-data-section_item'>
+                                        <span>{{t('location')}}:</span>
+                                        <p>{{t('address')}}: {{data['employerInformation']['address'] or ''}}</p>
+                                        <p>{{t('city')}}: {{data['employerInformation']['city'] or ''}} </p>
+                                        <p>{{t('zipcode')}}: {{data['employerInformation']['zipCode'] or ''}} </p>
+                                      </div>
+                                      <div class='form-data-section_item'>
+                                        <span>{{t('phone')}}:</span>
+                                        <p>{{data['employerInformation']['phone'] or '' }}</p>
+                                      </div>
+                                      <div class='form-data-section_item'>
+                                        <span>{{t('email')}}:</span>
+                                        <p>{{data['employerInformation']['email'] or '' }}</p>
+                                      </div>
+                                    </div>
+                                </td>
+                            </tr>
+                            <tr style="background-color: white;">
+                                <td>
+                                    <div class='form-data-section_title' style="line-height: 18px;">
+                                        <p style="line-height: 18px; font-weight: bold;">{{t('job_information')}}</p>
+                                    </div>
+                                    <div class='form-data-section'>
+                                      <div class='form-data-section_item'>
+                                        <span>{{t('date_and_time')}}:</span>
+                                        <p>{{data['jobInformation']['date'] or 'N/A'}} {{data['jobInformation']['time'] or ''}}</p>
+                                      </div>
+                                      <div class='form-data-section_item'>
+                                        <span>{{t('numberWorkers')}}:</span>
+                                        <p>{{data['jobInformation']['numberWorkers'] or 'N/A'}}</p>
+                                      </div>
+                                      <div class='form-data-section_item'>
+                                        <span>{{t('numberHours')}}:</span>
+                                        <p>{{data['jobInformation']['numberHours'] or 'N/A'}}</p>
+                                      </div>
+                                      <div class='form-data-section_item'>
+                                        <span>{{t('hourlyRate')}}:</span>
+                                        <p>{{data['jobInformation']['hourlyRate'] or 'N/A'}}</p>
+                                      </div>
+                                      <div class='form-data-section_item'>
+                                        <span>{{t('transportation')}}:</span>
+                                        <p>{{data['jobInformation']['transportation'] or 'N/A'}}</p>
+                                      </div>
+                                      <div class='form-data-section_item'>
+                                        <span>{{t('description')}}:</span>
+                                        <p class="nocapitalize">{{data['jobInformation']['description'] or 'N/A' }}</p>
+                                      </div>
+                                    </div>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                    <!-- Outlook data ends here -->
