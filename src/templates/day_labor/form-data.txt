@@ -1,9 +1,13 @@
 {{t('name')}}:
 {{data['employerInformation']['name'] or ''}}
 
+{{t('organization')}}:
+{{data['employerInformation']['organization'] or ''}}
+
 {{t('location')}}:
 {{t('address')}}: {{data['employerInformation']['address'] or ''}}
 {{t('city')}}: {{data['employerInformation']['city'] or ''}}
+{{t('state')}}: {{data['employerInformation']['state'] or ''}}
 {{t('zipcode')}}: {{data['employerInformation']['zipCode'] or ''}}
 
 {{t('phone')}}:
@@ -11,6 +15,9 @@
 
 {{t('email')}}:
 {{data['employerInformation']['email'] or '' }}
+
+{{t('description')}}:
+{{data['jobInformation']['description'] or 'N/A' }}
 
 {{t('date_and_time')}}:
 {{data['jobInformation']['date'] or 'N/A'}} {{data['jobInformation']['time'] or ''}}
@@ -26,6 +33,3 @@
 
 {{t('transportation')}}:
 {{data['jobInformation']['transportation'] or 'N/A'}}
-
-{{t('description')}}:
-{{data['jobInformation']['description'] or 'N/A' }}
