@@ -3,3 +3,7 @@
 .DS_Store
 .vscode/
 .idea/
+__pycache__
+/local
+zappa_settings.json
+local_env.sh

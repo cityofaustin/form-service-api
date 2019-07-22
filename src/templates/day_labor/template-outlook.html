@@ -1,0 +1,32 @@
+    <!-- Outlook begins here -->
+    <table class="outlook">
+        <tbody>
+            <tr>
+                <td>
+                    {% include 'common/header-outlook.html' %}
+
+                    <table class='opo-content outlook' style="width: 100%; padding: 0px; border: none; align-items: center;">
+                        <tbody>
+                            <tr>
+                                <td>
+                                    <h3>{{t('title')}}</h3>
+
+                                    <table style="width: 100%;">
+                                         <tr>
+                                            <td>
+                                                <p>{{ t('thank_you_for_submitting') }}</p>
+                                            </td>
+                                        </tr>
+                                    </table>
+
+                                    <br/> <br/>
+                                    {% include 'day_labor/form-data-outlook.html' %}
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+    <!-- Outlook ends here -->

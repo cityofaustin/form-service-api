@@ -1,0 +1,11 @@
+{% include 'common/header.txt' %}
+
+{{t('title')}}
+
+{{ t('thanksSharingThanksExperience') }}
+
+{{ t('yourFeedback') }}
+
+{% include 'thanks/form-data.txt' %}
+
+{% include 'common/footer.txt' %}
