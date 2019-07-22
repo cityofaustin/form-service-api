@@ -2,11 +2,7 @@
   {% include 'common/header.html' %}
   <div class='form-content'>
     <h3>{{t('title')}}</h3>
-
-    <div class="form-confirmation">
-        <p class="blue">{{ t('yourConfirmationNumberIs') }}: <span class="form-data-case-number">{{case_number}}</span></p>
-    </div>
-
+    <p>{{ t('thank_you_for_submitting') }}</p>
     {% include 'day_labor/form-data.html' %}
   </div>
 </div>
