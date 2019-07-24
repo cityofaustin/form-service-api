@@ -8,7 +8,6 @@ zappa_settings = {
         "profile_name": None,
         "project_name": "coa-forms-api",
         "runtime": "python3.7",
-        "s3_bucket": "PLACEHOLDER_S3_BUCKET",
         "log_level": "ERROR",
         "environment_variables": {
         },
@@ -23,6 +22,7 @@ zappa_settings = {
 config = zappa_settings[os.getenv("ZAPPA_STAGE")] = zappa_settings.pop("PLACEHOLDER_STAGE_NAME")
 
 config["s3_bucket"] = os.getenv("S3_UPLOADS_BUCKET")
+config["role_name"] = f"coa-forms-api-{os.getenv('ZAPPA_STAGE')}".replace('_','-')[:64] # AWS IAM roles must be under 64 characters
 
 vars_to_add = [
     "DEPLOYMENT_MODE",
