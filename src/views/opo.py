@@ -8,7 +8,7 @@ from services.dynamodb import create_dynamodb_item
 bp = Blueprint('opo', __name__)
 
 # If description starts with "DEBUG" or "debug", then the submission is a smoke test.
-# OPO/APD emails will be sent to dev email address
+# OPO/APD emails will be sent to smoke test email address
 def is_smoke_test(data):
     return re.match("^DEBUG", data['description'], re.IGNORECASE)
 

@@ -238,20 +238,26 @@ day_labor:
   name:
     en: "Your name"
     es: ""
+  organization:
+    en: "Organization"
+    es: ""
   location:
     en: "Work site address"
     es: ""
   city:
     en: "City"
     es: ""
+  state:
+    en: "State"
+    es: ""
   job_information:
     en: "Job Information"
     es: ""
   numberWorkers:
-    en: "Number of workers needed"
+    en: "How many workers do you need?"
     es: ""
   numberHours:
-    en: "Number of hours you expect they'll work"
+    en: "How many hours do you expect each person to work, per day?"
     es: ""
   hourlyRate:
     en: "Hourly pay rate"
@@ -260,11 +266,14 @@ day_labor:
     en: "Transportation"
     es: ""
   date_and_time:
-    en: "Date and time for this job"
+    en: "Date and start time"
     es: ""
   title:
-    en: "Your day labor request was submitted successfully"
+    en: "Your request to hire a day laborer was successfully submitted"
     es: ""
   yourConfirmationNumberIs:
     en: "Your confirmation number is"
     es: "Su número de confirmación es"
+  thank_you_for_submitting:
+    en: "Thank you for submitting your request to hire a day laborer! We’ll contact you soon to confirm. You can also contact our office at (512) 972-4100."
+    es: ""

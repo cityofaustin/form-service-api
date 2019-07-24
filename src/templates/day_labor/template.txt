@@ -2,7 +2,7 @@
 
 {{ t('title') }}
 
-{{ t('yourConfirmationNumberIs') }}: {{case_number}}
+{{ t('thank_you_for_submitting') }}
 
 {% include 'day_labor/form-data.txt' %}
 
