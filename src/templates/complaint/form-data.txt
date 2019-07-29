@@ -39,7 +39,7 @@
 {{t('name')}}: {{witness['name'] or 'N/A' }}
 {{t('email')}}: {{witness['email'] or 'N/A' }}
 {{t('phone')}}: {{witness['phoneNumber'] or 'N/A' }}
-{{t('additional_information')}}: {{witness['anythingElse'] or 'N/A' }}
+{{t('follow_up')}}: {{witness['anythingElse'] or 'N/A' }}
 
 {% endfor %}
 

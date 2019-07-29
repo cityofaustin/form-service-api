@@ -80,7 +80,7 @@
             <li>{{t('name')}}: {{witness['name'] or 'N/A' }}</li>
             <li  class="nocapitalize">{{t('email')}}: <a href='mailto:{{witness['email'] or ';'}}'>{{witness['email'] or 'N/A' }}</a></li>
             <li>{{t('phone')}}: {{witness['phoneNumber'] or 'N/A' }}</li>
-            <li  class="nocapitalize">{{t('additional_information')}}: {{witness['anythingElse'] or 'N/A' }}</li>
+            <li  class="nocapitalize">{{t('follow_up')}}: {{witness['anythingElse'] or 'N/A' }}</li>
           </ul>
         </div>
         {% endfor %}
@@ -91,16 +91,16 @@
       <div class='form-data-section_title'>{{t('demographics')}}</div>
       <div class='form-data-section'>
         <div class='form-data-section_item'>
-          <span>{{t('additional_information')}}:</span>
+          <p>{{t('gender')}}: {{t(data['gender']) or 'N/A' }}</p>
+          <p>{{t('race')}}: {{t(data['race']) or 'N/A' }}</p>
+          <p>{{t('zipcode')}}: {{data['zipCode'] or 'N/A' }}</p>
+          <p>&nbsp;</p>
+          <span>{{t('follow_up')}}:</span>
           <p>{{t('name')}}: {{data['view:contactPreferences']['yourName'] or 'N/A' }}</p>
           <p>{{t('phone')}}: {{data['view:contactPreferences']['yourPhone'] or 'N/A' }}</p>
           <p class="nocapitalize">{{t('email')}}: {{data['view:contactPreferences']['yourEmail'] or 'N/A' }}</p>
           <p>{{t('willingcontact')}}: {{t(data['willingToBeContacted']) or 'N/A' }}</p>
           <p>{{t('needTranslator')}}: {{t(data['view:contactPreferences']['needTranslator']) or 'N/A' }}</p>
-          <p>&nbsp;</p>
-          <p>{{t('gender')}}: {{t(data['gender']) or 'N/A' }}</p>
-          <p>{{t('race')}}: {{t(data['race']) or 'N/A' }}</p>
-          <p>{{t('zipcode')}}: {{data['zipCode'] or 'N/A' }}</p>
         </div>
       </div>
     </div>

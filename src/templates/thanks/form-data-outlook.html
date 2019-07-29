@@ -74,7 +74,7 @@
                                             <li>{{t('name')}}: {{witness['name'] or 'N/A' }}</li>
                                             <li  class="nocapitalize">{{t('email')}}: <a href='mailto:{{witness['email'] or ';'}}'>{{witness['email'] or 'N/A' }}</a></li>
                                             <li>{{t('phone')}}: {{witness['phoneNumber'] or 'N/A' }}</li>
-                                            <li  class="nocapitalize">{{t('additional_information')}}: {{witness['anythingElse'] or 'N/A' }}</li>
+                                            <li  class="nocapitalize">{{t('follow_up')}}: {{witness['anythingElse'] or 'N/A' }}</li>
                                           </ul>
                                         </div>
                                         {% endfor %}
@@ -88,7 +88,7 @@
                                     </div>
                                       <div class='form-data-section'>
                                         <div class='form-data-section_item'>
-                                          <span>{{t('additional_information')}}:</span>
+                                          <span>{{t('follow_up')}}:</span>
                                           <p>{{t('name')}}: {{data['view:contactPreferences']['yourName'] or 'N/A' }}</p>
                                           <p>{{t('phone')}}: {{data['view:contactPreferences']['yourPhone'] or 'N/A' }}</p>
                                           <p class="nocapitalize">{{t('email')}}: {{data['view:contactPreferences']['yourEmail'] or 'N/A' }}</p>

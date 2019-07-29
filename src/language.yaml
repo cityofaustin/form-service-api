@@ -99,9 +99,9 @@ common:
   aware_of_media:
     en: "Aware of media"
     es: "Tiene archivos"
-  additional_information:
-    en: "Additional information"
-    es: "Información adicional"
+  follow_up:
+    en: "Follow up"
+    es: "Comunicación de seguimiento"
   tell_us_what_happened:
     en: "Tell us what happened"
     es: "Díganos que sucedió"
