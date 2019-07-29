@@ -87,9 +87,6 @@ common:
   demographics:
     en: "Demographic information"
     es: "Información demográfica"
-  willingcontact:
-    en: "Willing to be contacted"
-    es: "Desea ser contactado"
   has_officer_details:
     en: "Has officer details"
     es: "Tiene detalles del oficial"
@@ -102,6 +99,9 @@ common:
   additional_information:
     en: "Additional information"
     es: "Información adicional"
+  follow_up:
+    en: "Follow up"
+    es: "Comunicación de seguimiento"
   tell_us_what_happened:
     en: "Tell us what happened"
     es: "Díganos que sucedió"
