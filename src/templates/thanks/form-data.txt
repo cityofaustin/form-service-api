@@ -33,7 +33,6 @@
 {{t('name')}}: {{data['view:contactPreferences']['yourName'] or 'N/A' }}
 {{t('phone')}}: {{data['view:contactPreferences']['yourPhone'] or 'N/A' }}
 {{t('email')}}: {{data['view:contactPreferences']['yourEmail'] or 'N/A' }}
-{{t('willingcontact')}}: {{t(data['willingToBeContacted']) or 'N/A' }}
 {{t('needTranslator')}}: {{t(data['view:contactPreferences']['needTranslator']) or 'N/A' }}
 
 {{t('gender')}}: {{t(data['gender']) or 'N/A' }}

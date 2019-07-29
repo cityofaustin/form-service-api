@@ -87,9 +87,6 @@ common:
   demographics:
     en: "Demographic information"
     es: "Información demográfica"
-  willingcontact:
-    en: "Willing to be contacted"
-    es: "Desea ser contactado"
   has_officer_details:
     en: "Has officer details"
     es: "Tiene detalles del oficial"
