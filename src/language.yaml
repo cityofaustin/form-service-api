@@ -198,9 +198,6 @@ complaint:
   thanksSharingExperience:
     en: "Thank you for sharing your experience with us. This helps us better serve you and your community."
     es: "Muchas gracias por compartir su experiencia con nosotros, esto nos ayuda a servirles mejor a usted y a su comunidad."
-  yourConfirmationNumberIs:
-    en: "Your confirmation number is"
-    es: "Su número de confirmación es"
   youCanEmailUs:
     en: "You can <a class='form-data-link' href='mailto:policeoversight@austintexas.gov'>email us</a> or call us at <a class='form-data-link' href='tel:512-972-2676'>(512) 972-2676</a> to check the status of your complaint. If you provided your contact information, a staff person from the Office of Police Oversight will contact you within 2 to 4 business days."
     es: "Nos puede enviar un <a class='form-data-link' href='mailto:policeoversight@austintexas.gov'>correo electrónico</a> o llamar al <a class='form-data-link' href='tel:512-972-2676'>(512) 972-2676</a> en cualquier momento con su número de confirmación para averiguar el estado de su queja. Si usted nos dio su información de contacto, un empleado de la Oficina de Fiscalización de la Policía se comunicará con usted en un periodo de 2 a 4 días laborales."
@@ -271,9 +268,6 @@ day_labor:
   title:
     en: "Your request to hire a day laborer was successfully submitted"
     es: ""
-  yourConfirmationNumberIs:
-    en: "Your confirmation number is"
-    es: "Su número de confirmación es"
   thank_you_for_submitting:
     en: "Thank you for submitting your request to hire a day laborer! We’ll contact you within 24 hours to confirm. You can also contact our office at (512) 972-4100."
     es: ""

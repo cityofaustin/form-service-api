@@ -4,8 +4,6 @@
 
 {{ t('thanksSharingExperience') }}
 
-{{ t('yourConfirmationNumberIs') }}: {{case_number}}
-
 {{ t('youCanEmailUs') }}
 
 {{ t('foraFullExplanation') }}
