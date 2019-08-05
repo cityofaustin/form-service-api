@@ -58,24 +58,26 @@ def submit():
 
     # Send emails
     try:
-
         # If this is not a user confirmation only, then submit to OPO and/or APD
         if(user_confirmation_only == False):
-            # If this is a complaint, send to OPO
-            if (form_type=="complaint"):
-                email_recipient=os.getenv("EMAIL_OPO")
-            # If this is a thank you note, send to APD
-            elif(form_type=="thanks"):
-                email_recipient=os.getenv("EMAIL_APD")
-            else:
-                raise Exception(f"form type '{form_type}' is not valid. Should be either 'complaint' or 'thanks'.")
-
+            # If its a test email, send to the smoke-test S3 Bucket
             if (is_smoke_test(data)):
                 print("Smoke Test Data")
                 pprint.pprint(data)
                 email_recipient=os.getenv("EMAIL_SMOKE_TEST")
-
-            send_email(form_type, "en", email_recipient, email_source, case_number, data, media_files)
+                send_email(form_type, "en", email_recipient, email_source, case_number, data, media_files)
+            # If this is a complaint, send to OPO
+            elif (form_type=="complaint"):
+                email_recipient=os.getenv("EMAIL_OPO")
+                send_email(form_type, "en", email_recipient, email_source, case_number, data, media_files)
+            # If this is a thank you note, send to OPO and APD
+            elif(form_type=="thanks"):
+                email_recipient=os.getenv("EMAIL_APD")
+                send_email(form_type, "en", email_recipient, email_source, case_number, data, media_files)
+                email_recipient=os.getenv("EMAIL_OPO")
+                send_email(form_type, "en", email_recipient, email_source, case_number, data, media_files)
+            else:
+                raise Exception(f"form type '{form_type}' is not valid. Should be either 'complaint' or 'thanks'.")
 
         # Send the user an email, if an email was provided
         if (user_email):
