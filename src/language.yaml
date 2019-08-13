@@ -259,7 +259,7 @@ day_labor:
   hourlyRate:
     en: "Hourly pay rate"
     es: ""
-  hourlyRate:
+  recommendRate:
     en: "I'd like a suggestion from the Day Labor Center's staff"
     es: ""
   transportation:
