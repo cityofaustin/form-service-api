@@ -224,13 +224,13 @@ thanks:
 
 day_labor:
   office:
-    en: "Office of TBD"
+    en: "First Workers Day Labor Center"
     es: ""
   emailSubject:
     en: "Your day labor request was submitted successfully"
     es: ""
   employer_information:
-    en: "Employer Information"
+    en: "Employer information"
     es: ""
   name:
     en: "Your name"
@@ -248,7 +248,7 @@ day_labor:
     en: "State"
     es: ""
   job_information:
-    en: "Job Information"
+    en: "Job information"
     es: ""
   numberWorkers:
     en: "How many workers do you need?"
@@ -258,6 +258,9 @@ day_labor:
     es: ""
   hourlyRate:
     en: "Hourly pay rate"
+    es: ""
+  recommendRate:
+    en: "I'd like a suggestion from the Day Labor Center's staff"
     es: ""
   transportation:
     en: "Transportation"
