@@ -261,7 +261,7 @@ day_labor:
     es: "Tasa de pago por hora"
   recommendRate:
     en: "I'd like a suggestion from the Day Labor Center's staff"
-    es: "Me gustaría que el personal del Centro para Jornaleros me sugiriera una tasa."
+    es: "Me gustaría que el personal del Centro para Jornaleros me sugiriera una tasa"
   transportation:
     en: "Transportation"
     es: "Transporte"
