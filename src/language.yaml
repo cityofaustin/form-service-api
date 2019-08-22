@@ -225,52 +225,52 @@ thanks:
 day_labor:
   office:
     en: "First Workers Day Labor Center"
-    es: ""
+    es: "First Workers Day Labor Center"
   emailSubject:
     en: "Your day labor request was submitted successfully"
-    es: ""
+    es: "Recibimos su solicitud para contratar un jornalero"
   employer_information:
     en: "Employer information"
-    es: ""
+    es: "Información del empleador"
   name:
     en: "Your name"
-    es: ""
+    es: "Su nombre"
   organization:
     en: "Organization"
-    es: ""
+    es: "Organización"
   location:
     en: "Work site address"
-    es: ""
+    es: "Dirección del lugar de trabajo"
   city:
     en: "City"
-    es: ""
+    es: "Ciudad"
   state:
     en: "State"
-    es: ""
+    es: "Estado"
   job_information:
     en: "Job information"
-    es: ""
+    es: "Información sobre el trabajo"
   numberWorkers:
     en: "How many workers do you need?"
-    es: ""
+    es: "¿Cuántos trabajadores necesita?"
   numberHours:
     en: "How many hours do you expect each person to work, per day?"
-    es: ""
+    es: "¿Cuántas horas espera que cada persona trabaje al día?"
   hourlyRate:
     en: "Hourly pay rate"
-    es: ""
+    es: "Tasa de pago por hora"
   recommendRate:
     en: "I'd like a suggestion from the Day Labor Center's staff"
-    es: ""
+    es: "Me gustaría que el personal del Centro para Jornaleros me sugiriera una tasa"
   transportation:
     en: "Transportation"
-    es: ""
+    es: "Transporte"
   date_and_time:
     en: "Date and start time"
     es: ""
   title:
     en: "Your request to hire a day laborer was successfully submitted"
-    es: ""
+    es: "Recibimos su solicitud para contratar un jornalero"
   thank_you_for_submitting:
     en: "Thank you for submitting your request to hire a day laborer! We’ll contact you within 24 hours to confirm. You can also contact our office at (512) 972-4100."
-    es: ""
+    es: "¡Muchas gracias por enviar su solicitud para contratar a un jornalero! Nos comunicaremos con usted en las próximas 24 horas para confirmar. También puede llamar a nuestra oficina al (512) 972-4100."

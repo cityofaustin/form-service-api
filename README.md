@@ -220,7 +220,6 @@ The first step is to load the yaml file, for that there is this method:
 ```
 
 
-
 The first parameter is the yaml file you wish to load, in this case we are loading a translations file for our emails located in `templates/email/officepoliceoversight/language.yaml`. The second is value is called `section` and it contains the section within the yaml file (see syntax below), if the section is not found or does not exist, its value will default to `common`. The `language` parameter is the language code that needs to be rendered (see syntax below), this parameter will contain strings such as `en` (for English), `es` for Spanish, and you can come up with any additional codes you want (ie. `ar, vi` for Arabic or Vietnamese respectively).
 
 Sample syntax:
