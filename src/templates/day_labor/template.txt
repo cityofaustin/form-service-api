@@ -6,4 +6,4 @@
 
 {% include 'day_labor/form-data.txt' %}
 
-{% include 'common/footer.txt' %}
+{% include 'day_labor/footer.txt' %}

@@ -29,7 +29,10 @@
 {{data['jobInformation']['numberHours'] or 'N/A'}}
 
 {{t('hourlyRate')}}:
-{{data['jobInformation']['hourlyRate'] or 'N/A'}}
+{{data['jobInformation']['hourlyRate']['hourlyRate'] or 'N/A'}}
+
+{{t('recommendRate')}}:
+{{data['jobInformation']['hourlyRate']['recommendRate'] or 'N/A'}}
 
 {{t('transportation')}}:
 {{data['jobInformation']['transportation'] or 'N/A'}}
