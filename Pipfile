@@ -40,7 +40,7 @@ Jinja2 = "==2.10.1"
 lambda_packages = "==0.20.0"
 MarkupSafe = "==1.1.1"
 Pillow = "==6.0.0"
-PyYAML = "==5.1"
+PyYAML = "==5.4"
 Unidecode = "==1.0.23"
 Werkzeug = "==0.15.2"
 
