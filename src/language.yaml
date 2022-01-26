@@ -204,6 +204,8 @@ complaint:
   foraFullExplanation:
     en: "For a full explanation of what happens next, as well as a ranking of policy violations, visit the <a href='https://alpha.austin.gov/police-oversight/complaint-investigation-process'>complaint investigation process</a> page. Again, thank you for sharing your experience with us."
     es: "Para una explicación completa de lo que va a suceder ahora, así como una clasificación de las infracciones a las políticas, visite la página del <a href='https://alpha.austin.gov/es/police-oversight/complaint-investigation-process'>proceso de investigación de quejas</a>. Nuevamente, muchas gracias por compartir su experiencia con nosotros."
+  updatedResponse:
+    en: "Thank you for submitting your complaint. If you provided your contact information a staff person with the Office of Police Oversight will contact you within 5 business days"
 
 thanks:
   office:
